@@ -4,13 +4,13 @@ const Layout = ({ children }) => {
     return (
         <>
             <header>
-                <NavBar />
+                {/* <NavBar /> */}
             </header>
 
-            <main className=" h-max md:min-h-screen z-0 bg-cust-white overflow-hidden">
+            <main>
                 {children}
             </main>
-            <Footer />
+            {/* <Footer /> */}
         </>
     );
 };
