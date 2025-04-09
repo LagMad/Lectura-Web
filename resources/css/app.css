@@ -2,5 +2,8 @@
 @source "../views";
 
 @theme {
-    
+    --color-cust-light-gray: #ECF0F3;
+    --color-cust-dark-gray: #4E4E4E;
+    --color-cust-blue: #0081FC;
+    --color-cust-light-orange: #FFBEA4;
 }
