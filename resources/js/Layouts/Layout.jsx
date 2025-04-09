@@ -9,10 +9,10 @@ const Layout = ({ children }) => {
                 <Navbar />
             </header>
 
-            <main className=" h-max mpred:min-h-screen z-0 bg-cust-white overflow-hidden">
+            <main className="min-h-screen z-0 bg-cust-light-gray overflow-hidden">
                 {children}
             </main>
-            {/* <Footer /> */}
+            <Footer />
         </>
     );
 };
