@@ -1,6 +1,56 @@
 @import "tailwindcss";
 @source "../views";
 
+@layer components {
+  .container {
+    @apply mx-auto px-4;
+  }
+
+  @media (min-width: 600px) {
+    .container {
+      max-width: 600px;
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .container {
+      max-width: 768px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container {
+      max-width: 1024px;
+      padding-left: 4rem;
+      padding-right: 4rem;
+    }
+  }
+
+  @media (min-width: 1240px) {
+    .container {
+      max-width: 1240px;
+      padding-left: 5rem;
+      padding-right: 5rem;
+    }
+  }
+
+  @media (min-width: 1440px) {
+    .container {
+      max-width: 1440px;
+      padding-left: 6rem;
+      padding-right: 6rem;
+    }
+  }
+}
+
 @theme {
-    
+  --color-cust-light-gray: #ECF0F3;
+  --color-cust-dark-gray: #4E4E4E;
+  --color-cust-blue: #0081FC;
+  --color-cust-light-orange: #FFBEA4;
+  --color-cust-gray:#747474;
+  --color-cust-light-blue:#3E5DF0;
+  --color-cust-primary-color:#FFFDFD
 }
