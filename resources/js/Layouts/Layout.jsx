@@ -4,7 +4,7 @@ import Footer from "../Components/Footer";
 
 const Layout = ({ children }) => {
     return (
-        <>
+        <div className="">
             <header>
                 <Navbar />
             </header>
@@ -13,7 +13,7 @@ const Layout = ({ children }) => {
                 {children}
             </main>
             <Footer />
-        </>
+        </div>
     );
 };
 
