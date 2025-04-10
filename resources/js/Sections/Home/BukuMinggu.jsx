@@ -7,7 +7,10 @@ import "swiper/css/pagination";
 
 import { Pagination } from "swiper/modules";
 
-import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";
+import {
+    MdOutlineKeyboardArrowLeft,
+    MdOutlineKeyboardArrowRight,
+} from "react-icons/md";
 
 const BukuMinggu = () => {
     const swiperRef = useRef(null);
@@ -83,7 +86,10 @@ const BukuMinggu = () => {
                     alt="boy-reading"
                 />
                 <div className="absolute flex flex-col justify-start items-center w-[calc(100vw-512px)] left-full -translate-x-[70px] top-[30px] gap-3 pr-4">
-                    <button className="w-full text-right underline text-lg font-bold cursor-pointer" onClick={() => alert("Lihat Semua")}>
+                    <button
+                        className="w-full text-right underline text-lg font-bold cursor-pointer pr-4"
+                        onClick={() => alert("Lihat Semua")}
+                    >
                         Lihat Semua
                     </button>
                     <Swiper
@@ -114,7 +120,7 @@ const BukuMinggu = () => {
                     <div className="flex justify-center items-center gap-2 mt-4">
                         {/* Left Arrow */}
                         <button
-                            className="w-8 h-8 flex items-center justify-center text-xl font-bold rounded-full border border-gray-300 hover:bg-gray-200 disabled:opacity-50"
+                            className="cursor-pointer w-8 h-8 flex items-center justify-center text-xl font-bold rounded-full border border-gray-300 hover:bg-gray-200 disabled:opacity-50"
                             onClick={() => {
                                 if (activeIndex > 0) {
                                     swiperRef.current?.slideTo(
@@ -144,7 +150,7 @@ const BukuMinggu = () => {
 
                         {/* Right Arrow */}
                         <button
-                            className="w-8 h-8 flex items-center justify-center text-xl font-bold rounded-full border border-gray-300 hover:bg-gray-200 disabled:opacity-50"
+                            className="cursor-pointer w-8 h-8 flex items-center justify-center text-xl font-bold rounded-full border border-gray-300 hover:bg-gray-200 disabled:opacity-50"
                             onClick={() => {
                                 if (activeIndex < totalPages - 1) {
                                     swiperRef.current?.slideTo(
