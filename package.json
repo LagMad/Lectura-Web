@@ -18,6 +18,8 @@
         "@iconify/react": "^5.2.1",
         "@inertiajs/react": "^2.0.6",
         "react": "^19.1.0",
-        "react-dom": "^19.1.0"
+        "react-dom": "^19.1.0",
+        "react-icons": "^5.5.0",
+        "swiper": "^11.2.6"
     }
 }
