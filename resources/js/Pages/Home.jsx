@@ -8,7 +8,7 @@ import SloganSection from '../Sections/Home/SloganSection'
 
 const Home = () => {
   return (
-    <div className='flex flex-col gap-28 py-10'>
+    <div className='flex flex-col gap-28 py-20 bg-cust-light-gray'>
       <HeroSection />
       <SloganSection />
       <BukuMinggu />
