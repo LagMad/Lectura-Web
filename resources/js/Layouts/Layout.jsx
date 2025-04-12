@@ -5,11 +5,11 @@ import Footer from "../Components/Footer";
 const Layout = ({ children }) => {
     return (
         <div className="">
-            <header className="bg-cust-light-gray ">
+            <header>
                 <Navbar />
             </header>
 
-            <main className="min-h-screen z-0 bg-cust-light-gray overflow-hidden">
+            <main className="min-h-screen z-0 overflow-hidden">
                 {children}
             </main>
             <Footer />
