@@ -1,6 +1,6 @@
 import React from "react";
 
-const BukuHomeCard = ({ image, penulis, judul }) => {
+const BukuHomeCard = ({ image, penulis, judul, showButton = true }) => {
     return (
         <div className="flex flex-col justify-between items-center h-[400px] gap-7 px-6 py-3 rounded-2xl bg-white drop-shadow-lg">
             <div className="flex flex-col justify-center items-center gap-1">
@@ -12,14 +12,16 @@ const BukuHomeCard = ({ image, penulis, judul }) => {
                     {judul}
                 </div>
             </div>
-            <div className="flex justify-end items-end self-end">
-                <button
-                    className="cursor-pointer text-white text-base font-normal bg-cust-blue px-5 py-1 rounded-full"
-                    onClick={() => alert("Baca Buku : " + judul)}
-                >
-                    Baca Sekarang
-                </button>
-            </div>
+            {showButton && (
+                <div className="flex justify-end items-end self-end">
+                    <button
+                        className="cursor-pointer text-white text-base font-normal bg-cust-blue px-5 py-1 rounded-full"
+                        onClick={() => alert("Baca Buku : " + judul)}
+                    >
+                        Baca Sekarang
+                    </button>
+                </div>
+            )}
         </div>
     );
 };
