@@ -3,7 +3,7 @@ import { Icon } from '@iconify/react';
 
 const Footer = () => {
     return (
-        <footer className='container space-y-10'>
+        <footer className='container space-y-10 py-16 lg:py-20'>
             <div className="mx-auto grid grid-cols-2 md:grid-cols-5 gap-5 lg:gap-8 text-sm lg:text-md text-gray-700">
                 <div>
                     <h4 className="text-lg font-bold mb-1 lg:mb-2">LOGO</h4>

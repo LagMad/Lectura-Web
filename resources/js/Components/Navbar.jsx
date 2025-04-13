@@ -5,9 +5,9 @@ const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
 
     const navLinks = [
-        { name: 'Home', href: '#' },
-        { name: 'Books', href: '#' },
-        { name: 'Help', href: '#' },
+        { name: 'Home', href: '/' },
+        { name: 'Books', href: 'book' },
+        { name: 'Help', href: 'help' },
     ];
 
     const categories = [
@@ -49,11 +49,11 @@ const Navbar = () => {
 
                 <div
                     className={`transition-all overflow-hidden duration-300 ease-in-out 
-            lg:flex lg:flex-row lg:items-center lg:gap-12 lg:ml-auto 
+            lg:flex lg:flex-row lg:items-center lg:gap-6 xl:gap-12 lg:ml-auto 
             ${isOpen ? 'flex' : 'hidden lg:flex'}`}
                 >
-                    <div className="flex flex-col lg:flex-row lg:items-center lg:gap-12">
-                        <ul className="flex flex-col lg:flex-row gap-3 ml-1 lg:ml-0 lg:gap-7 text-lg text-cust-gray">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:gap-7 xl:gap-12">
+                        <ul className="flex flex-col lg:flex-row gap-3 ml-1 lg:ml-0 lg:gap-7 xl:text-lg text-cust-gray">
                             {navLinks.map((link, idx) => (
                                 <li key={idx}>
                                     <a
@@ -84,7 +84,7 @@ const Navbar = () => {
                         </div>
                     </div>
 
-                    <form className="relative items-center w-sm hidden lg:flex">
+                    <form className="relative items-center w-sm lg:w-auto xl:w-sm hidden lg:flex">
                         <Icon icon="mdi:magnify" className="absolute left-4 text-gray-500 text-xl" />
                         <input
                             type="text"
