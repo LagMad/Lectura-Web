@@ -2,7 +2,7 @@ import React from 'react'
 
 const SloganSection = () => {
     return (
-        <section className='container'>
+        <section>
             <div className='container'>
                 <img 
                 src="slogan.webp" 

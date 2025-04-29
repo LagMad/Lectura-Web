@@ -4,12 +4,12 @@ import Footer from "../Components/Footer";
 
 const Layout = ({ children }) => {
     return (
-        <div className="">
+        <div className="font-po">
             <header>
                 <Navbar />
             </header>
 
-            <main className="min-h-screen pt-16 z-0 overflow-hidden">
+            <main className="min-h-screen z-0 overflow-hidden">
                 {children}
             </main>
             <Footer />
