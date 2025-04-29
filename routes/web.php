@@ -26,6 +26,10 @@ Route::get('/tentang', function () {
     return Inertia::render('Tentang');
 });
 
+Route::get('/admin-pengguna', function () {
+    return Inertia::render('Admin/Pengguna');
+});
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
