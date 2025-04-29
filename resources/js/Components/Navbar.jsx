@@ -1,101 +1,84 @@
 import React, { useState } from 'react';
+import Button from './Button';
 import { Icon } from '@iconify/react';
+import { usePage } from '@inertiajs/react';
+
+const navLinks = [
+    { name: 'Beranda', href: '/' },
+    { name: 'Buku', href: '/buku' },
+    { name: 'Bantuan', href: '/bantuan' },
+    { name: 'Tentang', href: '/tentang' },
+];
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
-
-    const navLinks = [
-        { name: 'Home', href: '/' },
-        { name: 'Books', href: 'book' },
-        { name: 'Help', href: 'help' },
-    ];
-
-    const categories = [
-        { value: 'satu', label: 'Satu' },
-        { value: 'dua', label: 'Dua' },
-    ];
+    const { url } = usePage();
 
     return (
-        <nav className="lg:border-none border-b border-gray-300">
-            <div className="container mx-auto py-6 flex flex-col lg:flex-row gap-4 lg:gap-0">
-                <div className="flex justify-between items-center">
-                    <div className="text-lg font-bold">LOGO</div>
-                    <div className="flex gap-4 font-medium lg:hidden">
-                        <button className="px-3 py-2 border rounded hover:bg-gray-100">Sign In</button>
-                        <button className="px-3 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">Sign Up</button>
-                    </div>
+        <nav className="bg-white fixed w-full z-50 shadow-sm">
+            <div className="container mx-auto py-5 flex justify-between items-center">
+                <div className="flex items-center gap-5 xl:gap-10">
+                    <h1 className="font-bold text-cust-blue text-2xl xl:text-3xl">E-Library</h1>
+                    <ul className="hidden lg:flex font-medium gap-3 xl:gap-6">
+                        {navLinks.map((link, idx) => (
+                            <li key={idx}>
+                                <a
+                                    href={link.href}
+                                    className={`transition-colors duration-200 hover:text-cust-primary-color ${url === link.href ? 'text-cust-primary-color font-semibold' : 'text-gray-700'
+                                        }`}
+                                >
+                                    {link.name}
+                                </a>
+                            </li>
+                        ))}
+                    </ul>
                 </div>
 
-                <div className="w-full flex justify-between items-center lg:hidden">
-                    <form className="relative flex items-center w-full max-w-md">
-                        <Icon icon="mdi:magnify" className="absolute left-4 text-gray-500 text-xl" />
+                <div className="items-center flex gap-4 w-1/2 justify-end">
+                    <div className="relative w-full max-w-xs lg:w-1/3 xl:w-full xl:max-w-xs">
                         <input
                             type="text"
-                            placeholder="Cari Produk, Judul Buku, atau Penulis"
-                            className="w-full border-2 border-gray-500 px-11 py-2 rounded-full"
+                            placeholder="Cari buku..."
+                            className="w-full border border-gray-400 rounded-lg py-2 px-4 pr-10 text-sm placeholder-gray-500"
                         />
-                    </form>
+                        <Icon icon="mdi:magnify" className="absolute right-3 top-2.5 text-gray-500 text-lg" />
+                    </div>
+                    <div className='hidden lg:flex gap-4'>
+                        <Button>Sign In</Button>
+                        <Button variant="filled">Sign Up</Button>
+                    </div>
                     <button
-                        className="text-2xl ml-4"
                         onClick={() => setIsOpen(!isOpen)}
-                        aria-label="Toggle Menu"
+                        className="lg:hidden text-2xl text-gray-700"
                     >
-                        <Icon
-                            icon={isOpen ? 'mdi:close' : 'mdi:menu'}
-                            className={`transform transition-transform duration-300 ${isOpen ? 'rotate-90' : 'rotate-0'}`}
-                        />
+                        <Icon icon={isOpen ? 'mdi:close' : 'mdi:menu'} />
                     </button>
                 </div>
 
-                <div
-                    className={`transition-all overflow-hidden duration-300 ease-in-out 
-            lg:flex lg:flex-row lg:items-center lg:gap-6 xl:gap-12 lg:ml-auto 
-            ${isOpen ? 'flex' : 'hidden lg:flex'}`}
-                >
-                    <div className="flex flex-col lg:flex-row lg:items-center lg:gap-7 xl:gap-12">
-                        <ul className="flex flex-col lg:flex-row gap-3 ml-1 lg:ml-0 lg:gap-7 xl:text-lg text-cust-gray">
-                            {navLinks.map((link, idx) => (
-                                <li key={idx}>
-                                    <a
-                                        href={link.href}
-                                        className="hover:font-medium hover:text-cust-light-blue hover:border-t-4"
-                                    >
-                                        {link.name}
-                                    </a>
-                                </li>
-                            ))}
-                        </ul>
+            </div>
 
-                        <div>
-                            <label htmlFor="kategori" className="sr-only">Kategori</label>
-                            <select
-                                id="kategori"
-                                name="kategori"
-                                defaultValue=""
-                                className="font-medium text-lg pt-3 lg:pt-0"
+            <div
+                className={`lg:hidden container overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-screen py-4' : 'max-h-0'
+                    }`}
+            >
+                <ul className="flex flex-col gap-4">
+                    {navLinks.map((link, idx) => (
+                        <li key={idx}>
+                            <a
+                                href={link.href}
+                                className={`block text-center font-medium rounded transition-colors duration-200 ${url === link.href ? 'text-cust-primary-color font-semibold' : 'text-gray-700'
+                                    }`}
                             >
-                                <option value="" disabled hidden>Kategori</option>
-                                {categories.map((cat, idx) => (
-                                    <option key={idx} value={cat.value}>
-                                        {cat.label}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
+                                {link.name}
+                            </a>
+                        </li>
+                    ))}
+                </ul>
 
-                    <form className="relative items-center w-sm lg:w-auto xl:w-sm hidden lg:flex">
-                        <Icon icon="mdi:magnify" className="absolute left-4 text-gray-500 text-xl" />
-                        <input
-                            type="text"
-                            placeholder="Cari Produk, Judul Buku, atau Penulis"
-                            className="w-full border-2 border-gray-500 px-11 py-2 rounded-full"
-                        />
-                    </form>
-
-                    <div className="hidden lg:flex gap-4 font-medium">
-                        <button className="px-4 py-2 border rounded hover:bg-gray-100">Sign In</button>
-                        <button className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">Sign Up</button>
+                <div className="mt-4">
+                    <div className="flex flex-col gap-2">
+                        <Button>Sign In</Button>
+                        <Button variant="filled">Sign Up</Button>
                     </div>
                 </div>
             </div>
