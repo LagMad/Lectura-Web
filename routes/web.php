@@ -14,6 +14,18 @@ Route::get('/', function () {
     ]);
 });
 
+Route::get('/buku', function () {
+    return Inertia::render('Buku');
+});
+
+Route::get('/bantuan', function () {
+    return Inertia::render('Bantuan');
+});
+
+Route::get('/tentang', function () {
+    return Inertia::render('Tentang');
+});
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
