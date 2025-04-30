@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 export default function TambahBuku() {
-    // State for form values
     const [formValues, setFormValues] = useState({
         judul: "",
         penulis: "",
@@ -13,7 +12,6 @@ export default function TambahBuku() {
         deskripsi: "",
     });
 
-    // Handle input changes
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormValues({
@@ -22,10 +20,8 @@ export default function TambahBuku() {
         });
     };
 
-    // Handle numeric input (only allow numbers)
     const handleNumericInput = (e) => {
         const { name, value } = e.target;
-        // Only allow numeric values
         if (/^\d*$/.test(value)) {
             setFormValues({
                 ...formValues,
@@ -34,11 +30,24 @@ export default function TambahBuku() {
         }
     };
 
-    // Handle form submission
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log("Form values:", formValues);
         // Add your submission logic here
+    };
+
+    const [previewUrl, setPreviewUrl] = useState(null);
+    const fileInputRef = useRef(null);
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file && file.type.startsWith("image/")) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                setPreviewUrl(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     return (
@@ -55,16 +64,29 @@ export default function TambahBuku() {
                     <div className="flex flex-col md:flex-row gap-8">
                         {/* Cover Upload Section */}
                         <div className="w-full md:w-1/4">
-                            <div className="bg-gray-200 rounded md:w-full mx-auto sm:w-1/2 w-3/4 aspect-[8/8] md:aspect-[11/12] flex items-center justify-center mb-2">
-                                <span className="text-gray-500 text-sm text-center px-4">
-                                    Unggah Cover
-                                </span>
+                            <div
+                                className="bg-gray-200 rounded md:w-full mx-auto sm:w-1/2 w-3/4 aspect-[8/8] md:aspect-[11/12] flex items-center justify-center mb-2 overflow-hidden"
+                                style={{ position: "relative" }}
+                            >
+                                {previewUrl ? (
+                                    <img
+                                        src={previewUrl}
+                                        alt="Cover Preview"
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <span className="text-gray-500 text-sm text-center px-4">
+                                        Unggah Cover
+                                    </span>
+                                )}
                             </div>
                             <input
                                 type="file"
                                 className="hidden"
                                 id="coverUpload"
                                 accept="image/*"
+                                ref={fileInputRef}
+                                onChange={handleFileChange}
                             />
                             <label
                                 htmlFor="coverUpload"
