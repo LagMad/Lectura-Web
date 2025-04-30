@@ -41,7 +41,7 @@ export default function AdminLayout({
                                 <span className="text-lg font-medium text-gray-700">
                                     Ahmad Irza
                                 </span>
-                                <div className="h-8 w-8 rounded-full bg-blue-500 text-white flex items-center justify-center">
+                                <div className="h-8 w-8 rounded-full bg-cust-light-blue text-white flex items-center justify-center">
                                     <User size={18} />
                                 </div>
                             </div>
@@ -85,7 +85,7 @@ export default function AdminLayout({
                                         className={`mr-3 ${
                                             isActive("/admin-buku") ||
                                             isActive("/admin-tambah-buku")
-                                                ? "text-blue-500"
+                                                ? "text-cust-light-blue"
                                                 : "text-gray-500"
                                         }`}
                                     />
@@ -105,7 +105,7 @@ export default function AdminLayout({
                                         size={18}
                                         className={`mr-3 ${
                                             isActive("/admin-pengguna")
-                                                ? "text-blue-500"
+                                                ? "text-cust-light-blue"
                                                 : "text-gray-500"
                                         }`}
                                     />
@@ -125,7 +125,7 @@ export default function AdminLayout({
                                         size={18}
                                         className={`mr-3 ${
                                             isActive("/admin-pengaturan")
-                                                ? "text-blue-500"
+                                                ? "text-cust-light-blue"
                                                 : "text-gray-500"
                                         }`}
                                     />

@@ -42,7 +42,7 @@ export default function Pengaturan() {
                             </label>
                             <input
                                 type="text"
-                                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cust-light-blue"
                             />
                         </div>
 
@@ -52,7 +52,7 @@ export default function Pengaturan() {
                             </label>
                             <input
                                 type="email"
-                                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cust-light-blue"
                             />
                         </div>
 
@@ -62,7 +62,7 @@ export default function Pengaturan() {
                             </label>
                             <input
                                 type="tel"
-                                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cust-light-blue"
                             />
                         </div>
 
@@ -72,7 +72,7 @@ export default function Pengaturan() {
                             </label>
                             <input
                                 type="text"
-                                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cust-light-blue"
                             />
                         </div>
                     </div>
@@ -187,7 +187,7 @@ export default function Pengaturan() {
                                     Kedaluarsa Kata Sandi
                                 </label>
                                 <div className="relative">
-                                    <select className="appearance-none w-full border border-gray-300 rounded px-3 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <select className="appearance-none w-full border border-gray-300 rounded px-3 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-cust-light-blue">
                                         <option>30 Hari</option>
                                         <option>60 Hari</option>
                                         <option>90 Hari</option>
@@ -227,7 +227,7 @@ export default function Pengaturan() {
                 </div>
 
                 <div className="flex justify-end mt-6">
-                    <button className="px-4 py-2 bg-cust-blue text-white font-medium rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    <button className="px-4 py-2 bg-cust-blue text-white font-medium rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-cust-light-blue focus:ring-offset-2">
                         Simpan Perubahan
                     </button>
                 </div>
