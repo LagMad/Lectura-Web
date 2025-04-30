@@ -27,9 +27,12 @@ export default function AdminLayout({
                                 <Menu size={24} />
                             </button>
                             <div className="flex-shrink-0 flex items-center">
-                                <h1 className="text-cust-blue text-2xl font-bold ml-2 sm:ml-0 ">
+                                <a
+                                    href="/"
+                                    className="text-cust-blue text-2xl font-bold ml-2 sm:ml-0 no-underline hover:opacity-80 transition-opacity"
+                                >
                                     E-Library
-                                </h1>
+                                </a>
                             </div>
                         </div>
 
