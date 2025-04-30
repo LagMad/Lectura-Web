@@ -74,7 +74,8 @@ export default function AdminLayout({
                                 <Link
                                     href="/admin-buku"
                                     className={`flex items-center px-4 py-2 text-sm font-medium ${
-                                        isActive("/admin-buku")
+                                        isActive("/admin-buku") ||
+                                        isActive("/admin-tambah-buku")
                                             ? "text-blue-600 bg-blue-50 hover:bg-blue-100"
                                             : "text-gray-700 hover:bg-gray-100"
                                     }`}
@@ -82,7 +83,8 @@ export default function AdminLayout({
                                     <BookOpen
                                         size={18}
                                         className={`mr-3 ${
-                                            isActive("/admin-buku")
+                                            isActive("/admin-buku") ||
+                                            isActive("/admin-tambah-buku")
                                                 ? "text-blue-500"
                                                 : "text-gray-500"
                                         }`}

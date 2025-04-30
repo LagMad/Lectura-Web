@@ -34,6 +34,10 @@ Route::get('/admin-buku', function () {
     return Inertia::render('Admin/Buku');
 });
 
+Route::get('/admin-tambah-buku', function () {
+    return Inertia::render('Admin/TambahBuku');
+});
+
 Route::get('/admin-pengaturan', function () {
     return Inertia::render('Admin/Pengaturan');
 });

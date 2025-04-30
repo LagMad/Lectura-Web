@@ -28,9 +28,12 @@ export default function ManajemenBuku() {
                 <h2 className="text-2xl lg:mb-0 mb-2 font-bold">
                     Managemen Buku
                 </h2>
-                <button className="bg-cust-blue hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center text-sm">
+                <a
+                    href="/admin-tambah-buku"
+                    class="bg-cust-blue hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center text-sm"
+                >
                     <span className="mr-1">+</span> Tambah Buku
-                </button>
+                </a>
             </div>
             <p className="md:text-sm text-xs text-gray-500 mb-6">
                 Kelola inventoris buku anda
