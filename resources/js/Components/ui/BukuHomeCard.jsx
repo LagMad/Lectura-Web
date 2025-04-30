@@ -4,11 +4,11 @@ const BukuHomeCard = ({ image, penulis, judul, showButton = true }) => {
     return (
         <div className="flex flex-col justify-between items-center h-[400px] gap-7 px-6 py-3 rounded-2xl bg-white drop-shadow-lg">
             <div className="flex flex-col justify-center items-center gap-1">
-                <img className="w-full h-auto" src={image} alt="silat" />
+                <img className="w-full h-52 object-contain" src={image} alt="silat" />
                 <div className="text-cust-dark-gray font-light text-sm w-full">
                     {penulis}
                 </div>
-                <div className="text-black font-normal text-sm w-full">
+                <div className="text-black font-normal text-sm w-full line-clamp-2">
                     {judul}
                 </div>
             </div>

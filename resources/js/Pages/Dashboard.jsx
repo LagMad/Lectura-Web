@@ -1,38 +1,23 @@
 import React, { useState } from "react";
-import General from "../Sections/Dashboard/General";
-import EditProfile from "../Sections/Dashboard/EditProfile";
-import Password from "../Sections/Dashboard/Password";
-import SocialProfiles from "../Sections/Dashboard/SocialProfiles";
-import PinjamanBuku from "../Sections/Dashboard/PinjamanBuku";
+import Umum from "../Sections/Dashboard/Umum";
+import MediaSosial from "../Sections/Dashboard/MediaSosial";
+import KataSandi from "../Sections/Dashboard/KataSandi";
 
 const Dashboard = () => {
-    const [activeTitle, setActiveTitle] = useState("General");
+    const [activeTitle, setActiveTitle] = useState("Umum");
 
     const sections = [
         {
-            title: "General",
-            component: <General />,
-            titleDesc: "Update your username and manage your account",
+            title: "Umum",
+            component: <Umum />,
         },
         {
-            title: "Edit Profile",
-            component: <EditProfile />,
-            titleDesc: "Setup your Account presence and hiring needs",
+            title: "Kata Sandi",
+            component: <KataSandi />,
         },
         {
-            title: "Password",
-            component: <Password />,
-            titleDesc: "Manage your password",
-        },
-        {
-            title: "Social Profiles",
-            component: <SocialProfiles />,
-            titleDesc: "Add elsewhere links to your profile",
-        },
-        {
-            title: "Pinjaman Buku",
-            component: <PinjamanBuku />,
-            titleDesc: "Borrowed books",
+            title: "Media Sosial",
+            component: <MediaSosial />,
         },
     ];
 
@@ -41,32 +26,30 @@ const Dashboard = () => {
     );
 
     return (
-        <div className="flex flex-col justify-start items-start gap-10 px-36 py-24 w-full">
-            <div className="flex flex-row justify-center items-stretch gap-5 w-full">
-                <img
-                    className="w-16 h-auto"
-                    src="/profile.svg"
-                    alt="profile-pict"
-                />
-                <div className="flex flex-col justify-center items-start gap-0 w-full">
-                    <div className="text-2xl font-medium">
-                        Krisna Liantara{" "}
-                        <span className="text-cust-gray font-light">/</span>{" "}
-                        {activeSection.title}
-                    </div>
-                    <div className="text-sm font-medium text-cust-dark-gray">
-                        {activeSection.titleDesc}
+        <div className="flex flex-row justify-center items-start gap-10 px-20 py-24 w-full bg-cust-light-gray">
+            <div className="flex flex-col justify-start items-start gap-8 w-1/6 bg-white p-10 rounded-2xl">
+                <div className="flex flex-col justify-center items-center gap-3 w-full">
+                    <img
+                        className="w-16 h-auto"
+                        src="/profile.svg"
+                        alt="profile-pict"
+                    />
+                    <div className="flex flex-col justify-center items-center gap-0 w-full">
+                        <div className="text-2xl font-medium">
+                            Krisna Liantara
+                        </div>
+                        <div className="text-sm font-medium text-cust-dark-gray">
+                            Anggota Sejak 2024
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div className="flex flex-row justify-start items-start gap-10 w-full">
-                <div className="flex flex-col justify-start items-start gap-3 w-1/6">
+                <div className="flex flex-col justify-start items-start gap-3 w-full">
                     {sections.map((section, index) => (
                         <button
                             key={index}
                             className={`cursor-pointer text-lg ${
                                 activeTitle === section.title
-                                    ? "font-bold text-black"
+                                    ? "font-bold text-cust-blue"
                                     : "font-normal text-cust-gray"
                             }`}
                             onClick={() => {
@@ -77,8 +60,8 @@ const Dashboard = () => {
                         </button>
                     ))}
                 </div>
-                <div className="w-5/6">{activeSection.component}</div>
             </div>
+            <div className="w-5/6 bg-white p-10 rounded-2xl">{activeSection.component}</div>
         </div>
     );
 };
