@@ -1,16 +1,33 @@
 import React from 'react';
+import { Icon } from '@iconify/react';
 
 const HeroSection = () => {
     const smallImages = [
-        { src: 'laut-bercerita.png', alt: 'Berita Kecil 1' },
-        { src: 'mie-ayam.png', alt: 'Berita Kecil 2' },
+        { src: 'hero-2.jpg', alt: 'Berita Kecil 1' },
+        { src: 'hero-3.jpg', alt: 'Berita Kecil 2' },
     ];
 
     const categories = [
-        { src: 'buku-andalan.webp', label: 'Buku Andalan' },
-        { src: 'buku-international.webp', label: 'Buku International' },
-        { src: 'buku-digital.webp', label: 'Buku Digital' },
-        { src: 'olahraga.webp', label: 'Olahraga' },
+        {
+            name: 'Teknologi',
+            icon: 'fa6-solid:laptop-code',
+            books: '150+ Buku',
+        },
+        {
+            name: 'Science',
+            icon: 'gridicons:science',
+            books: '200+ Buku',
+        },
+        {
+            name: 'Literatur',
+            icon: 'basil:book-solid',
+            books: '300+ Buku',
+        },
+        {
+            name: 'Bisnis',
+            icon: 'lucide:chart-line',
+            books: '180+ Buku',
+        },
     ];
 
     return (
@@ -19,7 +36,7 @@ const HeroSection = () => {
                 <div className="md:col-span-2">
                     <div className="h-64 sm:h-80 md:h-96 bg-purple-200 rounded-3xl shadow-md overflow-hidden group">
                         <img
-                            src="boy-reading.png"
+                            src="hero-1.jpg"
                             alt="Berita Besar"
                             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                         />
@@ -39,22 +56,17 @@ const HeroSection = () => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 items-center text-center container">
-                {categories.map((category, index) => (
-                    <div
-                        key={index}
-                        className="flex flex-col items-center gap-2 group cursor-pointer transition duration-300 hover:opacity-90"
-                    >
-                        <img
-                            src={category.src}
-                            alt={category.label}
-                            className="w-2/3 sm:w-3/4 md:w-2/3 transition-transform duration-300 group-hover:scale-105"
-                        />
-                        <p className="text-sm sm:text-base transition-colors duration-300 group-hover:text-purple-600">
-                            {category.label}
-                        </p>
-                    </div>
-                ))}
+            <div className='container'>
+                <h1 className='font-bold text-xl lg:text-2xl mb-6'>Cari Berdasarkan Kategori</h1>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                    {categories.map((cat, index) => (
+                        <div key={index} className="flex flex-col p-4 bg-white rounded-lg hover:shadow-lg transition">
+                            <Icon icon={cat.icon} className="text-2xl text-cust-primary-color" />
+                            <h2 className="font-semibold">{cat.name}</h2>
+                            <p className="text-gray-500 text-sm">{cat.books}</p>
+                        </div>
+                    ))}
+                </div>
             </div>
         </section>
     );
