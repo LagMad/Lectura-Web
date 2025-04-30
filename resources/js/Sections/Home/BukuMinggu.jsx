@@ -94,7 +94,7 @@ const BukuMinggu = () => {
                         src="/boy-reading.svg"
                         alt="boy-reading"
                     />
-                    <div className="absolute flex flex-col justify-start items-center w-[calc(100vw-480px)] left-full -translate-x-[70px] top-[30px] gap-3 pr-4">
+                    <div className="absolute flex flex-col justify-start items-center w-[calc(100vw-470px)] left-full -translate-x-[70px] top-[30px] gap-3 pr-4">
                         <button
                             className="w-full text-right underline text-lg font-bold cursor-pointer pr-4"
                             onClick={() => alert("Lihat Semua")}

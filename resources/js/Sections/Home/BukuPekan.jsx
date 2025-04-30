@@ -95,7 +95,7 @@ const BukuPekan = () => {
                         src="/girl-reading-on-sofa.svg"
                         alt="girl-reading-on-sofa"
                     />
-                    <div className="absolute flex flex-col justify-start items-center w-[calc(100vw-512px)] left-full -translate-x-[70px] top-[30px] gap-3 pr-4">
+                    <div className="absolute flex flex-col justify-start items-center w-[calc(100vw-470px)] left-full -translate-x-[70px] top-[30px] gap-3 pr-4">
                         <button
                             className="w-full text-right underline text-lg font-bold cursor-pointer pr-4"
                             onClick={() => alert("Lihat Semua")}
