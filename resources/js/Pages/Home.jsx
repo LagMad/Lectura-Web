@@ -9,7 +9,7 @@ import SloganSection from '../Sections/Home/SloganSection'
 const Home = () => {
   return (
     <Layout>
-      <div className='py-40 bg-cust-light-blue space-y-16 lg:space-y-24'>
+      <div className='flex flex-col gap-16 py-20 bg-cust-light-gray'>
         <HeroSection />
         <SloganSection />
         <BukuMinggu />

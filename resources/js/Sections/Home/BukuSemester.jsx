@@ -72,96 +72,111 @@ const BukuSemester = () => {
     const totalPages = Math.ceil(dataDummy.length / 5);
 
     return (
-        <div className="flex flex-col justify-center items-start gap-10 w-full px-40">
-            <div className="text-5xl font-bold w-full">
-                Buku Favorit Sepanjang Semester
-            </div>
-            <div className="relative flex flex-col justify-start items-start w-[300px] bg-white p-3 h-[520px] rounded-2xl gap-12">
-                <div className="text-3xl font-bold w-full">
-                    BUKU FAVORIT SEPANJANG SEMESTER
+        <div className="px-20">
+            <div className="flex flex-col justify-center items-start gap-10 w-full p-10 pb-24 bg-[#EFF6FF] rounded-2xl">
+                <div className="flex flex-col justify-center items-center gap-5 w-full">
+                    <div className="text-5xl font-bold w-full text-center">
+                        Buku Favorit Sepanjang Semester
+                    </div>
+                    <hr className="h-0.5 bg-black w-1/3 self-center rounded-full" />
+                    <div className="w-1/3 text-center leading-tight">
+                        Deretan buku terbaik pilihan pembaca selama satu
+                        semester penuh. Bacaan yang terus relevan, memikat, dan
+                        tak terlupakan.
+                    </div>
                 </div>
-                <img
-                    className="h-auto w-full"
-                    src="/girl-reading.png"
-                    alt="girl-reading"
-                />
-                <div className="absolute flex flex-col justify-start items-center w-[calc(100vw-512px)] left-full -translate-x-[70px] top-[30px] gap-3 pr-4">
-                    <button
-                        className="w-full text-right underline text-lg font-bold cursor-pointer"
-                        onClick={() => alert("Lihat Semua")}
-                    >
-                        Lihat Semua
-                    </button>
-                    <Swiper
-                        modules={[Pagination]}
-                        spaceBetween={20}
-                        slidesPerView={5}
-                        slidesPerGroup={5}
-                        pagination={false}
-                        onSwiper={(swiper) => (swiperRef.current = swiper)}
-                        onSlideChange={(swiper) =>
-                            setActiveIndex(Math.floor(swiper.activeIndex / 5))
-                        }
-                        className="w-full h-[450px]"
-                    >
-                        {dataDummy.map((data, index) => (
-                            <SwiperSlide
-                                key={index}
-                                className="flex items-stretch"
+                <div className="relative flex flex-col justify-start items-start w-[300px] bg-[#54473F] p-3 h-[520px] rounded-2xl gap-20">
+                    <div className="text-3xl font-extrabold w-full text-white">
+                        SEPANJANG{" "}
+                        <span className="text-[#CBD2A4]">SEMESTER</span>
+                    </div>
+                    <img
+                        className="h-auto w-full"
+                        src="/girl-reading.svg"
+                        alt="girl-reading"
+                    />
+                    <div className="absolute flex flex-col justify-start items-center w-[calc(100vw-470px)] left-full -translate-x-[70px] top-[30px] gap-3 pr-4">
+                        <button
+                            className="w-full text-right underline text-lg font-bold cursor-pointer pr-4"
+                            onClick={() => alert("Lihat Semua")}
+                        >
+                            Lihat Semua
+                        </button>
+                        <Swiper
+                            modules={[Pagination]}
+                            spaceBetween={20}
+                            slidesPerView={5}
+                            slidesPerGroup={5}
+                            pagination={false}
+                            onSwiper={(swiper) => (swiperRef.current = swiper)}
+                            onSlideChange={(swiper) =>
+                                setActiveIndex(
+                                    Math.floor(swiper.activeIndex / 5)
+                                )
+                            }
+                            className="w-full h-[450px]"
+                        >
+                            {dataDummy.map((data, index) => (
+                                <SwiperSlide
+                                    key={index}
+                                    className="flex items-stretch"
+                                >
+                                    <BukuHomeCard
+                                        image={data.image}
+                                        penulis={data.penulis}
+                                        judul={data.judul}
+                                    />
+                                </SwiperSlide>
+                            ))}
+                        </Swiper>
+                        <div className="flex justify-center items-center gap-2 mt-4">
+                            {/* Left Arrow */}
+                            <button
+                                className="cursor-pointer w-8 h-8 flex items-center justify-center text-xl font-bold rounded-full border border-gray-300 hover:bg-gray-200 disabled:opacity-50"
+                                onClick={() => {
+                                    if (activeIndex > 0) {
+                                        swiperRef.current?.slideTo(
+                                            (activeIndex - 1) * 5
+                                        );
+                                    }
+                                }}
+                                disabled={activeIndex === 0}
                             >
-                                <BukuHomeCard
-                                    image={data.image}
-                                    penulis={data.penulis}
-                                    judul={data.judul}
-                                />
-                            </SwiperSlide>
-                        ))}
-                    </Swiper>
-                    <div className="flex justify-center items-center gap-2 mt-4">
-                        {/* Left Arrow */}
-                        <button
-                            className="w-8 h-8 flex items-center justify-center text-xl font-bold rounded-full border border-gray-300 hover:bg-gray-200 disabled:opacity-50"
-                            onClick={() => {
-                                if (activeIndex > 0) {
-                                    swiperRef.current?.slideTo(
-                                        (activeIndex - 1) * 5
-                                    );
-                                }
-                            }}
-                            disabled={activeIndex === 0}
-                        >
-                            <MdOutlineKeyboardArrowLeft />
-                        </button>
+                                <MdOutlineKeyboardArrowLeft />
+                            </button>
 
-                        {/* Dots */}
-                        {Array.from({ length: totalPages }).map((_, idx) => (
-                            <div
-                                key={idx}
-                                className={`w-3 h-3 rounded-full cursor-pointer transition-all duration-300 ${
-                                    activeIndex === idx
-                                        ? "bg-cust-blue"
-                                        : "bg-cust-dark-gray"
-                                }`}
-                                onClick={() =>
-                                    swiperRef.current?.slideTo(idx * 5)
-                                }
-                            />
-                        ))}
+                            {/* Dots */}
+                            {Array.from({ length: totalPages }).map(
+                                (_, idx) => (
+                                    <div
+                                        key={idx}
+                                        className={`w-3 h-3 rounded-full cursor-pointer transition-all duration-300 ${
+                                            activeIndex === idx
+                                                ? "bg-cust-blue"
+                                                : "bg-cust-dark-gray"
+                                        }`}
+                                        onClick={() =>
+                                            swiperRef.current?.slideTo(idx * 5)
+                                        }
+                                    />
+                                )
+                            )}
 
-                        {/* Right Arrow */}
-                        <button
-                            className="w-8 h-8 flex items-center justify-center text-xl font-bold rounded-full border border-gray-300 hover:bg-gray-200 disabled:opacity-50"
-                            onClick={() => {
-                                if (activeIndex < totalPages - 1) {
-                                    swiperRef.current?.slideTo(
-                                        (activeIndex + 1) * 5
-                                    );
-                                }
-                            }}
-                            disabled={activeIndex === totalPages - 1}
-                        >
-                            <MdOutlineKeyboardArrowRight />
-                        </button>
+                            {/* Right Arrow */}
+                            <button
+                                className="cursor-pointer w-8 h-8 flex items-center justify-center text-xl font-bold rounded-full border border-gray-300 hover:bg-gray-200 disabled:opacity-50"
+                                onClick={() => {
+                                    if (activeIndex < totalPages - 1) {
+                                        swiperRef.current?.slideTo(
+                                            (activeIndex + 1) * 5
+                                        );
+                                    }
+                                }}
+                                disabled={activeIndex === totalPages - 1}
+                            >
+                                <MdOutlineKeyboardArrowRight />
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
