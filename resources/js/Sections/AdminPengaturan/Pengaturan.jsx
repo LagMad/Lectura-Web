@@ -99,7 +99,7 @@ export default function Pengaturan() {
                                 <button
                                     className={`relative inline-flex h-6 w-11 items-center rounded-full ${
                                         notifications.dueDateReminder
-                                            ? "bg-blue-600"
+                                            ? "bg-cust-blue"
                                             : "bg-gray-300"
                                     }`}
                                     onClick={() =>
@@ -129,7 +129,7 @@ export default function Pengaturan() {
                                 <button
                                     className={`relative inline-flex h-6 w-11 items-center rounded-full ${
                                         notifications.newBookNotification
-                                            ? "bg-blue-600"
+                                            ? "bg-cust-blue"
                                             : "bg-gray-300"
                                     }`}
                                     onClick={() =>
@@ -158,7 +158,7 @@ export default function Pengaturan() {
                                 <button
                                     className={`relative inline-flex h-6 w-11 items-center rounded-full ${
                                         notifications.systemMaintenance
-                                            ? "bg-blue-600"
+                                            ? "bg-cust-blue"
                                             : "bg-gray-300"
                                     }`}
                                     onClick={() =>
@@ -208,7 +208,7 @@ export default function Pengaturan() {
                                 <button
                                     className={`relative inline-flex h-6 w-11 items-center rounded-full ${
                                         twoFactorAuth
-                                            ? "bg-blue-600"
+                                            ? "bg-cust-blue"
                                             : "bg-gray-300"
                                     }`}
                                     onClick={handleTwoFactorToggle}
@@ -227,7 +227,7 @@ export default function Pengaturan() {
                 </div>
 
                 <div className="flex justify-end mt-6">
-                    <button className="px-4 py-2 bg-blue-600 text-white font-medium rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    <button className="px-4 py-2 bg-cust-blue text-white font-medium rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                         Simpan Perubahan
                     </button>
                 </div>

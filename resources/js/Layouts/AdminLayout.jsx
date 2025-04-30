@@ -76,7 +76,7 @@ export default function AdminLayout({
                                     className={`flex items-center px-4 py-2 text-sm font-medium ${
                                         isActive("/admin-buku") ||
                                         isActive("/admin-tambah-buku")
-                                            ? "text-blue-600 bg-blue-50 hover:bg-blue-100"
+                                            ? "text-cust-blue bg-blue-50 hover:bg-blue-100"
                                             : "text-gray-700 hover:bg-gray-100"
                                     }`}
                                 >
@@ -97,7 +97,7 @@ export default function AdminLayout({
                                     href="/admin-pengguna"
                                     className={`flex items-center px-4 py-2 text-sm font-medium ${
                                         isActive("/admin-pengguna")
-                                            ? "text-blue-600 bg-blue-50 hover:bg-blue-100"
+                                            ? "text-cust-blue bg-blue-50 hover:bg-blue-100"
                                             : "text-gray-700 hover:bg-gray-100"
                                     }`}
                                 >
@@ -117,7 +117,7 @@ export default function AdminLayout({
                                     href="/admin-pengaturan"
                                     className={`flex items-center px-4 py-2 text-sm font-medium ${
                                         isActive("/admin-pengaturan")
-                                            ? "text-blue-600 bg-blue-50 hover:bg-blue-100"
+                                            ? "text-cust-blue bg-blue-50 hover:bg-blue-100"
                                             : "text-gray-700 hover:bg-gray-100"
                                     }`}
                                 >

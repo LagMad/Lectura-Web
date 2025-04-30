@@ -30,7 +30,7 @@ export default function ManajemenBuku() {
                 </h2>
                 <a
                     href="/admin-tambah-buku"
-                    class="bg-cust-blue hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center text-sm"
+                    class="bg-cust-blue hover:bg-cust-blue text-white px-4 py-2 rounded flex items-center text-sm"
                 >
                     <span className="mr-1">+</span> Tambah Buku
                 </a>

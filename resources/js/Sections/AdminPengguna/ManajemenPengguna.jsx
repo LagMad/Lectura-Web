@@ -28,7 +28,7 @@ export default function ManajemenPengguna() {
                 <h2 className="text-2xl lg:mb-0 mb-2 font-bold">
                     Managemen Pengguna
                 </h2>
-                <button className="bg-cust-blue hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center text-sm">
+                <button className="bg-cust-blue hover:bg-cust-blue text-white px-4 py-2 rounded flex items-center text-sm">
                     <span className="mr-1">+</span> Tambah Pengguna
                 </button>
             </div>
