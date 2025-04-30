@@ -1,5 +1,5 @@
-import React from 'react';
-import { Icon } from '@iconify/react';
+import React from "react";
+import { Icon } from "@iconify/react";
 
 const Footer = () => {
     return (
@@ -36,7 +36,6 @@ const Footer = () => {
                             </p>
                         </div>
                     </div>
-
                     <div className="italic text-sm text-gray-300 relative max-w-md">
                         <Icon icon="mdi:format-quote-open" className="text-xl mb-2" />
                         Tidak ada batas untuk ilmu. Bacalah, pelajari, dan kejarlah ilmu itu seperti mengejar cahaya
