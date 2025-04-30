@@ -30,6 +30,14 @@ Route::get('/admin-pengguna', function () {
     return Inertia::render('Admin/Pengguna');
 });
 
+Route::get('/admin-buku', function () {
+    return Inertia::render('Admin/Buku');
+});
+
+Route::get('/admin-pengaturan', function () {
+    return Inertia::render('Admin/Pengaturan');
+});
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');

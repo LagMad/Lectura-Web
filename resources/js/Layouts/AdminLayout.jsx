@@ -1,10 +1,18 @@
 import { Menu, LogOut, User, BookOpen, Settings, Bell } from "lucide-react";
+import { Link, usePage } from "@inertiajs/react";
 
 export default function AdminLayout({
     children,
     isSidebarOpen,
     toggleSidebar,
 }) {
+    const { url } = usePage();
+
+    // Function to check if a route is active
+    const isActive = (path) => {
+        return url.startsWith(path);
+    };
+
     return (
         <div className="flex flex-col min-h-screen bg-gray-100 font-[poppins]">
             {/* Navbar */}
@@ -63,40 +71,64 @@ export default function AdminLayout({
                     <div className="py-4">
                         <ul className="space-y-1">
                             <li>
-                                <a
-                                    href="#"
-                                    className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+                                <Link
+                                    href="/admin-buku"
+                                    className={`flex items-center px-4 py-2 text-sm font-medium ${
+                                        isActive("/admin-buku")
+                                            ? "text-blue-600 bg-blue-50 hover:bg-blue-100"
+                                            : "text-gray-700 hover:bg-gray-100"
+                                    }`}
                                 >
                                     <BookOpen
                                         size={18}
-                                        className="mr-3 text-gray-500"
+                                        className={`mr-3 ${
+                                            isActive("/admin-buku")
+                                                ? "text-blue-500"
+                                                : "text-gray-500"
+                                        }`}
                                     />
                                     <span>Manajemen Buku</span>
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a
-                                    href="#"
-                                    className="flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100"
+                                <Link
+                                    href="/admin-pengguna"
+                                    className={`flex items-center px-4 py-2 text-sm font-medium ${
+                                        isActive("/admin-pengguna")
+                                            ? "text-blue-600 bg-blue-50 hover:bg-blue-100"
+                                            : "text-gray-700 hover:bg-gray-100"
+                                    }`}
                                 >
                                     <User
                                         size={18}
-                                        className="mr-3 text-blue-500"
+                                        className={`mr-3 ${
+                                            isActive("/admin-pengguna")
+                                                ? "text-blue-500"
+                                                : "text-gray-500"
+                                        }`}
                                     />
                                     <span>Pengguna</span>
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a
-                                    href="#"
-                                    className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+                                <Link
+                                    href="/admin-pengaturan"
+                                    className={`flex items-center px-4 py-2 text-sm font-medium ${
+                                        isActive("/admin-pengaturan")
+                                            ? "text-blue-600 bg-blue-50 hover:bg-blue-100"
+                                            : "text-gray-700 hover:bg-gray-100"
+                                    }`}
                                 >
                                     <Settings
                                         size={18}
-                                        className="mr-3 text-gray-500"
+                                        className={`mr-3 ${
+                                            isActive("/admin-pengaturan")
+                                                ? "text-blue-500"
+                                                : "text-gray-500"
+                                        }`}
                                     />
                                     <span>Pengaturan</span>
-                                </a>
+                                </Link>
                             </li>
                         </ul>
                     </div>
