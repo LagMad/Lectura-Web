@@ -16,7 +16,7 @@ export default function AdminLayout({
     return (
         <div className="flex flex-col min-h-screen bg-gray-100 font-[poppins]">
             {/* Navbar */}
-            <nav className="bg-white shadow-sm border-b border-gray-200">
+            <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
                 <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16">
                         <div className="flex items-center">
@@ -53,7 +53,7 @@ export default function AdminLayout({
                 </div>
             </nav>
 
-            <div className="flex flex-1">
+            <div className="flex flex-1 z-0">
                 {/* Overlay for mobile - only visible when sidebar is open */}
                 {isSidebarOpen && (
                     <div
