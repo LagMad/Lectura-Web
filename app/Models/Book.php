@@ -2,26 +2,28 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Book extends Model
 {
     use HasFactory;
 
-    protected $table = 'books';
-
     protected $fillable = [
-        'title',
-        'isbn',
-        'category_id',
-        'year',
-        'cover_image',
-        'pdf_link',
+        'judul',
+        'penulis',
+        'jumlah_halaman',
+        'kategori',
+        'penerbit',
+        'tahun_terbit',
+        'bahasa',
+        'deskripsi',
+        'cover_path',
+        'status'
     ];
 
-    public function category()
+    public function reviews()
     {
-        return $this->belongsTo(Category::class);
+        return $this->hasMany(Review::class);
     }
 }
