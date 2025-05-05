@@ -26,6 +26,10 @@ Route::get('/bantuan', function () {
     return Inertia::render('Bantuan');
 });
 
+Route::get('/detail-buku', function () {
+    return Inertia::render('Buku/Detail');
+});
+
 Route::get('/tentang', function () {
     return Inertia::render('Tentang');
 });
