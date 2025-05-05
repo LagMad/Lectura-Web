@@ -1,25 +1,62 @@
 import { useState, useRef } from "react";
+import axios from "axios";
 
 export default function TambahBuku() {
+    const getCsrfToken = () => {
+        const metaTag = document.querySelector('meta[name="csrf-token"]');
+        if (metaTag) {
+            return metaTag.getAttribute("content");
+        }
+
+        // Jika tidak ada meta tag, coba dapatkan dari cookie (Laravel biasanya menyimpan XSRF-TOKEN cookie)
+        const getCookieValue = (name) => {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(";").shift();
+            return null;
+        };
+
+        return getCookieValue("XSRF-TOKEN");
+    };
+    // State untuk form values
     const [formValues, setFormValues] = useState({
         judul: "",
         penulis: "",
-        jumlahHalaman: "",
+        jumlah_halaman: "", // Changed from jumlahHalaman to match backend field name
         kategori: "",
         penerbit: "",
-        tahunTerbit: "",
+        tahun_terbit: "", // Changed from tahunTerbit to match backend field name
         bahasa: "",
         deskripsi: "",
     });
 
+    // State untuk error handling
+    const [errors, setErrors] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitSuccess, setSubmitSuccess] = useState(false);
+
+    // Ref untuk file input
+    const fileInputRef = useRef(null);
+    const [previewUrl, setPreviewUrl] = useState(null);
+
+    // Handle regular input changes
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormValues({
             ...formValues,
             [name]: value,
         });
+
+        // Clear error when field is edited
+        if (errors[name]) {
+            setErrors({
+                ...errors,
+                [name]: null,
+            });
+        }
     };
 
+    // Handle numeric input validation
     const handleNumericInput = (e) => {
         const { name, value } = e.target;
         if (/^\d*$/.test(value)) {
@@ -27,27 +64,120 @@ export default function TambahBuku() {
                 ...formValues,
                 [name]: value,
             });
+
+            // Clear error when field is edited
+            if (errors[name]) {
+                setErrors({
+                    ...errors,
+                    [name]: null,
+                });
+            }
         }
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log("Form values:", formValues);
-        // Add your submission logic here
-    };
-
-    const [previewUrl, setPreviewUrl] = useState(null);
-    const fileInputRef = useRef(null);
-
+    // Handle file upload preview
     const handleFileChange = (e) => {
         const file = e.target.files[0];
-        if (file && file.type.startsWith("image/")) {
-            const reader = new FileReader();
-            reader.onload = () => {
-                setPreviewUrl(reader.result);
-            };
-            reader.readAsDataURL(file);
+        if (file) {
+            if (file.type.startsWith("image/")) {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    setPreviewUrl(reader.result);
+                };
+                reader.readAsDataURL(file);
+
+                // Clear cover error if exists
+                if (errors.cover) {
+                    setErrors({
+                        ...errors,
+                        cover: null,
+                    });
+                }
+            } else {
+                setErrors({
+                    ...errors,
+                    cover: "File harus berupa gambar (JPG, PNG, GIF)",
+                });
+                e.target.value = ""; // Reset the input
+            }
         }
+    };
+
+    // Form submission
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        setErrors({});
+
+        const formData = new FormData();
+        formData.append("judul", formValues.judul);
+        formData.append("penulis", formValues.penulis);
+        formData.append("jumlah_halaman", formValues.jumlah_halaman);
+        formData.append("kategori", formValues.kategori);
+        formData.append("penerbit", formValues.penerbit);
+        formData.append("tahun_terbit", formValues.tahun_terbit);
+        formData.append("bahasa", formValues.bahasa);
+        formData.append("deskripsi", formValues.deskripsi);
+        formData.append("status", "Tersedia");
+
+        if (fileInputRef.current?.files[0]) {
+            formData.append("cover", fileInputRef.current.files[0]);
+        }
+
+        try {
+            const csrfToken = getCsrfToken();
+
+            const headers = {
+                "Content-Type": "multipart/form-data",
+            };
+
+            // Only add CSRF token if it exists
+            if (csrfToken) {
+                headers["X-CSRF-TOKEN"] = csrfToken;
+            }
+
+            const response = await axios.post("/simpan-buku", formData, {
+                headers,
+            });
+
+            setSubmitSuccess(true);
+            setPreviewUrl(null);
+            if (fileInputRef.current) fileInputRef.current.value = "";
+
+            // Reset form values
+            setFormValues({
+                judul: "",
+                penulis: "",
+                jumlah_halaman: "",
+                kategori: "",
+                penerbit: "",
+                tahun_terbit: "",
+                bahasa: "",
+                deskripsi: "",
+            });
+        } catch (error) {
+            console.error("Terjadi kesalahan:", error);
+
+            if (
+                error.response &&
+                error.response.data &&
+                error.response.data.errors
+            ) {
+                setErrors(error.response.data.errors);
+            } else {
+                setErrors({
+                    general:
+                        "Terjadi kesalahan saat menyimpan data. Silakan coba lagi.",
+                });
+            }
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    // Handle cancel button
+    const handleCancel = () => {
+        window.location.href = "/admin-tambah-buku";
     };
 
     return (
@@ -55,11 +185,23 @@ export default function TambahBuku() {
             <div className="mb-6">
                 <h1 className="text-2xl font-bold">Tambah Buku Baru</h1>
                 <p className="text-gray-600">
-                    Masukkan Detail Buku Baru yang akan dipilih
+                    Masukkan Detail Buku Baru yang akan ditambahkan
                 </p>
             </div>
 
-            <div className="w-full max-w-4xl py-8 px-4 sm:px-6 lg:px-8 bg-white rounded-lg">
+            {submitSuccess && (
+                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 w-fit">
+                    Buku berhasil disimpan!
+                </div>
+            )}
+
+            {errors.general && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 w-fit">
+                    {errors.general}
+                </div>
+            )}
+
+            <div className="w-full max-w-4xl py-8 px-4 sm:px-6 lg:px-8 bg-white rounded-lg shadow-sm">
                 <form onSubmit={handleSubmit}>
                     <div className="flex flex-col md:flex-row gap-8">
                         {/* Cover Upload Section */}
@@ -90,10 +232,15 @@ export default function TambahBuku() {
                             />
                             <label
                                 htmlFor="coverUpload"
-                                className="block text-center text-sm text-cust-blue cursor-pointer mt-2"
+                                className="block text-center text-sm text-blue-600 cursor-pointer mt-2 hover:text-blue-800"
                             >
                                 Pilih File
                             </label>
+                            {errors.cover && (
+                                <p className="text-red-500 text-xs mt-1 text-center">
+                                    {errors.cover}
+                                </p>
+                            )}
                         </div>
 
                         {/* Form Fields */}
@@ -105,7 +252,8 @@ export default function TambahBuku() {
                                         htmlFor="judul"
                                         className="block text-sm font-medium text-gray-700 mb-1"
                                     >
-                                        Judul Buku
+                                        Judul Buku{" "}
+                                        <span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="text"
@@ -113,9 +261,18 @@ export default function TambahBuku() {
                                         name="judul"
                                         value={formValues.judul}
                                         onChange={handleInputChange}
-                                        className="w-full p-2 border border-gray-300 rounded"
+                                        className={`w-full p-2 border ${
+                                            errors.judul
+                                                ? "border-red-500"
+                                                : "border-gray-300"
+                                        } rounded`}
                                         required
                                     />
+                                    {errors.judul && (
+                                        <p className="text-red-500 text-xs mt-1">
+                                            {errors.judul}
+                                        </p>
+                                    )}
                                 </div>
 
                                 {/* Penulis */}
@@ -124,7 +281,8 @@ export default function TambahBuku() {
                                         htmlFor="penulis"
                                         className="block text-sm font-medium text-gray-700 mb-1"
                                     >
-                                        Penulis
+                                        Penulis{" "}
+                                        <span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="text"
@@ -132,33 +290,52 @@ export default function TambahBuku() {
                                         name="penulis"
                                         value={formValues.penulis}
                                         onChange={handleInputChange}
-                                        className="w-full p-2 border border-gray-300 rounded"
+                                        className={`w-full p-2 border ${
+                                            errors.penulis
+                                                ? "border-red-500"
+                                                : "border-gray-300"
+                                        } rounded`}
                                         required
                                     />
+                                    {errors.penulis && (
+                                        <p className="text-red-500 text-xs mt-1">
+                                            {errors.penulis}
+                                        </p>
+                                    )}
                                 </div>
 
                                 {/* Jumlah Halaman - Numbers Only */}
                                 <div>
                                     <label
-                                        htmlFor="jumlahHalaman"
+                                        htmlFor="jumlah_halaman"
                                         className="block text-sm font-medium text-gray-700 mb-1"
                                     >
-                                        Jumlah Halaman
+                                        Jumlah Halaman{" "}
+                                        <span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="text"
-                                        id="jumlahHalaman"
-                                        name="jumlahHalaman"
-                                        value={formValues.jumlahHalaman}
+                                        id="jumlah_halaman"
+                                        name="jumlah_halaman"
+                                        value={formValues.jumlah_halaman}
                                         onChange={handleNumericInput}
-                                        className="w-full p-2 border border-gray-300 rounded"
+                                        className={`w-full p-2 border ${
+                                            errors.jumlah_halaman
+                                                ? "border-red-500"
+                                                : "border-gray-300"
+                                        } rounded`}
                                         required
                                     />
+                                    {errors.jumlah_halaman && (
+                                        <p className="text-red-500 text-xs mt-1">
+                                            {errors.jumlah_halaman}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
                         {/* Kategori */}
                         <div>
                             <label
@@ -173,8 +350,17 @@ export default function TambahBuku() {
                                 name="kategori"
                                 value={formValues.kategori}
                                 onChange={handleInputChange}
-                                className="w-full p-2 border border-gray-300 rounded"
+                                className={`w-full p-2 border ${
+                                    errors.kategori
+                                        ? "border-red-500"
+                                        : "border-gray-300"
+                                } rounded`}
                             />
+                            {errors.kategori && (
+                                <p className="text-red-500 text-xs mt-1">
+                                    {errors.kategori}
+                                </p>
+                            )}
                         </div>
 
                         {/* Penerbit */}
@@ -191,27 +377,45 @@ export default function TambahBuku() {
                                 name="penerbit"
                                 value={formValues.penerbit}
                                 onChange={handleInputChange}
-                                className="w-full p-2 border border-gray-300 rounded"
+                                className={`w-full p-2 border ${
+                                    errors.penerbit
+                                        ? "border-red-500"
+                                        : "border-gray-300"
+                                } rounded`}
                             />
+                            {errors.penerbit && (
+                                <p className="text-red-500 text-xs mt-1">
+                                    {errors.penerbit}
+                                </p>
+                            )}
                         </div>
 
                         {/* Tahun Terbit - Numbers Only */}
                         <div>
                             <label
-                                htmlFor="tahunTerbit"
+                                htmlFor="tahun_terbit"
                                 className="block text-sm font-medium text-gray-700 mb-1"
                             >
                                 Tahun Terbit
                             </label>
                             <input
                                 type="text"
-                                id="tahunTerbit"
-                                name="tahunTerbit"
-                                value={formValues.tahunTerbit}
+                                id="tahun_terbit"
+                                name="tahun_terbit"
+                                value={formValues.tahun_terbit}
                                 onChange={handleNumericInput}
-                                className="w-full p-2 border border-gray-300 rounded"
+                                className={`w-full p-2 border ${
+                                    errors.tahun_terbit
+                                        ? "border-red-500"
+                                        : "border-gray-300"
+                                } rounded`}
                                 maxLength={4}
                             />
+                            {errors.tahun_terbit && (
+                                <p className="text-red-500 text-xs mt-1">
+                                    {errors.tahun_terbit}
+                                </p>
+                            )}
                         </div>
 
                         {/* Bahasa */}
@@ -228,13 +432,22 @@ export default function TambahBuku() {
                                 name="bahasa"
                                 value={formValues.bahasa}
                                 onChange={handleInputChange}
-                                className="w-full p-2 border border-gray-300 rounded"
+                                className={`w-full p-2 border ${
+                                    errors.bahasa
+                                        ? "border-red-500"
+                                        : "border-gray-300"
+                                } rounded`}
                             />
+                            {errors.bahasa && (
+                                <p className="text-red-500 text-xs mt-1">
+                                    {errors.bahasa}
+                                </p>
+                            )}
                         </div>
                     </div>
 
                     {/* Deskripsi */}
-                    <div>
+                    <div className="mt-6">
                         <label
                             htmlFor="deskripsi"
                             className="block text-sm font-medium text-gray-700 mb-1"
@@ -247,8 +460,17 @@ export default function TambahBuku() {
                             value={formValues.deskripsi}
                             onChange={handleInputChange}
                             rows={5}
-                            className="w-full p-2 border border-gray-300 rounded"
+                            className={`w-full p-2 border ${
+                                errors.deskripsi
+                                    ? "border-red-500"
+                                    : "border-gray-300"
+                            } rounded`}
                         ></textarea>
+                        {errors.deskripsi && (
+                            <p className="text-red-500 text-xs mt-1">
+                                {errors.deskripsi}
+                            </p>
+                        )}
                     </div>
 
                     {/* Form Actions */}
@@ -256,14 +478,16 @@ export default function TambahBuku() {
                         <button
                             type="button"
                             className="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50"
+                            onClick={handleCancel}
                         >
                             Batal
                         </button>
                         <button
                             type="submit"
-                            className="px-4 py-2 bg-cust-blue text-white rounded hover:bg-blue-700"
+                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-blue-300"
+                            disabled={isSubmitting}
                         >
-                            Simpan
+                            {isSubmitting ? "Menyimpan..." : "Simpan"}
                         </button>
                     </div>
                 </form>

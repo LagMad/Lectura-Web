@@ -88,7 +88,7 @@ export default function AdminLayout({
                                         className={`mr-3 ${
                                             isActive("/admin-buku") ||
                                             isActive("/admin-tambah-buku")
-                                                ? "text-cust-light-blue"
+                                                ? "text-cust-blue"
                                                 : "text-gray-500"
                                         }`}
                                     />
@@ -108,7 +108,7 @@ export default function AdminLayout({
                                         size={18}
                                         className={`mr-3 ${
                                             isActive("/admin-pengguna")
-                                                ? "text-cust-light-blue"
+                                                ? "text-cust-blue"
                                                 : "text-gray-500"
                                         }`}
                                     />
@@ -128,7 +128,7 @@ export default function AdminLayout({
                                         size={18}
                                         className={`mr-3 ${
                                             isActive("/admin-pengaturan")
-                                                ? "text-cust-light-blue"
+                                                ? "text-cust-blue"
                                                 : "text-gray-500"
                                         }`}
                                     />
