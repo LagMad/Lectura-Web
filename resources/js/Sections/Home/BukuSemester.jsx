@@ -12,11 +12,11 @@ import {
     MdOutlineKeyboardArrowRight,
 } from "react-icons/md";
 
-const BukuSemester = () => {
+const BukuMinggu = () => {
     const swiperRef = useRef(null);
     const [activeIndex, setActiveIndex] = useState(0);
 
-    const dataDummy = [
+    const dataBuku = [
         {
             image: "/silat.png",
             penulis: "A. Fuadi",
@@ -69,54 +69,98 @@ const BukuSemester = () => {
         },
     ];
 
-    const totalPages = Math.ceil(dataDummy.length / 5);
+    // Function to get slides per view based on screen width
+    const getSlidesPerView = () => {
+        if (typeof window !== "undefined") {
+            const width = window.innerWidth;
+            if (width < 640) return 1; // Mobile
+            if (width < 768) return 2; // Small tablets
+            if (width < 1024) return 3; // Tablets
+            if (width < 1280) return 4; // Small laptops
+            return 5; // Large screens
+        }
+        return 5; // Default for SSR
+    };
+
+    const slidesPerView = getSlidesPerView();
+    const totalPages = Math.ceil(dataBuku.length / slidesPerView);
 
     return (
-        <div className="px-20">
-            <div className="flex flex-col justify-center items-start gap-10 w-full p-10 pb-24 bg-[#EFF6FF] rounded-2xl">
-                <div className="flex flex-col justify-center items-center gap-5 w-full">
-                    <div className="text-5xl font-bold w-full text-center">
+        <div className="container">
+            <div className="flex flex-col justify-center items-start gap-5 sm:gap-8 lg:gap-10 w-full p-5 sm:p-8 lg:p-10 pb-10 sm:pb-16 lg:pb-24 bg-[#EFF6FF] rounded-xl sm:rounded-2xl">
+                <div className="flex flex-col justify-center items-center gap-3 sm:gap-4 lg:gap-5 w-full">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold w-full text-center">
                         Buku Favorit Sepanjang Semester
-                    </div>
-                    <hr className="h-0.5 bg-black w-1/3 self-center rounded-full" />
-                    <div className="w-1/3 text-center leading-tight">
-                        Deretan buku terbaik pilihan pembaca selama satu
-                        semester penuh. Bacaan yang terus relevan, memikat, dan
-                        tak terlupakan.
-                    </div>
+                    </h2>
+                    <hr className="h-0.5 bg-black w-2/3 sm:w-1/2 lg:w-1/3 self-center rounded-full" />
+                    <p className="w-full sm:w-2/3 md:w-1/2 lg:w-1/3 text-center text-sm sm:text-base leading-tight">
+                        Deretan buku terbaik pilihan pembaca selama satu semester penuh. Bacaan yang terus relevan, memikat, dan tak terlupakan.
+                    </p>
                 </div>
-                <div className="relative flex flex-col justify-start items-start w-[300px] bg-[#54473F] p-3 h-[520px] rounded-2xl gap-20">
-                    <div className="text-3xl font-extrabold w-full text-white">
-                        SEPANJANG{" "}
-                        <span className="text-[#CBD2A4]">SEMESTER</span>
+
+                <div className="w-full flex flex-col lg:flex-row">
+                    <div className="flex flex-col justify-start items-start w-full bg-[#54473F] p-3 sm:p-4 rounded-xl sm:rounded-2xl gap-3 sm:gap-5">
+                        <h3 className="text-xl sm:text-2xl lg:text-3xl font-extrabold w-full text-white">
+                            SEPANJANG {" "}
+                            <span className="text-[#F0F1C5]">SEMESTER</span>{" "}
+                        </h3>
+                        <img
+                            className="h-auto w-full"
+                            src="/girl-reading.svg"
+                            alt="boy-reading"
+                        />
                     </div>
-                    <img
-                        className="h-auto w-full"
-                        src="/girl-reading.svg"
-                        alt="girl-reading"
-                    />
-                    <div className="absolute flex flex-col justify-start items-center w-[calc(100vw-470px)] left-full -translate-x-[70px] top-[30px] gap-3 pr-4">
-                        <button
-                            className="w-full text-right underline text-lg font-bold cursor-pointer pr-4"
-                            onClick={() => alert("Lihat Semua")}
-                        >
-                            Lihat Semua
-                        </button>
+
+                    <div className="flex flex-col xl:w-[calc(100vw-470px)] xl:left-full gap-3">
+                        <div className="flex justify-between items-center w-full">
+                            <button
+                                className="w-full text-right underline text-lg font-bold cursor-pointer pr-4"
+                                onClick={() => alert("Lihat Semua")}
+                            >
+                                Lihat Semua
+                            </button>
+                        </div>
+
                         <Swiper
                             modules={[Pagination]}
-                            spaceBetween={20}
-                            slidesPerView={5}
-                            slidesPerGroup={5}
+                            spaceBetween={10}
+                            slidesPerView={slidesPerView}
+                            slidesPerGroup={slidesPerView}
                             pagination={false}
                             onSwiper={(swiper) => (swiperRef.current = swiper)}
                             onSlideChange={(swiper) =>
                                 setActiveIndex(
-                                    Math.floor(swiper.activeIndex / 5)
+                                    Math.floor(
+                                        swiper.activeIndex / slidesPerView
+                                    )
                                 )
                             }
-                            className="w-full h-[450px]"
+                            className="w-full"
+                            breakpoints={{
+                                320: { slidesPerView: 1, slidesPerGroup: 1 },
+                                640: {
+                                    slidesPerView: 2,
+                                    slidesPerGroup: 2,
+                                    spaceBetween: 15,
+                                },
+                                768: {
+                                    slidesPerView: 3,
+                                    slidesPerGroup: 3,
+                                    spaceBetween: 15,
+                                },
+                                1024: {
+                                    slidesPerView: 4,
+                                    slidesPerGroup: 4,
+                                    spaceBetween: 20,
+                                },
+                                1280: {
+                                    slidesPerView: 5,
+                                    slidesPerGroup: 5,
+                                    spaceBetween: 20,
+                                },
+                            }}
                         >
-                            {dataDummy.map((data, index) => (
+                            {dataBuku.map((data, index) => (
                                 <SwiperSlide
                                     key={index}
                                     className="flex items-stretch"
@@ -129,14 +173,14 @@ const BukuSemester = () => {
                                 </SwiperSlide>
                             ))}
                         </Swiper>
+
                         <div className="flex justify-center items-center gap-2 mt-4">
-                            {/* Left Arrow */}
                             <button
                                 className="cursor-pointer w-8 h-8 flex items-center justify-center text-xl font-bold rounded-full border border-gray-300 hover:bg-gray-200 disabled:opacity-50"
                                 onClick={() => {
                                     if (activeIndex > 0) {
                                         swiperRef.current?.slideTo(
-                                            (activeIndex - 1) * 5
+                                            (activeIndex - 1) * slidesPerView
                                         );
                                     }
                                 }}
@@ -145,30 +189,69 @@ const BukuSemester = () => {
                                 <MdOutlineKeyboardArrowLeft />
                             </button>
 
-                            {/* Dots */}
-                            {Array.from({ length: totalPages }).map(
-                                (_, idx) => (
-                                    <div
-                                        key={idx}
-                                        className={`w-3 h-3 rounded-full cursor-pointer transition-all duration-300 ${
-                                            activeIndex === idx
+                            {totalPages <= 5 ? (
+                                Array.from({ length: totalPages }).map(
+                                    (_, idx) => (
+                                        <div
+                                            key={idx}
+                                            className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full cursor-pointer transition-all duration-300 ${activeIndex === idx
                                                 ? "bg-cust-blue"
                                                 : "bg-cust-dark-gray"
-                                        }`}
-                                        onClick={() =>
-                                            swiperRef.current?.slideTo(idx * 5)
-                                        }
-                                    />
+                                                }`}
+                                            onClick={() =>
+                                                swiperRef.current?.slideTo(
+                                                    idx * slidesPerView
+                                                )
+                                            }
+                                        />
+                                    )
                                 )
+                            ) : (
+                                <>
+                                    {Array.from({
+                                        length: Math.min(3, totalPages),
+                                    }).map((_, idx) => (
+                                        <div
+                                            key={idx}
+                                            className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full cursor-pointer transition-all duration-300 ${activeIndex === idx
+                                                ? "bg-cust-blue"
+                                                : "bg-cust-dark-gray"
+                                                }`}
+                                            onClick={() =>
+                                                swiperRef.current?.slideTo(
+                                                    idx * slidesPerView
+                                                )
+                                            }
+                                        />
+                                    ))}
+                                    {totalPages > 3 && (
+                                        <div className="text-xs font-bold">
+                                            ...
+                                        </div>
+                                    )}
+                                    {totalPages > 3 && (
+                                        <div
+                                            className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full cursor-pointer transition-all duration-300 ${activeIndex === totalPages - 1
+                                                ? "bg-cust-blue"
+                                                : "bg-cust-dark-gray"
+                                                }`}
+                                            onClick={() =>
+                                                swiperRef.current?.slideTo(
+                                                    (totalPages - 1) *
+                                                    slidesPerView
+                                                )
+                                            }
+                                        />
+                                    )}
+                                </>
                             )}
-
-                            {/* Right Arrow */}
+                            =
                             <button
                                 className="cursor-pointer w-8 h-8 flex items-center justify-center text-xl font-bold rounded-full border border-gray-300 hover:bg-gray-200 disabled:opacity-50"
                                 onClick={() => {
                                     if (activeIndex < totalPages - 1) {
                                         swiperRef.current?.slideTo(
-                                            (activeIndex + 1) * 5
+                                            (activeIndex + 1) * slidesPerView
                                         );
                                     }
                                 }}
@@ -184,4 +267,4 @@ const BukuSemester = () => {
     );
 };
 
-export default BukuSemester;
+export default BukuMinggu;
