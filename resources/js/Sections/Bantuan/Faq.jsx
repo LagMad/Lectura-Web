@@ -59,12 +59,41 @@ const Faq = () => {
                 <div className='container space-y-10'>
                     <div className='text-center'>
                         <h1 className='font-bold text-4xl'>Masih Memiliki Pertanyaan?</h1>
-                        <p className='font-lg mt-2'>tidak dapat menemukan apa yang Anda cari? Kantor Perpustakaan kami di sini untuk membantu</p>
+                        <p className='font-lg mt-2'>Tidak dapat menemukan apa yang Anda cari? Kantor Perpustakaan kami di sini untuk membantu</p>
                     </div>
-                    <div className='flex justify-center gap-4 lg:gap-8'>
-                        <Button variant='filled'>Chat dengan kami</Button>
-                        <Button>Detail Bantuan</Button>
-                    </div>
+
+                    <form className="max-w-xl mx-auto space-y-4">
+                        <div className="flex items-center border rounded-lg px-4 py-2 gap-2">
+                            <Icon icon="ix:user-profile-filled" className="text-cust-dark-gray text-xl" />
+                            <input
+                                type="text"
+                                placeholder="Nama kalian"
+                                className="w-full outline-none"
+                            />
+                        </div>
+
+                        <div className="flex items-center border rounded-lg px-4 py-2 gap-2">
+                            <Icon icon="la:id-card" className="text-cust-dark-gray text-xl" />
+                            <input
+                                type="text"
+                                placeholder="NIS kalian"
+                                className="w-full outline-none"
+                            />
+                        </div>
+
+                        <div className="flex items-start border rounded-lg px-4 py-2 gap-2">
+                            <Icon icon="mdi:help-circle-outline" className="text-cust-dark-gray text-xl mt-1" />
+                            <textarea
+                                placeholder="Tuliskan pertanyaan nya disini"
+                                rows="4"
+                                className="w-full outline-none resize-none"
+                            ></textarea>
+                        </div>
+
+                        <div className="text-right">
+                            <Button variant='filled' type="submit">Kirim</Button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </section>
