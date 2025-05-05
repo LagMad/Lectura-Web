@@ -44,7 +44,7 @@ export default function AdminLayout({
                                 <span className="text-lg font-medium text-gray-700">
                                     Ahmad Irza
                                 </span>
-                                <div className="h-8 w-8 rounded-full bg-cust-light-blue text-white flex items-center justify-center">
+                                <div className="h-8 w-8 rounded-full bg-cust-blue text-white flex items-center justify-center">
                                     <User size={18} />
                                 </div>
                             </div>

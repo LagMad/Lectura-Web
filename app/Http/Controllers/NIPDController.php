@@ -13,7 +13,7 @@ class NIPDController extends Controller
         $nipd = $request->input('nipd');
         
         $validNipd = ValidNIPD::where('nipd', $nipd)
-            ->where('is_registered', false)
+            ->where('is_registered', 0)
             ->first();
         
         if ($validNipd) {

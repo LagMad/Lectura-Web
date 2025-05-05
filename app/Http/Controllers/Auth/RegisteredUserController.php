@@ -45,7 +45,7 @@ class RegisteredUserController extends Controller
     
             // Periksa apakah NIPD valid dan belum terdaftar
             $validNipd = ValidNIPD::where('nipd', $request->nipd)
-                ->where('is_registered', false)
+                ->where('is_registered', 0)
                 ->first();
     
             if (!$validNipd) {
@@ -63,7 +63,7 @@ class RegisteredUserController extends Controller
             ]);
     
             // Update status NIPD menjadi sudah terdaftar
-            $validNipd->update(['is_registered' => true]);
+            $validNipd->update(['is_registered' => 1]);
 
             event(new Registered($user));
 
