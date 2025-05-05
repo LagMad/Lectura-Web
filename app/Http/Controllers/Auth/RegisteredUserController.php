@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\ValidNIPD;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -33,22 +34,36 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         try {
-            // Validate request data
-            $validated = $request->validate([
+            
+            $request->validate([
                 'name' => ['required', 'string', 'max:255'],
                 'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
                 'password' => ['required', 'confirmed', Rules\Password::defaults()],
                 'role' => ['sometimes', 'string', 'in:admin,siswa'],
+                'nipd' => 'required|string|exists:valid_nipds,nipd',
             ]);
-
-            $role = $validated['role'] ?? 'siswa';
-
+    
+            // Periksa apakah NIPD valid dan belum terdaftar
+            $validNipd = ValidNIPD::where('nipd', $request->nipd)
+                ->where('is_registered', false)
+                ->first();
+    
+            if (!$validNipd) {
+                return back()->withErrors([
+                    'nipd' => 'NIPD tidak valid atau sudah terdaftar.',
+                ]);
+            }
+    
             $user = User::create([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'password' => Hash::make($validated['password']),
-                'role' => $role,
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'nipd' => $request->nipd,
+                'role' => $request->role,
             ]);
+    
+            // Update status NIPD menjadi sudah terdaftar
+            $validNipd->update(['is_registered' => true]);
 
             event(new Registered($user));
 

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\NIPDController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -18,6 +19,8 @@ Route::get('/edit-buku/{book}', [BookController::class, 'edit'])->name('books.ed
 Route::put('/update-buku/{book}', [BookController::class, 'update'])->name('books.update');
 Route::delete('/hapus-buku/{book}', [BookController::class, 'destroy'])->name('books.destroy');
 Route::get('/admin-buku', [BookController::class, 'adminBuku'])->name('books.admin');
+
+Route::post('/validate-nipd', [NIPDController::class, 'validateNipd']);
 
 Route::get('/bantuan', function () {
     return Inertia::render('Bantuan');

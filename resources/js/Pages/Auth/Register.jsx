@@ -3,6 +3,7 @@ import { Link, useForm } from "@inertiajs/react";
 import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
+import axios from "axios";
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -10,8 +11,55 @@ export default function Register() {
         email: "",
         password: "",
         password_confirmation: "",
+        nipd: "",
         role: "siswa",
     });
+
+    const [nipdStatus, setNipdStatus] = useState({
+        checked: false,
+        valid: false,
+        message: "",
+    });
+
+    const validateNipd = async () => {
+        try {
+            const response = await axios.post("/validate-nipd", {
+                nipd: data.nipd,
+            });
+
+            setNipdStatus({
+                checked: true,
+                valid: response.data.valid,
+                message: response.data.message,
+            });
+        } catch (error) {
+            setNipdStatus({
+                checked: true,
+                valid: false,
+                message: "Terjadi kesalahan saat memvalidasi NIPD.",
+            });
+        }
+    };
+
+    const handleOnChange = (event) => {
+        const { name, value } = event.target;
+
+        if (name === "nipd") {
+            const numericValue = value.replace(/\D/g, "");
+
+            const truncatedValue = numericValue.slice(0, 5);
+
+            setData(name, truncatedValue);
+
+            setNipdStatus({
+                checked: false,
+                valid: false,
+                message: "",
+            });
+        } else {
+            setData(name, value);
+        }
+    };
 
     const [passwordRequirements, setPasswordRequirements] = useState({
         minLength: false,
@@ -33,6 +81,22 @@ export default function Register() {
     const submit = (e) => {
         e.preventDefault();
 
+        // Cek validasi NIPD sebelum submit jika belum divalidasi
+        if (!nipdStatus.checked) {
+            validateNipd().then(() => {
+                if (nipdStatus.valid) {
+                    proceedWithSubmit();
+                }
+            });
+        } else if (nipdStatus.valid) {
+            proceedWithSubmit();
+        } else {
+            // Jika NIPD tidak valid, fokus ke field NIPD
+            document.getElementById("nipd").focus();
+        }
+    };
+
+    const proceedWithSubmit = () => {
         post(route("register"), {
             onFinish: () => reset("password", "password_confirmation"),
         });
@@ -104,6 +168,51 @@ export default function Register() {
                                 />
                                 <InputError
                                     message={errors.name}
+                                    className="mt-2"
+                                />
+                            </div>
+
+                            <div>
+                                <InputLabel
+                                    htmlFor="nipd"
+                                    value="NIPD (Nomor Induk Peserta Didik)"
+                                />
+                                <div className="flex">
+                                    <TextInput
+                                        id="nipd"
+                                        name="nipd"
+                                        value={data.nipd}
+                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3"
+                                        onChange={handleOnChange}
+                                        required
+                                        maxLength={5}
+                                        pattern="[0-9]*"
+                                        inputMode="numeric"
+                                    />
+                                    <button
+                                        type="button"
+                                        className="ml-2 mt-1 px-3 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                        onClick={validateNipd}
+                                        disabled={!data.nipd || processing}
+                                    >
+                                        Validasi
+                                    </button>
+                                </div>
+
+                                {nipdStatus.checked && (
+                                    <div
+                                        className={`mt-2 text-sm ${
+                                            nipdStatus.valid
+                                                ? "text-green-600"
+                                                : "text-red-600"
+                                        }`}
+                                    >
+                                        {nipdStatus.message}
+                                    </div>
+                                )}
+
+                                <InputError
+                                    message={errors.nipd}
                                     className="mt-2"
                                 />
                             </div>
