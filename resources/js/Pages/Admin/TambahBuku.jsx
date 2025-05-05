@@ -4,7 +4,6 @@ import TambahBuku from "@/Sections/AdminBuku/TambahBuku";
 
 export default function Buku() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
     };

@@ -6,30 +6,25 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    public function up()
     {
         Schema::create('books', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->string('isbn')->unique();
-            $table->unsignedBigInteger('category_id');
-            $table->year('year')->nullable();
-            $table->string('cover_image')->nullable();
-            $table->string('pdf_link');
+            $table->string('judul');
+            $table->string('penulis');
+            $table->integer('jumlah_halaman');
+            $table->string('kategori')->nullable();
+            $table->string('penerbit')->nullable();
+            $table->string('tahun_terbit')->nullable();
+            $table->string('bahasa')->nullable();
+            $table->text('deskripsi')->nullable();
+            $table->string('cover_path')->nullable();
+            $table->string('status');
             $table->timestamps();
-        
-            $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
         });
-        
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('books');
     }

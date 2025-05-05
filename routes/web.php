@@ -1,22 +1,23 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\BookController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('Home', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
+    return Inertia::render('Home');
+})->name('home');
 
-Route::get('/buku', function () {
-    return Inertia::render('Buku');
-});
+Route::get('/buku', [BookController::class, 'index'])->name('books.index');
+Route::get('/admin-tambah-buku', [BookController::class, 'create'])->name('books.create');
+Route::post('/simpan-buku', [BookController::class, 'store'])->name('books.store');
+Route::get('/detail-buku/{book}', [BookController::class, 'show'])->name('books.show');
+Route::get('/edit-buku/{book}', [BookController::class, 'edit'])->name('books.edit');
+Route::put('/update-buku/{book}', [BookController::class, 'update'])->name('books.update');
+Route::delete('/hapus-buku/{book}', [BookController::class, 'destroy'])->name('books.destroy');
+Route::get('/admin-buku', [BookController::class, 'adminBuku'])->name('books.admin');
 
 Route::get('/bantuan', function () {
     return Inertia::render('Bantuan');
@@ -30,21 +31,10 @@ Route::get('/admin-pengguna', function () {
     return Inertia::render('Admin/Pengguna');
 });
 
-Route::get('/admin-buku', function () {
-    return Inertia::render('Admin/Buku');
-});
-
-Route::get('/admin-tambah-buku', function () {
-    return Inertia::render('Admin/TambahBuku');
-});
-
 Route::get('/admin-pengaturan', function () {
     return Inertia::render('Admin/Pengaturan');
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
