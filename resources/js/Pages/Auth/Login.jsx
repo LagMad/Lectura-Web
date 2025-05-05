@@ -13,6 +13,15 @@ export default function Login({ status, canResetPassword }) {
         remember: false,
     });
 
+    const handleOnChange = (event) => {
+        setData(
+            event.target.name,
+            event.target.type === "checkbox"
+                ? event.target.checked
+                : event.target.value
+        );
+    };
+
     const submit = (e) => {
         e.preventDefault();
 
@@ -33,85 +42,107 @@ export default function Login({ status, canResetPassword }) {
                     membaca yang praktis dan menyenangkan!
                 </div>
             </div>
-            <div className="w-1/2 h-fit my-auto">
-                <div className="w-fit mx-auto font-bold text-2xl">
-                    Masuk Akun Sekolah
-                </div>
-                <div className="w-8/12 mx-auto">
-                    <form onSubmit={submit}>
-                        <div>
-                            <TextInput
-                                id="email"
-                                type="email"
-                                name="email"
-                                placeholder="Email"
-                                value={data.email}
-                                className="mt-1 block w-full border-2 border-black"
-                                autoComplete="username"
-                                isFocused={true}
-                                onChange={(e) =>
-                                    setData("email", e.target.value)
-                                }
-                            />
-
-                            <InputError
-                                message={errors.email}
-                                className="mt-2"
-                            />
+            <div className="w-1/2 h-fit my-auto bg-white">
+                <div className="flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-white">
+                    <div className="w-full sm:max-w-md mt-6 px-6 py-4overflow-hidden sm:rounded-lg">
+                        <div className="text-center mb-6">
+                            <h1 className="text-3xl font-bold text-blue-600 mb-1">
+                                Masuk E-Library
+                            </h1>
+                            <p className="text-gray-600">
+                                Masuk ke akun sekolah mu
+                            </p>
                         </div>
 
-                        <div className="mt-4">
-                            <TextInput
-                                id="password"
-                                type="password"
-                                name="password"
-                                value={data.password}
-                                className="mt-1 block w-full border-2 border-black"
-                                autoComplete="current-password"
-                                placeholder="Kata Sandi"
-                                onChange={(e) =>
-                                    setData("password", e.target.value)
-                                }
-                            />
-
-                            <InputError
-                                message={errors.password}
-                                className="mt-2"
-                            />
-                        </div>
-
-                        <div className="mt-4 justify-between flex">
-                            <label className="flex items-center">
-                                <Checkbox
-                                    name="remember"
-                                    checked={data.remember}
-                                    onChange={(e) =>
-                                        setData("remember", e.target.checked)
-                                    }
+                        <form onSubmit={submit}>
+                            <div className="mb-4">
+                                <label
+                                    className="block text-gray-700 mb-2"
+                                    htmlFor="email"
+                                >
+                                    Alamat Email
+                                </label>
+                                <input
+                                    id="email"
+                                    type="email"
+                                    name="email"
+                                    value={data.email}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    onChange={handleOnChange}
+                                    required
+                                    autoFocus
                                 />
-                                <span className="ms-2 text-sm text-gray-600">
-                                    Remember me
-                                </span>
-                            </label>
-                            {canResetPassword && (
+                                <InputError
+                                    message={errors.email}
+                                    className="mt-2"
+                                />
+                            </div>
+
+                            <div className="mb-4">
+                                <label
+                                    className="block text-gray-700 mb-2"
+                                    htmlFor="password"
+                                >
+                                    Kata Sandi
+                                </label>
+                                <input
+                                    id="password"
+                                    type="password"
+                                    name="password"
+                                    value={data.password}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    onChange={handleOnChange}
+                                    required
+                                />
+                                <InputError
+                                    message={errors.password}
+                                    className="mt-2"
+                                />
+                            </div>
+
+                            <div className="flex items-center justify-between mb-4">
+                                <label className="inline-flex items-center">
+                                    <input
+                                        type="checkbox"
+                                        name="remember"
+                                        checked={data.remember}
+                                        onChange={handleOnChange}
+                                        className="rounded border-gray-300 text-blue-600 shadow-sm focus:ring-blue-500"
+                                    />
+                                    <span className="ml-2 text-sm text-gray-600">
+                                        Ingat Saya
+                                    </span>
+                                </label>
+
                                 <Link
                                     href={route("password.request")}
-                                    className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                    className="text-sm text-blue-600 hover:underline"
                                 >
-                                    Forgot your password?
+                                    Lupa Kata Sandi?
                                 </Link>
-                            )}
-                        </div>
+                            </div>
 
-                        <div className="mt-4 w-full items-center">
-                            <PrimaryButton
-                                className="w-full text-center py-3"
+                            <button
+                                type="submit"
                                 disabled={processing}
+                                className="w-full bg-blue-600 text-white rounded-md py-2 px-4 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
                             >
-                                <div className="mx-auto w-fit">Masuk</div>
-                            </PrimaryButton>
-                        </div>
-                    </form>
+                                Masuk
+                            </button>
+
+                            <div className="flex items-center justify-center mt-4">
+                                <span className="text-sm text-gray-600">
+                                    Belum Punya Akun?
+                                </span>
+                                <Link
+                                    href={route("register")}
+                                    className="ml-1 text-sm text-blue-600 hover:underline"
+                                >
+                                    Daftar
+                                </Link>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
             {status && (
