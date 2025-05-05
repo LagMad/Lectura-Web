@@ -20,9 +20,7 @@ export default function PengaturanNotifikasi() {
                         <button
                             onClick={() => setEmailNotif(!emailNotif)}
                             className={`w-12 h-6 rounded-full transition-colors duration-300 ease-in-out focus:outline-none cursor-pointer ${
-                                emailNotif
-                                    ? "bg-cust-light-blue"
-                                    : "bg-gray-200"
+                                emailNotif ? "bg-cust-blue" : "bg-gray-200"
                             }`}
                         >
                             <span
@@ -46,7 +44,7 @@ export default function PengaturanNotifikasi() {
                         <button
                             onClick={() => setSmsNotif(!smsNotif)}
                             className={`w-12 h-6 rounded-full transition-colors duration-300 ease-in-out focus:outline-none cursor-pointer ${
-                                smsNotif ? "bg-cust-light-blue" : "bg-gray-200"
+                                smsNotif ? "bg-cust-blue" : "bg-gray-200"
                             }`}
                         >
                             <span
