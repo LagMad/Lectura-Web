@@ -70,7 +70,8 @@ class BookController extends Controller
         'bahasa' => 'nullable|string|max:255',
         'deskripsi' => 'nullable|string',
         'cover' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        'status' => 'required|string|max:255'
+        'status' => 'required|string|max:255',
+        'link' => 'nullable|string|max:255'
     ]);
 
     $data = $request->except('cover');
@@ -108,7 +109,7 @@ class BookController extends Controller
      */
     public function edit(Book $book)
     {
-        return Inertia::render('Books/Edit', [
+        return Inertia::render('Admin/EditBuku', [
             'book' => $book,
         ]);
     
@@ -117,22 +118,33 @@ class BookController extends Controller
     /**
      * Update the specified book in database.
      */
-    public function update(Request $request, Book $book)
+    public function update(Request $request, $id)
     {
-        $request->validate([
-            'judul' => 'required|string|max:255',
-            'penulis' => 'required|string|max:255',
-            'jumlah_halaman' => 'required|integer|min:1',
+        // Find the book by ID
+        $book = Book::findOrFail($id);
+        
+        // Validate the request
+        $validated = $request->validate([
+            'judul' => 'string|max:255',
+            'penulis' => 'string|max:255',
+            'jumlah_halaman' => 'integer|min:1',
             'kategori' => 'nullable|string|max:255',
             'penerbit' => 'nullable|string|max:255',
             'tahun_terbit' => 'nullable|string|max:4',
             'bahasa' => 'nullable|string|max:255',
+            'link' => 'nullable|string|max:255',
             'deskripsi' => 'nullable|string',
+            'status' => 'in:Tersedia,Tidak Tersedia,Terkendala',
             'cover' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-
-        $data = $request->except('cover');
-
+        
+        // Log the request data for debugging
+        \Log::info('Book update request data:', $request->all());
+        \Log::info('Book before update:', $book->toArray());
+        
+        // Extract data except 'cover'
+        $data = $request->except(['cover', '_method', '_token']);
+        
         // Handle cover upload
         if ($request->hasFile('cover')) {
             if ($book->cover_path) {
@@ -141,13 +153,23 @@ class BookController extends Controller
             
             $path = $request->file('cover')->store('covers', 'public');
             $data['cover_path'] = $path;
+            $data['cover_url'] = Storage::url($path);
         }
-
-        $book->update($data);
-
-        return redirect()->route('books.index')
-            ->with('success', 'Buku berhasil diperbarui!');
-    }
+        
+        // Perform the update
+        $updated = $book->update($data);
+        
+        // Log after update
+        \Log::info('Book after update:', $book->fresh()->toArray());
+        \Log::info('Update successful: ' . ($updated ? 'Yes' : 'No'));
+        
+        // Return response
+        return response()->json([
+            'message' => 'Buku berhasil diperbarui.',
+            'success' => $updated,
+            'book' => $book->fresh()
+        ]);
+}
 
     /**
      * Remove the specified book from database.

@@ -78,7 +78,8 @@ export default function AdminLayout({
                                     href="/admin-buku"
                                     className={`flex items-center px-4 py-2 text-sm font-medium ${
                                         isActive("/admin-buku") ||
-                                        isActive("/admin-tambah-buku")
+                                        isActive("/admin-tambah-buku") ||
+                                        isActive("/admin-edit-buku/")
                                             ? "text-cust-blue bg-blue-50 hover:bg-blue-100"
                                             : "text-gray-700 hover:bg-gray-100"
                                     }`}
