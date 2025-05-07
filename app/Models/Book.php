@@ -19,7 +19,8 @@ class Book extends Model
         'bahasa',
         'deskripsi',
         'cover_path',
-        'status'
+        'status',
+        'link'
     ];
 
     public function reviews()

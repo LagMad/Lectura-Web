@@ -15,7 +15,7 @@ Route::get('/buku', [BookController::class, 'index'])->name('books.index');
 Route::get('/admin-tambah-buku', [BookController::class, 'create'])->name('books.create');
 Route::post('/simpan-buku', [BookController::class, 'store'])->name('books.store');
 Route::get('/detail-buku/{book}', [BookController::class, 'show'])->name('books.show');
-Route::get('/edit-buku/{book}', [BookController::class, 'edit'])->name('books.edit');
+Route::get('/admin-edit-buku/{book}', [BookController::class, 'edit'])->name('books.edit');
 Route::put('/update-buku/{book}', [BookController::class, 'update'])->name('books.update');
 Route::delete('/hapus-buku/{book}', [BookController::class, 'destroy'])->name('books.destroy');
 Route::get('/admin-buku', [BookController::class, 'adminBuku'])->name('books.admin');

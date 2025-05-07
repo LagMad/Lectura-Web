@@ -12,7 +12,7 @@ const navLinks = [
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const { url, auth } = usePage().props; // Assuming auth info is passed from backend via props
+    const { url, auth } = usePage();
 
     const handleLogout = async () => {
         try {
@@ -44,7 +44,7 @@ const Navbar = () => {
                                     href={link.href}
                                     className={`transition-colors duration-200 hover:text-cust-primary-color ${
                                         url === link.href
-                                            ? "text-cust-primary-color font-semibold"
+                                            ? "text-cust-blue font-bold"
                                             : "text-gray-700"
                                     }`}
                                 >
@@ -103,7 +103,7 @@ const Navbar = () => {
                                 href={link.href}
                                 className={`block text-center font-medium rounded transition-colors duration-200 ${
                                     url === link.href
-                                        ? "text-cust-primary-color font-semibold"
+                                        ? "text-cust-blue font-bold"
                                         : "text-gray-700"
                                 }`}
                             >
