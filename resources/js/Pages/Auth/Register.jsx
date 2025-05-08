@@ -12,7 +12,7 @@ export default function Register() {
         password: "",
         password_confirmation: "",
         nipd: "",
-        role: "siswa",
+        role: "Siswa",
     });
 
     const [nipdStatus, setNipdStatus] = useState({

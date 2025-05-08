@@ -12,7 +12,7 @@ const navLinks = [
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const { url, auth } = usePage();
+    const { url, auth } = usePage().props;
 
     const handleLogout = async () => {
         try {
