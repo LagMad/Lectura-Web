@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\PenggunaController;
 use App\Http\Controllers\NIPDController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -34,9 +35,10 @@ Route::get('/tentang', function () {
     return Inertia::render('Tentang');
 });
 
-Route::get('/admin-pengguna', function () {
-    return Inertia::render('Admin/Pengguna');
-});
+Route::get('/admin-pengguna', [PenggunaController::class, 'index'])->name('users.admin');
+Route::delete('/hapus-user/{user}', [PenggunaController::class, 'destroy'])->name('users.destroy');
+
+
 
 Route::get('/admin-pengaturan', function () {
     return Inertia::render('Admin/Pengaturan');

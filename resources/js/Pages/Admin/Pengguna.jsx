@@ -3,7 +3,7 @@ import AdminLayout from "@/Layouts/AdminLayout";
 import ManajemenPengguna from "@/Sections/AdminPengguna/ManajemenPengguna";
 import PengaturanSistem from "@/Sections/AdminPengguna/PengaturanSistem";
 
-export default function Pengguna() {
+export default function Pengguna({ users }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const toggleSidebar = () => {
@@ -22,7 +22,7 @@ export default function Pengguna() {
             toggleSidebar={toggleSidebar}
         >
             <div className="flex flex-col w-full">
-                <ManajemenPengguna />
+                <ManajemenPengguna users={users} />
                 <PengaturanSistem />
             </div>
         </AdminLayout>

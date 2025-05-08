@@ -60,6 +60,7 @@ class RegisteredUserController extends Controller
                 'password' => Hash::make($request->password),
                 'nipd' => $request->nipd,
                 'role' => $request->role,
+                'status' => 'Aktif'
             ]);
     
             // Update status NIPD menjadi sudah terdaftar
