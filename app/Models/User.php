@@ -20,7 +20,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role', // Tambahkan role ke fillable attributes
+        'role',
+        'nipd',
+        'status'
     ];
 
     /**
@@ -52,6 +54,11 @@ class User extends Authenticatable
     {
         return $this->role === 'admin';
     }
+
+    public function isGuru()
+    {
+        return $this->role === 'guru';
+    }
     
     /**
      * Cek apakah user adalah siswa
@@ -62,4 +69,15 @@ class User extends Authenticatable
     {
         return $this->role === 'siswa';
     }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function jurnalings()
+    {
+        return $this->hasMany(Jurnaling::class, 'id_siswa');
+    }
+
 }

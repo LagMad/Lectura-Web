@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
 import AdminLayout from "@/Layouts/AdminLayout";
-import ManajemenPengguna from "@/Sections/AdminPengguna/ManajemenPengguna";
-import PengaturanSistem from "@/Sections/AdminPengguna/PengaturanSistem";
+import EditBuku from "@/Sections/AdminBuku/EditBuku";
 
-export default function Pengguna({ users }) {
+export default function Buku({ book }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
     };
@@ -21,10 +19,7 @@ export default function Pengguna({ users }) {
             isSidebarOpen={isSidebarOpen}
             toggleSidebar={toggleSidebar}
         >
-            <div className="flex flex-col w-full">
-                <ManajemenPengguna users={users} />
-                <PengaturanSistem />
-            </div>
+            <EditBuku book={book} />
         </AdminLayout>
     );
 }

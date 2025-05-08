@@ -39,13 +39,13 @@ class RegisteredUserController extends Controller
                 'name' => ['required', 'string', 'max:255'],
                 'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
                 'password' => ['required', 'confirmed', Rules\Password::defaults()],
-                'role' => ['sometimes', 'string', 'in:admin,siswa'],
+                'role' => ['sometimes', 'string', 'in:admin,siswa,guru'],
                 'nipd' => 'required|string|exists:valid_nipds,nipd',
             ]);
     
             // Periksa apakah NIPD valid dan belum terdaftar
             $validNipd = ValidNIPD::where('nipd', $request->nipd)
-                ->where('is_registered', false)
+                ->where('is_registered', 0)
                 ->first();
     
             if (!$validNipd) {
@@ -60,10 +60,11 @@ class RegisteredUserController extends Controller
                 'password' => Hash::make($request->password),
                 'nipd' => $request->nipd,
                 'role' => $request->role,
+                'status' => 'Aktif'
             ]);
     
             // Update status NIPD menjadi sudah terdaftar
-            $validNipd->update(['is_registered' => true]);
+            $validNipd->update(['is_registered' => 1]);
 
             event(new Registered($user));
 
@@ -89,6 +90,7 @@ class RegisteredUserController extends Controller
     {
         return match ($role) {
             'admin' => route('books.admin'),
+            'guru' => route('books.admin'),
             default => route('home'),
         };
     }

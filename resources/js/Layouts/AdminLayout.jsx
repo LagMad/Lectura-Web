@@ -44,7 +44,7 @@ export default function AdminLayout({
                                 <span className="text-lg font-medium text-gray-700">
                                     Ahmad Irza
                                 </span>
-                                <div className="h-8 w-8 rounded-full bg-cust-light-blue text-white flex items-center justify-center">
+                                <div className="h-8 w-8 rounded-full bg-cust-blue text-white flex items-center justify-center">
                                     <User size={18} />
                                 </div>
                             </div>
@@ -78,7 +78,8 @@ export default function AdminLayout({
                                     href="/admin-buku"
                                     className={`flex items-center px-4 py-2 text-sm font-medium ${
                                         isActive("/admin-buku") ||
-                                        isActive("/admin-tambah-buku")
+                                        isActive("/admin-tambah-buku") ||
+                                        isActive("/admin-edit-buku/")
                                             ? "text-cust-blue bg-blue-50 hover:bg-blue-100"
                                             : "text-gray-700 hover:bg-gray-100"
                                     }`}

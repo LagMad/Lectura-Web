@@ -11,8 +11,8 @@ export default function ManajemenBuku({ books: initialBooks }) {
     const [categories, setCategories] = useState([]);
     const [statuses, setStatuses] = useState([
         "Tersedia",
+        "Tidak Tersedia",
         "Terkendala",
-        "Perbaikan",
     ]);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [bookToDelete, setBookToDelete] = useState(null);
@@ -316,7 +316,7 @@ export default function ManajemenBuku({ books: initialBooks }) {
                                                 book.status === "Tersedia"
                                                     ? "bg-green-100 text-green-500"
                                                     : book.status ===
-                                                      "Terkendala"
+                                                      "Tidak Tersedia"
                                                     ? "bg-red-100 text-red-500"
                                                     : "bg-yellow-100 text-yellow-500"
                                             }`}

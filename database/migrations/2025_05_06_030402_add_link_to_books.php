@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('nipd')->unique();
+        Schema::table('books', function (Blueprint $table) {
+            $table->string('link')->nullable();
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('nipd', function (Blueprint $table) {
-            $table->dropColumn('nipd');
+        Schema::table('books', function (Blueprint $table) {
+            $table->dropColumn('link');
         });
     }
 };

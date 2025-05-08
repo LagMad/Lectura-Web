@@ -19,11 +19,17 @@ class Book extends Model
         'bahasa',
         'deskripsi',
         'cover_path',
-        'status'
+        'status',
+        'link'
     ];
 
     public function reviews()
     {
         return $this->hasMany(Review::class);
+    }
+
+    public function jurnaling()
+    {
+        return $this->hasMany(Jurnaling::class, 'id_buku');
     }
 }
