@@ -53,6 +53,11 @@ class User extends Authenticatable
     {
         return $this->role === 'admin';
     }
+
+    public function isGuru()
+    {
+        return $this->role === 'guru';
+    }
     
     /**
      * Cek apakah user adalah siswa
