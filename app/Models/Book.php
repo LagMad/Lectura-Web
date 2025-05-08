@@ -27,4 +27,9 @@ class Book extends Model
     {
         return $this->hasMany(Review::class);
     }
+
+    public function jurnaling()
+    {
+        return $this->hasMany(Jurnaling::class, 'id_buku');
+    }
 }

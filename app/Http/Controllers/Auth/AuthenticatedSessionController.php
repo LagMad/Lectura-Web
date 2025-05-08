@@ -33,7 +33,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        if ($request->user()->role === 'admin') {
+        if ($request->user()->role === 'admin'|| $request->user()->role === 'guru' ) {
             return redirect()->intended(route('books.admin'));
         } else {
             return redirect()->intended(route('home'));
