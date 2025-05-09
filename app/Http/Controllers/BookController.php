@@ -6,10 +6,28 @@ use Inertia\Inertia;
 use App\Models\Book;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Cloudinary\Cloudinary;
+use Cloudinary\Configuration\Configuration;
 
 class BookController extends Controller
 {
-
+    protected $cloudinary;
+    
+    public function __construct()
+    {
+        $this->cloudinary = new Cloudinary(
+            Configuration::instance([
+                'cloud' => [
+                    'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                    'api_key' => env('CLOUDINARY_API_KEY'),
+                    'api_secret' => env('CLOUDINARY_API_SECRET'),
+                ],
+                'url' => [
+                    'secure' => true
+                ]
+            ])
+        );
+    }
     public function index()
     {
         $books = Book::latest()->paginate(10);
@@ -41,7 +59,6 @@ class BookController extends Controller
             $query->where('status', $request->status);
         }
 
-        // Get books with pagination
         $books = $query->latest()->paginate(10)->appends($request->all());
 
         return Inertia::render('Admin/Buku', [
@@ -49,48 +66,69 @@ class BookController extends Controller
         ]);
     }
 
-
     public function create()
     {
         return Inertia::render('Admin/TambahBuku');
     }
 
-    /**
-     * Store a newly created book in database.
-     */
     public function store(Request $request)
-{
-    $request->validate([
-        'judul' => 'required|string|max:255',
-        'penulis' => 'required|string|max:255',
-        'jumlah_halaman' => 'required|integer|min:1',
-        'kategori' => 'nullable|string|max:255',
-        'penerbit' => 'nullable|string|max:255',
-        'tahun_terbit' => 'nullable|string|max:4',
-        'bahasa' => 'nullable|string|max:255',
-        'deskripsi' => 'nullable|string',
-        'cover' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        'status' => 'required|string|max:255',
-        'link' => 'nullable|string|max:255'
-    ]);
+    {
+        $request->validate([
+            'judul' => 'required|string|max:255',
+            'penulis' => 'required|string|max:255',
+            'jumlah_halaman' => 'required|integer|min:1',
+            'kategori' => 'nullable|string|max:255',
+            'penerbit' => 'nullable|string|max:255',
+            'tahun_terbit' => 'nullable|string|max:4',
+            'bahasa' => 'nullable|string|max:255',
+            'deskripsi' => 'nullable|string',
+            'cover' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'status' => 'required|string|max:255',
+            'link' => 'nullable|string|max:255'
+        ]);
 
-    $data = $request->except('cover');
+        $data = $request->except('cover');
 
-    // Handle cover upload
-    if ($request->hasFile('cover')) {
-        $path = $request->file('cover')->store('covers', 'public');
-        $data['cover_path'] = $path;
+        if ($request->hasFile('cover')) {
+            $file = $request->file('cover');
+            $filePath = $file->getRealPath();
+            
+            try {
+                $uploadResult = $this->cloudinary->uploadApi()->upload($filePath, [
+                    'folder' => 'buku_covers',
+                    'transformation' => [
+                        'width' => 500,
+                        'height' => 750,
+                        'crop' => 'limit'
+                    ],
+                    'resource_type' => 'image',
+                    'access_mode' => 'public'
+                ]);
+                
+                $data['cover_path'] = $uploadResult['secure_url'];
+                $data['cloudinary_public_id'] = $uploadResult['public_id'];
+                
+                \Log::info('Cloudinary upload result:', [
+                    'public_id' => $uploadResult['public_id'],
+                    'url' => $uploadResult['secure_url']
+                ]);
+            } catch (\Exception $e) {
+                \Log::error('Cloudinary upload error: ' . $e->getMessage());
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error uploading cover: ' . $e->getMessage()
+                ], 500);
+            }
+        }
+
+        $book = Book::create($data);
+
+        return response()->json([
+            'success' => true, 
+            'message' => 'Buku berhasil ditambahkan!',
+            'data' => $book
+        ]);
     }
-
-    $book = Book::create($data);
-
-    // Return JSON response instead of redirect
-    return response()->json([
-        'success' => true, 
-        'message' => 'Buku berhasil ditambahkan!',
-        'data' => $book
-    ]);
-}
 
     public function show(Book $book)
     {
@@ -104,23 +142,15 @@ class BookController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for editing the specified book.
-     */
     public function edit(Book $book)
     {
         return Inertia::render('Admin/EditBuku', [
             'book' => $book,
         ]);
-    
     }
 
-    /**
-     * Update the specified book in database.
-     */
     public function update(Request $request, $id)
     {
-        // Find the book by ID
         $book = Book::findOrFail($id);
         
         // Validate the request
@@ -138,52 +168,78 @@ class BookController extends Controller
             'cover' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
         
-        // Log the request data for debugging
         \Log::info('Book update request data:', $request->all());
         \Log::info('Book before update:', $book->toArray());
         
-        // Extract data except 'cover'
         $data = $request->except(['cover', '_method', '_token']);
         
-        // Handle cover upload
         if ($request->hasFile('cover')) {
-            if ($book->cover_path) {
-                Storage::disk('public')->delete($book->cover_path);
+            try {
+                if ($book->cloudinary_public_id) {
+                    $this->cloudinary->uploadApi()->destroy($book->cloudinary_public_id);
+                    \Log::info('Deleted old image from Cloudinary:', ['public_id' => $book->cloudinary_public_id]);
+                }
+                
+                $file = $request->file('cover');
+                $filePath = $file->getRealPath();
+                
+                $uploadResult = $this->cloudinary->uploadApi()->upload($filePath, [
+                    'folder' => 'buku_covers',
+                    'transformation' => [
+                        'width' => 500,
+                        'height' => 750,
+                        'crop' => 'limit'
+                    ],
+                    'resource_type' => 'image',
+                    'access_mode' => 'public'
+                ]);
+                
+                $data['cover_path'] = $uploadResult['secure_url'];
+                $data['cloudinary_public_id'] = $uploadResult['public_id'];
+                
+                \Log::info('Cloudinary upload result:', [
+                    'public_id' => $uploadResult['public_id'],
+                    'url' => $uploadResult['secure_url']
+                ]);
+            } catch (\Exception $e) {
+                \Log::error('Cloudinary upload/delete error: ' . $e->getMessage());
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error handling cover: ' . $e->getMessage()
+                ], 500);
             }
-            
-            $path = $request->file('cover')->store('covers', 'public');
-            $data['cover_path'] = $path;
-            $data['cover_url'] = Storage::url($path);
         }
-        
-        // Perform the update
         $updated = $book->update($data);
         
-        // Log after update
         \Log::info('Book after update:', $book->fresh()->toArray());
         \Log::info('Update successful: ' . ($updated ? 'Yes' : 'No'));
         
-        // Return response
         return response()->json([
             'message' => 'Buku berhasil diperbarui.',
             'success' => $updated,
             'book' => $book->fresh()
         ]);
-}
+    }
 
-    /**
-     * Remove the specified book from database.
-     */
     public function destroy(Book $book)
     {
-        // Delete book cover if exists
-        if ($book->cover_path) {
-            Storage::disk('public')->delete($book->cover_path);
+        try {
+            if ($book->cloudinary_public_id) {
+                $this->cloudinary->uploadApi()->destroy($book->cloudinary_public_id);
+                \Log::info('Deleted image from Cloudinary during book deletion:', [
+                    'book_id' => $book->id, 
+                    'public_id' => $book->cloudinary_public_id
+                ]);
+            }
+
+            $book->delete();
+
+            return redirect()->route('books.admin')
+                ->with('success', 'Buku berhasil dihapus!');
+        } catch (\Exception $e) {
+            \Log::error('Error deleting book or Cloudinary image: ' . $e->getMessage());
+            return redirect()->route('books.admin')
+                ->with('error', 'Terjadi kesalahan saat menghapus buku: ' . $e->getMessage());
         }
-
-        $book->delete();
-
-        return redirect()->route('books.admin')
-            ->with('success', 'Buku berhasil dihapus!');
     }
 }
