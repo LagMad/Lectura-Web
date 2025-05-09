@@ -15,7 +15,6 @@ class BookController extends Controller
     
     public function __construct()
     {
-        // Configure Cloudinary directly in the controller
         $this->cloudinary = new Cloudinary(
             Configuration::instance([
                 'cloud' => [
@@ -60,7 +59,6 @@ class BookController extends Controller
             $query->where('status', $request->status);
         }
 
-        // Get books with pagination
         $books = $query->latest()->paginate(10)->appends($request->all());
 
         return Inertia::render('Admin/Buku', [
@@ -73,9 +71,6 @@ class BookController extends Controller
         return Inertia::render('Admin/TambahBuku');
     }
 
-    /**
-     * Store a newly created book in database.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -94,13 +89,11 @@ class BookController extends Controller
 
         $data = $request->except('cover');
 
-        // Handle cover upload to Cloudinary
         if ($request->hasFile('cover')) {
             $file = $request->file('cover');
             $filePath = $file->getRealPath();
             
             try {
-                // Upload to Cloudinary using the SDK directly
                 $uploadResult = $this->cloudinary->uploadApi()->upload($filePath, [
                     'folder' => 'buku_covers',
                     'transformation' => [
@@ -112,11 +105,9 @@ class BookController extends Controller
                     'access_mode' => 'public'
                 ]);
                 
-                // Store Cloudinary URL and public ID
                 $data['cover_path'] = $uploadResult['secure_url'];
                 $data['cloudinary_public_id'] = $uploadResult['public_id'];
                 
-                // Log the upload result for debugging
                 \Log::info('Cloudinary upload result:', [
                     'public_id' => $uploadResult['public_id'],
                     'url' => $uploadResult['secure_url']
@@ -132,7 +123,6 @@ class BookController extends Controller
 
         $book = Book::create($data);
 
-        // Return JSON response
         return response()->json([
             'success' => true, 
             'message' => 'Buku berhasil ditambahkan!',
@@ -152,9 +142,6 @@ class BookController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for editing the specified book.
-     */
     public function edit(Book $book)
     {
         return Inertia::render('Admin/EditBuku', [
@@ -162,12 +149,8 @@ class BookController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified book in database.
-     */
     public function update(Request $request, $id)
     {
-        // Find the book by ID
         $book = Book::findOrFail($id);
         
         // Validate the request
@@ -185,17 +168,13 @@ class BookController extends Controller
             'cover' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
         
-        // Log the request data for debugging
         \Log::info('Book update request data:', $request->all());
         \Log::info('Book before update:', $book->toArray());
         
-        // Extract data except 'cover'
         $data = $request->except(['cover', '_method', '_token']);
         
-        // Handle cover upload to Cloudinary
         if ($request->hasFile('cover')) {
             try {
-                // Delete old cover from Cloudinary if exists
                 if ($book->cloudinary_public_id) {
                     $this->cloudinary->uploadApi()->destroy($book->cloudinary_public_id);
                     \Log::info('Deleted old image from Cloudinary:', ['public_id' => $book->cloudinary_public_id]);
@@ -204,7 +183,6 @@ class BookController extends Controller
                 $file = $request->file('cover');
                 $filePath = $file->getRealPath();
                 
-                // Upload new cover to Cloudinary
                 $uploadResult = $this->cloudinary->uploadApi()->upload($filePath, [
                     'folder' => 'buku_covers',
                     'transformation' => [
@@ -216,11 +194,9 @@ class BookController extends Controller
                     'access_mode' => 'public'
                 ]);
                 
-                // Store new Cloudinary URL and public ID
                 $data['cover_path'] = $uploadResult['secure_url'];
                 $data['cloudinary_public_id'] = $uploadResult['public_id'];
                 
-                // Log the upload result for debugging
                 \Log::info('Cloudinary upload result:', [
                     'public_id' => $uploadResult['public_id'],
                     'url' => $uploadResult['secure_url']
@@ -233,15 +209,11 @@ class BookController extends Controller
                 ], 500);
             }
         }
-        
-        // Perform the update
         $updated = $book->update($data);
         
-        // Log after update
         \Log::info('Book after update:', $book->fresh()->toArray());
         \Log::info('Update successful: ' . ($updated ? 'Yes' : 'No'));
         
-        // Return response
         return response()->json([
             'message' => 'Buku berhasil diperbarui.',
             'success' => $updated,
@@ -249,13 +221,9 @@ class BookController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified book from database.
-     */
     public function destroy(Book $book)
     {
         try {
-            // Delete book cover from Cloudinary if exists
             if ($book->cloudinary_public_id) {
                 $this->cloudinary->uploadApi()->destroy($book->cloudinary_public_id);
                 \Log::info('Deleted image from Cloudinary during book deletion:', [
