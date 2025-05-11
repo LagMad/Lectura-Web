@@ -18,10 +18,12 @@ class Book extends Model
         'tahun_terbit',
         'bahasa',
         'deskripsi',
+        'status',
         'cover_path',
         'cloudinary_public_id',
-        'status',
-        'link'
+        'link',
+        'gdrive_file_id',
+        'original_filename'
     ];
 
     public function reviews()

@@ -9,13 +9,15 @@ use Illuminate\Support\Facades\Storage;
 use Cloudinary\Cloudinary;
 use Cloudinary\Configuration\Configuration;
 use Illuminate\Support\Facades\DB;
+use App\Services\GoogleDriveService;
 
 
 class BookController extends Controller
 {
     protected $cloudinary;
+    protected $googleDrive;
     
-    public function __construct()
+    public function __construct(GoogleDriveService $googleDrive)
     {
         $this->cloudinary = new Cloudinary(
             Configuration::instance([
@@ -29,6 +31,8 @@ class BookController extends Controller
                 ]
             ])
         );
+
+        $this->googleDrive = $googleDrive;  
     }
 
     public function index()
@@ -157,12 +161,13 @@ class BookController extends Controller
             'bahasa' => 'nullable|string|max:255',
             'deskripsi' => 'nullable|string',
             'cover' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'status' => 'required|string|max:255',
-            'link' => 'nullable|string|max:255'
+            'file_buku' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:10240', // 10MB max
+            'status' => 'required|string|max:255'
         ]);
 
-        $data = $request->except('cover');
+        $data = $request->except(['cover', 'file_buku']);
 
+        // Upload cover jika ada
         if ($request->hasFile('cover')) {
             $file = $request->file('cover');
             $filePath = $file->getRealPath();
@@ -191,6 +196,31 @@ class BookController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Error uploading cover: ' . $e->getMessage()
+                ], 500);
+            }
+        }
+
+        // Upload file ke Google Drive jika ada
+        if ($request->hasFile('file_buku')) {
+            try {
+                $file = $request->file('file_buku');
+                $fileName = $request->judul . ' - ' . $request->penulis . '.' . $file->getClientOriginalExtension();
+                
+                $driveFile = $this->googleDrive->uploadFile($file, $fileName);
+                
+                $data['link'] = $driveFile['webViewLink'];
+                $data['gdrive_file_id'] = $driveFile['id'];
+                $data['original_filename'] = $file->getClientOriginalName();
+                
+                \Log::info('Google Drive upload result:', [
+                    'file_id' => $driveFile['id'],
+                    'link' => $driveFile['webViewLink']
+                ]);
+            } catch (\Exception $e) {
+                \Log::error('Google Drive upload error: ' . $e->getMessage());
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error uploading file: ' . $e->getMessage()
                 ], 500);
             }
         }
@@ -236,17 +266,18 @@ class BookController extends Controller
             'penerbit' => 'nullable|string|max:255',
             'tahun_terbit' => 'nullable|string|max:4',
             'bahasa' => 'nullable|string|max:255',
-            'link' => 'nullable|string|max:255',
             'deskripsi' => 'nullable|string',
             'status' => 'in:Tersedia,Tidak Tersedia,Terkendala',
             'cover' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'file_buku' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:10240', // 10MB max
         ]);
         
         \Log::info('Book update request data:', $request->all());
         \Log::info('Book before update:', $book->toArray());
         
-        $data = $request->except(['cover', '_method', '_token']);
+        $data = $request->except(['cover', 'file_buku', '_method', '_token']);
         
+        // Upload cover jika ada
         if ($request->hasFile('cover')) {
             try {
                 if ($book->cloudinary_public_id) {
@@ -283,6 +314,38 @@ class BookController extends Controller
                 ], 500);
             }
         }
+
+        // Upload file ke Google Drive jika ada
+        if ($request->hasFile('file_buku')) {
+            try {
+                // Hapus file lama di Google Drive jika ada
+                if ($book->gdrive_file_id) {
+                    $this->googleDrive->deleteFile($book->gdrive_file_id);
+                    \Log::info('Deleted old file from Google Drive:', ['file_id' => $book->gdrive_file_id]);
+                }
+                
+                $file = $request->file('file_buku');
+                $fileName = $request->judul . ' - ' . $request->penulis . '.' . $file->getClientOriginalExtension();
+                
+                $driveFile = $this->googleDrive->uploadFile($file, $fileName);
+                
+                $data['link'] = $driveFile['webViewLink'];
+                $data['gdrive_file_id'] = $driveFile['id'];
+                $data['original_filename'] = $file->getClientOriginalName();
+                
+                \Log::info('Google Drive upload result:', [
+                    'file_id' => $driveFile['id'],
+                    'link' => $driveFile['webViewLink']
+                ]);
+            } catch (\Exception $e) {
+                \Log::error('Google Drive upload/delete error: ' . $e->getMessage());
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error handling file: ' . $e->getMessage()
+                ], 500);
+            }
+        }
+
         $updated = $book->update($data);
         
         \Log::info('Book after update:', $book->fresh()->toArray());
@@ -298,6 +361,7 @@ class BookController extends Controller
     public function destroy(Book $book)
     {
         try {
+            // Hapus cover dari Cloudinary jika ada
             if ($book->cloudinary_public_id) {
                 $this->cloudinary->uploadApi()->destroy($book->cloudinary_public_id);
                 \Log::info('Deleted image from Cloudinary during book deletion:', [
@@ -306,12 +370,21 @@ class BookController extends Controller
                 ]);
             }
 
+            // Hapus file dari Google Drive jika ada
+            if ($book->gdrive_file_id) {
+                $this->googleDrive->deleteFile($book->gdrive_file_id);
+                \Log::info('Deleted file from Google Drive during book deletion:', [
+                    'book_id' => $book->id, 
+                    'file_id' => $book->gdrive_file_id
+                ]);
+            }
+
             $book->delete();
 
             return redirect()->route('books.admin')
                 ->with('success', 'Buku berhasil dihapus!');
         } catch (\Exception $e) {
-            \Log::error('Error deleting book or Cloudinary image: ' . $e->getMessage());
+            \Log::error('Error deleting book, Cloudinary image, or Google Drive file: ' . $e->getMessage());
             return redirect()->route('books.admin')
                 ->with('error', 'Terjadi kesalahan saat menghapus buku: ' . $e->getMessage());
         }
