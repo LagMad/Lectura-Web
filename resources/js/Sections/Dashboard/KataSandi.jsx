@@ -4,10 +4,10 @@ import Button from "../../Components/ui/Button";
 
 const KataSandi = () => {
     return (
-        <div className="flex flex-col gap-16 w-full">
+        <div className="flex flex-col gap-16 w-full bg-white p-10 rounded-2xl">
             <div className="flex flex-col gap-5 w-full">
                 <div className="text-3xl font-bold">Ganti Kata Sandi</div>
-                <div className="flex flex-col w-1/2 gap-5">
+                <div className="flex flex-col lg:w-1/2 gap-5">
                     <Input
                         label={"Sandi Sekarang"}
                         placeholder={"John ..."}
