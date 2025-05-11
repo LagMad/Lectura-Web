@@ -77,8 +77,8 @@ const Navbar = () => {
                             </button>
                         ) : (
                             <>
-                                <Button>Sign In</Button>
-                                <Button variant="filled">Sign Up</Button>
+                                <Button href="/login">Sign In</Button>
+                                <Button variant="filled" href="/register">Sign Up</Button>
                             </>
                         )}
                     </div>
