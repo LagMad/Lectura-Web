@@ -48,7 +48,7 @@ class BookController extends Controller
 
         // Jurnaling Siswa
         $search = $request->input('search', '');
-        $kategori = $request->input('kategori', 'Semua Kategori');
+        $kategori = $request->input('kategori', '');
         $perPage = $request->input('perPage', 10);
         $page = $request->input('page', 1);
 
@@ -75,7 +75,7 @@ class BookController extends Controller
     }
     
     // Filter kategori
-    if ($kategori !== '' && $kategori !== null) {
+    if ($kategori !== '' && $kategori !== 'Semua Kategori') {
         $queryJurnaling->where('kategori', $kategori);
     }
     
