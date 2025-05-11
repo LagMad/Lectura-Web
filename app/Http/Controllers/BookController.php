@@ -48,7 +48,7 @@ class BookController extends Controller
 
         // Jurnaling Siswa
         $search = $request->input('search', '');
-        $kategori = $request->input('kategori', 'Semua Kategori');
+        $kategori = $request->input('kategori', '');
         $perPage = $request->input('perPage', 10);
         $page = $request->input('page', 1);
 
@@ -75,7 +75,7 @@ class BookController extends Controller
     }
     
     // Filter kategori
-    if ($kategori !== '' && $kategori !== null) {
+    if ($kategori !== '' && $kategori !== 'Semua Kategori') {
         $queryJurnaling->where('kategori', $kategori);
     }
     
@@ -150,89 +150,140 @@ class BookController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'judul' => 'required|string|max:255',
-            'penulis' => 'required|string|max:255',
-            'jumlah_halaman' => 'required|integer|min:1',
-            'kategori' => 'nullable|string|max:255',
-            'penerbit' => 'nullable|string|max:255',
-            'tahun_terbit' => 'nullable|string|max:4',
-            'bahasa' => 'nullable|string|max:255',
-            'deskripsi' => 'nullable|string',
-            'cover' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'file_buku' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:10240', // 10MB max
-            'status' => 'required|string|max:255'
-        ]);
+{
+    $request->validate([
+        'judul' => 'required|string|max:255',
+        'penulis' => 'required|string|max:255',
+        'jumlah_halaman' => 'required|integer|min:1',
+        'kategori' => 'nullable|string|max:255',
+        'penerbit' => 'nullable|string|max:255',
+        'tahun_terbit' => 'nullable|string|max:4',
+        'bahasa' => 'nullable|string|max:255',
+        'deskripsi' => 'nullable|string',
+        'cover' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'file_buku' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:10240', // 10MB max
+        'status' => 'required|string|max:255'
+    ]);
 
-        $data = $request->except(['cover', 'file_buku']);
-
-        // Upload cover jika ada
-        if ($request->hasFile('cover')) {
-            $file = $request->file('cover');
-            $filePath = $file->getRealPath();
-            
-            try {
-                $uploadResult = $this->cloudinary->uploadApi()->upload($filePath, [
-                    'folder' => 'buku_covers',
-                    'transformation' => [
-                        'width' => 500,
-                        'height' => 750,
-                        'crop' => 'limit'
-                    ],
-                    'resource_type' => 'image',
-                    'access_mode' => 'public'
-                ]);
-                
-                $data['cover_path'] = $uploadResult['secure_url'];
-                $data['cloudinary_public_id'] = $uploadResult['public_id'];
-                
-                \Log::info('Cloudinary upload result:', [
-                    'public_id' => $uploadResult['public_id'],
-                    'url' => $uploadResult['secure_url']
-                ]);
-            } catch (\Exception $e) {
-                \Log::error('Cloudinary upload error: ' . $e->getMessage());
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Error uploading cover: ' . $e->getMessage()
-                ], 500);
-            }
-        }
-
-        // Upload file ke Google Drive jika ada
-        if ($request->hasFile('file_buku')) {
-            try {
-                $file = $request->file('file_buku');
-                $fileName = $request->judul . ' - ' . $request->penulis . '.' . $file->getClientOriginalExtension();
-                
-                $driveFile = $this->googleDrive->uploadFile($file, $fileName);
-                
-                $data['link'] = $driveFile['webViewLink'];
-                $data['gdrive_file_id'] = $driveFile['id'];
-                $data['original_filename'] = $file->getClientOriginalName();
-                
-                \Log::info('Google Drive upload result:', [
-                    'file_id' => $driveFile['id'],
-                    'link' => $driveFile['webViewLink']
-                ]);
-            } catch (\Exception $e) {
-                \Log::error('Google Drive upload error: ' . $e->getMessage());
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Error uploading file: ' . $e->getMessage()
-                ], 500);
-            }
-        }
-
-        $book = Book::create($data);
-
+    // Pengecekan duplikasi buku
+    $potentialDuplicates = $this->checkDuplicateBook($request);
+    
+    if ($potentialDuplicates->isNotEmpty()) {
         return response()->json([
-            'success' => true, 
-            'message' => 'Buku berhasil ditambahkan!',
-            'data' => $book
+            'success' => false,
+            'message' => 'Buku serupa sudah ada dalam sistem',
+            'potential_duplicates' => $potentialDuplicates,
+            'request_new' => [
+                'judul' => $request->judul,
+                'penulis' => $request->penulis,
+                'jumlah_halaman' => $request->jumlah_halaman,
+                'penerbit' => $request->penerbit,
+                'tahun_terbit' => $request->tahun_terbit
+            ]
         ]);
     }
+
+    $data = $request->except(['cover', 'file_buku']);
+
+    // Upload cover jika ada
+    if ($request->hasFile('cover')) {
+        $file = $request->file('cover');
+        $filePath = $file->getRealPath();
+        
+        try {
+            $uploadResult = $this->cloudinary->uploadApi()->upload($filePath, [
+                'folder' => 'buku_covers',
+                'transformation' => [
+                    'width' => 500,
+                    'height' => 750,
+                    'crop' => 'limit'
+                ],
+                'resource_type' => 'image',
+                'access_mode' => 'public'
+            ]);
+            
+            $data['cover_path'] = $uploadResult['secure_url'];
+            $data['cloudinary_public_id'] = $uploadResult['public_id'];
+            
+            \Log::info('Cloudinary upload result:', [
+                'public_id' => $uploadResult['public_id'],
+                'url' => $uploadResult['secure_url']
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Cloudinary upload error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error uploading cover: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // Upload file ke Google Drive jika ada
+    if ($request->hasFile('file_buku')) {
+        try {
+            $file = $request->file('file_buku');
+            $fileName = $request->judul . ' - ' . $request->penulis . '.' . $file->getClientOriginalExtension();
+            
+            $driveFile = $this->googleDrive->uploadFile($file, $fileName);
+            
+            $data['link'] = $driveFile['webViewLink'];
+            $data['gdrive_file_id'] = $driveFile['id'];
+            $data['original_filename'] = $file->getClientOriginalName();
+            
+            \Log::info('Google Drive upload result:', [
+                'file_id' => $driveFile['id'],
+                'link' => $driveFile['webViewLink']
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Google Drive upload error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error uploading file: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    $book = Book::create($data);
+
+    return response()->json([
+        'success' => true, 
+        'message' => 'Buku berhasil ditambahkan!',
+        'data' => $book
+    ]);
+}
+
+private function checkDuplicateBook(Request $request)
+{
+    $query = Book::query();
+    
+    // Parameter untuk pengecekan
+    if ($request->filled('penulis')) {
+        $query->where('penulis', 'like', '%' . $request->penulis . '%');
+    }
+    
+    if ($request->filled('jumlah_halaman')) {
+        $query->where('jumlah_halaman', $request->jumlah_halaman);
+    }
+    
+    if ($request->filled('tahun_terbit')) {
+        $query->where('tahun_terbit', $request->tahun_terbit);
+    }
+    
+    if ($request->filled('penerbit')) {
+        $query->where('penerbit', 'like', '%' . $request->penerbit . '%');
+    }
+    
+    // Fuzzy match untuk judul
+    if ($request->filled('judul')) {
+        $query->where(function ($q) use ($request) {
+            $q->where('judul', 'like', '%' . $request->judul . '%')
+              ->orWhereRaw('SOUNDEX(judul) = SOUNDEX(?)', [$request->judul]);
+        });
+    }
+    
+    // Ambil buku-buku yang potensial duplikat
+    return $query->get();
+}
 
     public function show(Book $book)
     {
