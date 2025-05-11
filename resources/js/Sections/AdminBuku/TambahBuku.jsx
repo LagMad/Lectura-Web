@@ -35,6 +35,7 @@ export default function TambahBuku() {
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitSuccess, setSubmitSuccess] = useState(false);
+    const [duplicateBooks, setDuplicateBooks] = useState(null);
 
     // Ref untuk file input
     const coverInputRef = useRef(null);
@@ -148,6 +149,8 @@ export default function TambahBuku() {
         e.preventDefault();
         setIsSubmitting(true);
         setErrors({});
+        // Reset any previous duplicate warning
+        setDuplicateBooks(null);
 
         const formData = new FormData();
         formData.append("judul", formValues.judul);
@@ -189,32 +192,52 @@ export default function TambahBuku() {
                 headers,
             });
 
-            setSubmitSuccess(true);
-            setPreviewUrl(null);
-            setSelectedFileName("");
-            if (coverInputRef.current) coverInputRef.current.value = "";
-            if (fileInputRef.current) fileInputRef.current.value = "";
+            // Check if the response indicates duplicate books
+            if (!response.data.success && response.data.potential_duplicates) {
+                // Set duplicate books to show the warning
+                setDuplicateBooks(response.data);
+                return;
+            }
 
-            // Reset form values
-            setFormValues({
-                judul: "",
-                penulis: "",
-                jumlah_halaman: "",
-                kategori: "",
-                penerbit: "",
-                tahun_terbit: "",
-                bahasa: "",
-                deskripsi: "",
-            });
+            // Only proceed if the operation was successful
+            if (response.data.success) {
+                setSubmitSuccess(true);
+                setPreviewUrl(null);
+                setSelectedFileName("");
+                if (coverInputRef.current) coverInputRef.current.value = "";
+                if (fileInputRef.current) fileInputRef.current.value = "";
+
+                // Reset form values
+                setFormValues({
+                    judul: "",
+                    penulis: "",
+                    jumlah_halaman: "",
+                    kategori: "",
+                    penerbit: "",
+                    tahun_terbit: "",
+                    bahasa: "",
+                    deskripsi: "",
+                });
+            }
         } catch (error) {
             console.error("Terjadi kesalahan:", error);
 
-            if (
-                error.response &&
-                error.response.data &&
-                error.response.data.errors
-            ) {
-                setErrors(error.response.data.errors);
+            if (error.response) {
+                if (
+                    error.response.data &&
+                    error.response.data.potential_duplicates
+                ) {
+                    // Ada buku serupa, tampilkan informasi
+                    setDuplicateBooks(error.response.data);
+                } else if (error.response.data && error.response.data.errors) {
+                    setErrors(error.response.data.errors);
+                } else {
+                    setErrors({
+                        general:
+                            error.response.data.message ||
+                            "Terjadi kesalahan saat menyimpan data. Silakan coba lagi.",
+                    });
+                }
             } else {
                 setErrors({
                     general:
@@ -240,15 +263,52 @@ export default function TambahBuku() {
                 </p>
             </div>
 
-            {submitSuccess && (
-                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 w-fit">
-                    Buku berhasil disimpan!
-                </div>
-            )}
+            {submitSuccess &&
+                duplicateBooks ==
+                    null(
+                        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 w-fit">
+                            Buku berhasil disimpan!
+                        </div>
+                    )}
 
             {errors.general && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 w-fit">
                     {errors.general}
+                </div>
+            )}
+
+            {duplicateBooks && (
+                <div className="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded mb-4 w-fit">
+                    <h3 className="font-bold">Buku serupa sudah diupload!</h3>
+
+                    <p className="mb-2">
+                        Kami menemukan{" "}
+                        {duplicateBooks.potential_duplicates.length} buku serupa
+                        dalam sistem:
+                    </p>
+
+                    <div className="max-h-60 overflow-y-auto bg-white p-3 rounded border border-yellow-300 mb-3">
+                        {duplicateBooks.potential_duplicates.map(
+                            (book, index) => (
+                                <div
+                                    key={index}
+                                    className="mb-2 pb-2 border-b border-yellow-200 last:border-b-0"
+                                >
+                                    <p className="font-semibold">
+                                        {book.judul}
+                                    </p>
+                                    <p>Penulis: {book.penulis}</p>
+                                    <p>Jumlah halaman: {book.jumlah_halaman}</p>
+                                    {book.penerbit && (
+                                        <p>Penerbit: {book.penerbit}</p>
+                                    )}
+                                    {book.tahun_terbit && (
+                                        <p>Tahun terbit: {book.tahun_terbit}</p>
+                                    )}
+                                </div>
+                            )
+                        )}
+                    </div>
                 </div>
             )}
 

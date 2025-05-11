@@ -4,7 +4,7 @@ import Button from "../../Components/ui/Button";
 
 const Umum = () => {
     return (
-        <div className="flex flex-col gap-16 w-full">
+        <div className="flex flex-col gap-16 w-full bg-white p-10 rounded-2xl">
             <div className="flex flex-col gap-5 w-full">
                 <div className="text-3xl font-bold">Umum</div>
                 <div className="grid grid-cols-2 gap-5">
