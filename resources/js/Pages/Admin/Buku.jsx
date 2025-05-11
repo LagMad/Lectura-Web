@@ -1,8 +1,16 @@
 import { useState, useEffect } from "react";
 import AdminLayout from "@/Layouts/AdminLayout";
 import ManajemenBuku from "@/Sections/AdminBuku/ManajemenBuku";
+import JurnalingSiswa from "@/Sections/AdminBuku/JurnalingSiswa";
 
-export default function Buku({ books }) {
+export default function Buku({
+    books,
+    booksJurnaling,
+    totalBooks,
+    kategoriBuku,
+    filters,
+    pagination,
+}) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const toggleSidebar = () => {
@@ -19,7 +27,16 @@ export default function Buku({ books }) {
             isSidebarOpen={isSidebarOpen}
             toggleSidebar={toggleSidebar}
         >
-            <ManajemenBuku books={books} />
+            <div className="flex flex-col w-full">
+                <ManajemenBuku books={books} />
+                <JurnalingSiswa
+                    booksJurnaling={booksJurnaling}
+                    totalBooks={totalBooks}
+                    kategoriBuku={kategoriBuku}
+                    filters={filters}
+                    pagination={pagination}
+                />
+            </div>
         </AdminLayout>
     );
 }
