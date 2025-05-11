@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import Umum from "../Sections/Dashboard/Umum";
 import MediaSosial from "../Sections/Dashboard/MediaSosial";
 import KataSandi from "../Sections/Dashboard/KataSandi";
+import JurnalingSiswa from "@/Sections/AdminBuku/JurnalingSiswa";
+import ReadingJournal from "@/Sections/Dashboard/jurnalingSiswa";
 
 const Dashboard = () => {
     const [activeTitle, setActiveTitle] = useState("Umum");
@@ -18,6 +20,10 @@ const Dashboard = () => {
         {
             title: "Media Sosial",
             component: <MediaSosial />,
+        },
+        {
+            title: "Jurnal",
+            component: <ReadingJournal />,
         },
     ];
 
