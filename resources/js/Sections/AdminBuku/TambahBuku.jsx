@@ -18,17 +18,17 @@ export default function TambahBuku() {
 
         return getCookieValue("XSRF-TOKEN");
     };
+
     // State untuk form values
     const [formValues, setFormValues] = useState({
         judul: "",
         penulis: "",
-        jumlah_halaman: "", // Changed from jumlahHalaman to match backend field name
+        jumlah_halaman: "",
         kategori: "",
         penerbit: "",
-        tahun_terbit: "", // Changed from tahunTerbit to match backend field name
+        tahun_terbit: "",
         bahasa: "",
         deskripsi: "",
-        link: "",
     });
 
     // State untuk error handling
@@ -37,8 +37,10 @@ export default function TambahBuku() {
     const [submitSuccess, setSubmitSuccess] = useState(false);
 
     // Ref untuk file input
+    const coverInputRef = useRef(null);
     const fileInputRef = useRef(null);
     const [previewUrl, setPreviewUrl] = useState(null);
+    const [selectedFileName, setSelectedFileName] = useState("");
 
     // Handle regular input changes
     const handleInputChange = (e) => {
@@ -76,8 +78,8 @@ export default function TambahBuku() {
         }
     };
 
-    // Handle file upload preview
-    const handleFileChange = (e) => {
+    // Handle cover file upload preview
+    const handleCoverChange = (e) => {
         const file = e.target.files[0];
         if (file) {
             if (file.type.startsWith("image/")) {
@@ -104,6 +106,43 @@ export default function TambahBuku() {
         }
     };
 
+    // Handle buku file selection
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            // Check if file is allowed type
+            const allowedTypes = [
+                "application/pdf",
+                "application/msword",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "application/vnd.ms-excel",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "application/vnd.ms-powerpoint",
+                "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            ];
+
+            if (allowedTypes.includes(file.type)) {
+                setSelectedFileName(file.name);
+
+                // Clear file error if exists
+                if (errors.file_buku) {
+                    setErrors({
+                        ...errors,
+                        file_buku: null,
+                    });
+                }
+            } else {
+                setErrors({
+                    ...errors,
+                    file_buku:
+                        "File harus berupa PDF, DOC, DOCX, XLS, XLSX, PPT, atau PPTX",
+                });
+                e.target.value = ""; // Reset the input
+                setSelectedFileName("");
+            }
+        }
+    };
+
     // Form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -119,13 +158,19 @@ export default function TambahBuku() {
         formData.append("tahun_terbit", formValues.tahun_terbit);
         formData.append("bahasa", formValues.bahasa);
         formData.append("deskripsi", formValues.deskripsi);
-        formData.append("link", formValues.link);
-        const status =
-            formValues.link.trim() === "" ? "Tidak Tersedia" : "Tersedia";
+
+        // Check if file is uploaded and set status accordingly
+        const hasFile = fileInputRef.current?.files[0];
+        const status = hasFile ? "Tersedia" : "Tidak Tersedia";
         formData.append("status", status);
 
+        if (coverInputRef.current?.files[0]) {
+            formData.append("cover", coverInputRef.current.files[0]);
+        }
+
+        // Append the file_buku if present
         if (fileInputRef.current?.files[0]) {
-            formData.append("cover", fileInputRef.current.files[0]);
+            formData.append("file_buku", fileInputRef.current.files[0]);
         }
 
         try {
@@ -146,6 +191,8 @@ export default function TambahBuku() {
 
             setSubmitSuccess(true);
             setPreviewUrl(null);
+            setSelectedFileName("");
+            if (coverInputRef.current) coverInputRef.current.value = "";
             if (fileInputRef.current) fileInputRef.current.value = "";
 
             // Reset form values
@@ -157,7 +204,6 @@ export default function TambahBuku() {
                 penerbit: "",
                 tahun_terbit: "",
                 bahasa: "",
-                link: "",
                 deskripsi: "",
             });
         } catch (error) {
@@ -232,8 +278,8 @@ export default function TambahBuku() {
                                 className="hidden"
                                 id="coverUpload"
                                 accept="image/*"
-                                ref={fileInputRef}
-                                onChange={handleFileChange}
+                                ref={coverInputRef}
+                                onChange={handleCoverChange}
                             />
                             <label
                                 htmlFor="coverUpload"
@@ -338,28 +384,39 @@ export default function TambahBuku() {
                                     )}
                                 </div>
 
+                                {/* File Buku Upload - Replaced Link input */}
                                 <div>
                                     <label
-                                        htmlFor="link"
+                                        htmlFor="file_buku"
                                         className="block text-sm font-medium text-gray-700 mb-1"
                                     >
-                                        Link Buku{" "}
+                                        File Buku (PDF, DOC, DOCX, XLS, XLSX,
+                                        PPT, PPTX)
                                     </label>
-                                    <input
-                                        type="text"
-                                        id="link"
-                                        name="link"
-                                        value={formValues.link}
-                                        onChange={handleInputChange}
-                                        className={`w-full p-2 border ${
-                                            errors.link
-                                                ? "border-red-500"
-                                                : "border-gray-300"
-                                        } rounded`}
-                                    />
-                                    {errors.link && (
+                                    <div className="flex items-center">
+                                        <input
+                                            type="file"
+                                            className="hidden"
+                                            id="file_buku"
+                                            name="file_buku"
+                                            ref={fileInputRef}
+                                            onChange={handleFileChange}
+                                            accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+                                        />
+                                        <label
+                                            htmlFor="file_buku"
+                                            className="px-4 py-2 bg-gray-200 text-gray-700 rounded cursor-pointer hover:bg-gray-300"
+                                        >
+                                            Pilih File
+                                        </label>
+                                        <span className="ml-3 text-sm text-gray-600 truncate max-w-[250px]">
+                                            {selectedFileName ||
+                                                "Tidak ada file yang dipilih"}
+                                        </span>
+                                    </div>
+                                    {errors.file_buku && (
                                         <p className="text-red-500 text-xs mt-1">
-                                            {errors.link}
+                                            {errors.file_buku}
                                         </p>
                                     )}
                                 </div>
