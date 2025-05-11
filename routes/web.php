@@ -27,6 +27,10 @@ Route::get('/bantuan', function () {
     return Inertia::render('Bantuan');
 });
 
+Route::get('/semua-jurnal', function () {
+    return Inertia::render('Dashboard/AllJournal');
+});
+
 Route::get('/detail-buku', function () {
     return Inertia::render('Buku/Detail');
 });
