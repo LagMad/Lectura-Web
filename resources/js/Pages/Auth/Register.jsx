@@ -106,7 +106,7 @@ export default function Register() {
         <div className="md:h-screen flex justify-center justify-items-center bg-white w-full">
             <div className="w-1/2 h-fit my-auto">
                 <div className="mx-auto w-8/12 text-3xl font-bold">
-                    Daftarkan Dirimu E-Library!
+                    Daftarkan Dirimu di E-Library!
                 </div>
                 <div className="mx-auto w-8/12 text-lg mt-2">
                     Buka akses ke ribuan buku digital, artikel, dan referensi
