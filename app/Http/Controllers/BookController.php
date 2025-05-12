@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Inertia\Inertia;
 use App\Models\Book;
+use App\Models\Kategori;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Cloudinary\Cloudinary;
@@ -146,7 +147,11 @@ class BookController extends Controller
 
     public function create()
     {
-        return Inertia::render('Admin/TambahBuku');
+        $kategori = Kategori::all();
+    
+        return Inertia::render('Admin/TambahBuku', [
+            'kategori' => $kategori
+        ]);
     }
 
     public function store(Request $request)
