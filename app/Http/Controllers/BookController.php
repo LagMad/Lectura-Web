@@ -295,7 +295,7 @@ private function checkDuplicateBook(Request $request)
         $reviews = $book->reviews()->with('user')->latest()->get();
         $averageRating = $book->reviews()->avg('rating');
 
-        return Inertia::render('Books/Show', [
+        return Inertia::render('Buku/Detail', [
             'book' => $book,
             'reviews' => $reviews,
             'avgRating' => $averageRating
