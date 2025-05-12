@@ -247,7 +247,6 @@ const BukuMinggu = () => {
                                     )}
                                 </>
                             )}
-                            =
                             <button
                                 className="cursor-pointer w-8 h-8 flex items-center justify-center text-xl font-bold rounded-full border border-gray-300 hover:bg-gray-200 disabled:opacity-50"
                                 onClick={() => {
