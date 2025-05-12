@@ -4,13 +4,12 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\PenggunaController;
 use App\Http\Controllers\NIPDController;
+use App\Http\Controllers\HomeController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('Home');
-})->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home.index');
 
 Route::get('/buku', [BookController::class, 'index'])->name('books.index');
 Route::get('/admin-tambah-buku', [BookController::class, 'create'])->name('books.create');

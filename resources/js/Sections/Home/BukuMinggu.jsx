@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import BukuHomeCard from "../../Components/ui/BukuHomeCard";
 
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -12,62 +12,10 @@ import {
     MdOutlineKeyboardArrowRight,
 } from "react-icons/md";
 
-const BukuMinggu = () => {
+const BukuMinggu = ({ books }) => {
     const swiperRef = useRef(null);
     const [activeIndex, setActiveIndex] = useState(0);
-
-    const dataBuku = [
-        {
-            image: "/silat.png",
-            penulis: "A. Fuadi",
-            judul: "Buku Ayo Berlatih Silat. Let's Practice Silat",
-        },
-        {
-            image: "/mie-ayam.png",
-            penulis: "Brian Khrisna",
-            judul: "Buku Seporsi Mie Ayam Sebelum Mati",
-        },
-        {
-            image: "/laut-bercerita.png",
-            penulis: "Leila S. Chudori",
-            judul: "Buku Laut Bercerita",
-        },
-        {
-            image: "/raksasa-laut.png",
-            penulis: "Maya Lestari",
-            judul: "Buku Smong, Si Raksasa Laut. Smong the Dragon",
-        },
-        {
-            image: "/silat.png",
-            penulis: "A. Fuadi",
-            judul: "Buku Ayo Berlatih Silat. Let's Practice Silat",
-        },
-        {
-            image: "/silat.png",
-            penulis: "A. Fuadi",
-            judul: "Buku Ayo Berlatih Silat. Let's Practice Silat",
-        },
-        {
-            image: "/mie-ayam.png",
-            penulis: "Brian Khrisna",
-            judul: "Buku Seporsi Mie Ayam Sebelum Mati",
-        },
-        {
-            image: "/laut-bercerita.png",
-            penulis: "Leila S. Chudori",
-            judul: "Buku Laut Bercerita",
-        },
-        {
-            image: "/raksasa-laut.png",
-            penulis: "Maya Lestari",
-            judul: "Buku Smong, Si Raksasa Laut. Smong the Dragon",
-        },
-        {
-            image: "/silat.png",
-            penulis: "A. Fuadi",
-            judul: "Buku Ayo Berlatih Silat. Let's Practice Silat",
-        },
-    ];
+    const [slidesPerView, setSlidesPerView] = useState(5);
 
     // Function to get slides per view based on screen width
     const getSlidesPerView = () => {
@@ -82,8 +30,22 @@ const BukuMinggu = () => {
         return 5; // Default for SSR
     };
 
-    const slidesPerView = getSlidesPerView();
-    const totalPages = Math.ceil(dataBuku.length / slidesPerView);
+    useEffect(() => {
+        // Set initial slidesPerView on component mount
+        setSlidesPerView(getSlidesPerView());
+
+        // Update slidesPerView on window resize
+        const handleResize = () => {
+            setSlidesPerView(getSlidesPerView());
+        };
+
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
+    // Ensure we have books data before calculating
+    const booksData = books?.data || [];
+    const totalPages = Math.ceil(booksData.length / slidesPerView);
 
     return (
         <div className="container">
@@ -100,16 +62,16 @@ const BukuMinggu = () => {
                 </div>
 
                 <div className="w-full flex flex-col lg:flex-row">
-                    <div className="flex flex-col justify-start items-start w-full bg-[#6F826A] p-3 sm:p-4 rounded-xl sm:rounded-2xl gap-3 sm:gap-5">
+                    <div className="flex flex-col justify-start items-start w-full bg-[#54473F] p-3 sm:p-4 rounded-xl sm:rounded-2xl gap-3 sm:gap-5">
                         <h3 className="text-xl sm:text-2xl lg:text-3xl font-extrabold w-full text-white">
-                            BUKU
-                            <span className="text-[#F0F1C5]"> TERLARIS</span>{" "}
+                            SEPANJANG{" "}
+                            <span className="text-[#F0F1C5]">TERLARIS</span>{" "}
                             MINGGU INI
                         </h3>
                         <img
                             className="h-auto w-full"
-                            src="/boy-reading.svg"
-                            alt="boy-reading"
+                            src="/girl-reading-on-sofa.svg"
+                            alt="girl-reading"
                         />
                     </div>
 
@@ -117,151 +79,177 @@ const BukuMinggu = () => {
                         <div className="flex justify-between items-center w-full">
                             <button
                                 className="w-full text-right underline text-lg font-bold cursor-pointer pr-4"
-                                onClick={() => alert("Lihat Semua")}
+                                onClick={() => (window.location.href = "/buku")}
                             >
                                 Lihat Semua
                             </button>
                         </div>
 
-                        <Swiper
-                            modules={[Pagination]}
-                            spaceBetween={10}
-                            slidesPerView={slidesPerView}
-                            slidesPerGroup={slidesPerView}
-                            pagination={false}
-                            onSwiper={(swiper) => (swiperRef.current = swiper)}
-                            onSlideChange={(swiper) =>
-                                setActiveIndex(
-                                    Math.floor(
-                                        swiper.activeIndex / slidesPerView
-                                    )
-                                )
-                            }
-                            className="w-full"
-                            breakpoints={{
-                                320: { slidesPerView: 1, slidesPerGroup: 1 },
-                                640: {
-                                    slidesPerView: 2,
-                                    slidesPerGroup: 2,
-                                    spaceBetween: 15,
-                                },
-                                768: {
-                                    slidesPerView: 3,
-                                    slidesPerGroup: 3,
-                                    spaceBetween: 15,
-                                },
-                                1024: {
-                                    slidesPerView: 4,
-                                    slidesPerGroup: 4,
-                                    spaceBetween: 20,
-                                },
-                                1280: {
-                                    slidesPerView: 5,
-                                    slidesPerGroup: 5,
-                                    spaceBetween: 20,
-                                },
-                            }}
-                        >
-                            {dataBuku.map((data, index) => (
-                                <SwiperSlide
-                                    key={index}
-                                    className="flex items-stretch"
-                                >
-                                    <BukuHomeCard
-                                        image={data.image}
-                                        penulis={data.penulis}
-                                        judul={data.judul}
-                                    />
-                                </SwiperSlide>
-                            ))}
-                        </Swiper>
-
-                        <div className="flex justify-center items-center gap-2 mt-4">
-                            <button
-                                className="cursor-pointer w-8 h-8 flex items-center justify-center text-xl font-bold rounded-full border border-gray-300 hover:bg-gray-200 disabled:opacity-50"
-                                onClick={() => {
-                                    if (activeIndex > 0) {
-                                        swiperRef.current?.slideTo(
-                                            (activeIndex - 1) * slidesPerView
-                                        );
+                        {booksData.length > 0 ? (
+                            <>
+                                <Swiper
+                                    modules={[Pagination]}
+                                    spaceBetween={10}
+                                    slidesPerView={slidesPerView}
+                                    slidesPerGroup={slidesPerView}
+                                    pagination={false}
+                                    onSwiper={(swiper) =>
+                                        (swiperRef.current = swiper)
                                     }
-                                }}
-                                disabled={activeIndex === 0}
-                            >
-                                <MdOutlineKeyboardArrowLeft />
-                            </button>
-
-                            {totalPages <= 5 ? (
-                                Array.from({ length: totalPages }).map(
-                                    (_, idx) => (
-                                        <div
-                                            key={idx}
-                                            className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full cursor-pointer transition-all duration-300 ${activeIndex === idx
-                                                ? "bg-cust-blue"
-                                                : "bg-cust-dark-gray"
-                                                }`}
-                                            onClick={() =>
-                                                swiperRef.current?.slideTo(
-                                                    idx * slidesPerView
-                                                )
-                                            }
-                                        />
-                                    )
-                                )
-                            ) : (
-                                <>
-                                    {Array.from({
-                                        length: Math.min(3, totalPages),
-                                    }).map((_, idx) => (
-                                        <div
-                                            key={idx}
-                                            className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full cursor-pointer transition-all duration-300 ${activeIndex === idx
-                                                ? "bg-cust-blue"
-                                                : "bg-cust-dark-gray"
-                                                }`}
-                                            onClick={() =>
-                                                swiperRef.current?.slideTo(
-                                                    idx * slidesPerView
-                                                )
-                                            }
-                                        />
-                                    ))}
-                                    {totalPages > 3 && (
-                                        <div className="text-xs font-bold">
-                                            ...
-                                        </div>
-                                    )}
-                                    {totalPages > 3 && (
-                                        <div
-                                            className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full cursor-pointer transition-all duration-300 ${activeIndex === totalPages - 1
-                                                ? "bg-cust-blue"
-                                                : "bg-cust-dark-gray"
-                                                }`}
-                                            onClick={() =>
-                                                swiperRef.current?.slideTo(
-                                                    (totalPages - 1) *
+                                    onSlideChange={(swiper) =>
+                                        setActiveIndex(
+                                            Math.floor(
+                                                swiper.activeIndex /
                                                     slidesPerView
-                                                )
-                                            }
-                                        />
-                                    )}
-                                </>
-                            )}
-                            =
-                            <button
-                                className="cursor-pointer w-8 h-8 flex items-center justify-center text-xl font-bold rounded-full border border-gray-300 hover:bg-gray-200 disabled:opacity-50"
-                                onClick={() => {
-                                    if (activeIndex < totalPages - 1) {
-                                        swiperRef.current?.slideTo(
-                                            (activeIndex + 1) * slidesPerView
-                                        );
+                                            )
+                                        )
                                     }
-                                }}
-                                disabled={activeIndex === totalPages - 1}
-                            >
-                                <MdOutlineKeyboardArrowRight />
-                            </button>
-                        </div>
+                                    className="w-full"
+                                    breakpoints={{
+                                        320: {
+                                            slidesPerView: 1,
+                                            slidesPerGroup: 1,
+                                        },
+                                        640: {
+                                            slidesPerView: 2,
+                                            slidesPerGroup: 2,
+                                            spaceBetween: 15,
+                                        },
+                                        768: {
+                                            slidesPerView: 3,
+                                            slidesPerGroup: 3,
+                                            spaceBetween: 15,
+                                        },
+                                        1024: {
+                                            slidesPerView: 4,
+                                            slidesPerGroup: 4,
+                                            spaceBetween: 20,
+                                        },
+                                        1280: {
+                                            slidesPerView: 5,
+                                            slidesPerGroup: 5,
+                                            spaceBetween: 20,
+                                        },
+                                    }}
+                                >
+                                    {booksData.map((book) => (
+                                        <SwiperSlide
+                                            key={book.id}
+                                            className="flex items-stretch"
+                                        >
+                                            <BukuHomeCard
+                                                image={
+                                                    book.cover_path ||
+                                                    "/default-cover.png"
+                                                }
+                                                penulis={book.penulis}
+                                                judul={book.judul}
+                                                bookId={book.id}
+                                            />
+                                        </SwiperSlide>
+                                    ))}
+                                </Swiper>
+
+                                <div className="flex justify-center items-center gap-2 mt-4">
+                                    <button
+                                        className="cursor-pointer w-8 h-8 flex items-center justify-center text-xl font-bold rounded-full border border-gray-300 hover:bg-gray-200 disabled:opacity-50"
+                                        onClick={() => {
+                                            if (activeIndex > 0) {
+                                                swiperRef.current?.slideTo(
+                                                    (activeIndex - 1) *
+                                                        slidesPerView
+                                                );
+                                            }
+                                        }}
+                                        disabled={activeIndex === 0}
+                                    >
+                                        <MdOutlineKeyboardArrowLeft />
+                                    </button>
+
+                                    {totalPages <= 5 ? (
+                                        Array.from({ length: totalPages }).map(
+                                            (_, idx) => (
+                                                <div
+                                                    key={idx}
+                                                    className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full cursor-pointer transition-all duration-300 ${
+                                                        activeIndex === idx
+                                                            ? "bg-cust-blue"
+                                                            : "bg-cust-dark-gray"
+                                                    }`}
+                                                    onClick={() =>
+                                                        swiperRef.current?.slideTo(
+                                                            idx * slidesPerView
+                                                        )
+                                                    }
+                                                />
+                                            )
+                                        )
+                                    ) : (
+                                        <>
+                                            {Array.from({
+                                                length: Math.min(3, totalPages),
+                                            }).map((_, idx) => (
+                                                <div
+                                                    key={idx}
+                                                    className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full cursor-pointer transition-all duration-300 ${
+                                                        activeIndex === idx
+                                                            ? "bg-cust-blue"
+                                                            : "bg-cust-dark-gray"
+                                                    }`}
+                                                    onClick={() =>
+                                                        swiperRef.current?.slideTo(
+                                                            idx * slidesPerView
+                                                        )
+                                                    }
+                                                />
+                                            ))}
+                                            {totalPages > 3 && (
+                                                <div className="text-xs font-bold">
+                                                    ...
+                                                </div>
+                                            )}
+                                            {totalPages > 3 && (
+                                                <div
+                                                    className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full cursor-pointer transition-all duration-300 ${
+                                                        activeIndex ===
+                                                        totalPages - 1
+                                                            ? "bg-cust-blue"
+                                                            : "bg-cust-dark-gray"
+                                                    }`}
+                                                    onClick={() =>
+                                                        swiperRef.current?.slideTo(
+                                                            (totalPages - 1) *
+                                                                slidesPerView
+                                                        )
+                                                    }
+                                                />
+                                            )}
+                                        </>
+                                    )}
+
+                                    <button
+                                        className="cursor-pointer w-8 h-8 flex items-center justify-center text-xl font-bold rounded-full border border-gray-300 hover:bg-gray-200 disabled:opacity-50"
+                                        onClick={() => {
+                                            if (activeIndex < totalPages - 1) {
+                                                swiperRef.current?.slideTo(
+                                                    (activeIndex + 1) *
+                                                        slidesPerView
+                                                );
+                                            }
+                                        }}
+                                        disabled={
+                                            activeIndex === totalPages - 1
+                                        }
+                                    >
+                                        <MdOutlineKeyboardArrowRight />
+                                    </button>
+                                </div>
+                            </>
+                        ) : (
+                            <div className="flex justify-center items-center h-64 text-gray-500">
+                                Belum ada buku yang tersedia
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
