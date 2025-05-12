@@ -1,10 +1,44 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Layout from "@/Layouts/Layout";
 import { Star, StarHalf, StarOff } from "lucide-react";
-import { usePage } from "@inertiajs/react";
+import { usePage, router } from "@inertiajs/react";
 
 const Detail = () => {
-    const { book, avgRating } = usePage().props;
+    const { book, avgRating, auth, isFavorited } = usePage().props;
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [favorited, setFavorited] = useState(isFavorited); // Local state
+
+    const handleFavoriteToggle = () => {
+        if (isProcessing) return;
+        setIsProcessing(true);
+
+        if (favorited) {
+            // Remove from favorites
+            router.delete("/favorites", {
+                data: { book_id: book.id },
+                preserveScroll: true,
+                onFinish: () => {
+                    setFavorited(false);
+                    setIsProcessing(false);
+                },
+            });
+        } else {
+            // Add to favorites
+            router.post(
+                "/favorites",
+                {
+                    book_id: book.id,
+                },
+                {
+                    preserveScroll: true,
+                    onFinish: () => {
+                        setFavorited(true);
+                        setIsProcessing(false);
+                    },
+                }
+            );
+        }
+    };
 
     // Function to render stars based on rating
     const renderStars = (rating) => {
@@ -70,9 +104,21 @@ const Detail = () => {
                         <button className="font-semibold text-sm rounded-lg hover:scale-105 transition-all py-2 w-40 lg:w-64 bg-cust-primary-color border-2 border-cust-primary-color text-white">
                             Baca Sekarang
                         </button>
-                        <button className="border-2 border-cust-primary-color text-cust-primary-color font-semibold text-sm rounded-lg hover:scale-105 transition-all py-2 w-40 lg:w-64">
-                            Tambah ke Favorite
-                        </button>
+                        {auth.user && (
+                            <button
+                                className={`cursor-pointer border-2 border-cust-primary-color font-semibold text-sm rounded-lg hover:scale-105 transition-all py-2 w-40 lg:w-64 ${
+                                    isFavorited
+                                        ? "bg-cust-primary-color text-white"
+                                        : "text-cust-primary-color"
+                                }`}
+                                onClick={handleFavoriteToggle}
+                                disabled={isProcessing}
+                            >
+                                {isFavorited
+                                    ? "Hapus dari Favorite"
+                                    : "Tambah ke Favorite"}
+                            </button>
+                        )}
                     </div>
 
                     <div className="bg-white p-8 rounded-lg w-full md:w-1/2">

@@ -294,11 +294,19 @@ private function checkDuplicateBook(Request $request)
     {
         $reviews = $book->reviews()->with('user')->latest()->get();
         $averageRating = $book->reviews()->avg('rating');
+        $isFavorited = false;
+        
+        if (auth()->check()) {
+            $isFavorited = $book->favorites()
+                ->where('user_id', auth()->id())
+                ->exists();
+        }
 
         return Inertia::render('Buku/Detail', [
             'book' => $book,
             'reviews' => $reviews,
-            'avgRating' => $averageRating
+            'avgRating' => $averageRating,
+            'isFavorited' => $isFavorited
         ]);
     }
 
