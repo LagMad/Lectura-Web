@@ -101,9 +101,21 @@ const Detail = () => {
                             alt={`Cover Buku ${book.judul}`}
                             className="rounded-lg w-40 lg:w-64 object-cover"
                         />
-                        <button className="font-semibold text-sm rounded-lg hover:scale-105 transition-all py-2 w-40 lg:w-64 bg-cust-primary-color border-2 border-cust-primary-color text-white">
-                            Baca Sekarang
-                        </button>
+                        <a
+                            href={book.status === "Tersedia" ? book.link : "#"}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`font-semibold text-sm rounded-lg transition-all py-2 w-40 lg:w-64 border-2 text-center ${
+                                book.status === "Tersedia"
+                                    ? "bg-cust-primary-color border-cust-primary-color text-white hover:scale-105"
+                                    : " bg-gray-300 border-gray-300 text-gray-500 cursor-not-allowed pointer-events-none"
+                            }`}
+                        >
+                            {book.status === "Tersedia"
+                                ? "Baca Sekarang"
+                                : "Tidak Tersedia"}
+                        </a>
+
                         {auth.user && (
                             <button
                                 className={`cursor-pointer border-2 border-cust-primary-color font-semibold text-sm rounded-lg hover:scale-105 transition-all py-2 w-40 lg:w-64 ${
