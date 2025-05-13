@@ -23,17 +23,13 @@ const Dashboard = ({ auth, books }) => {
         },
         {
             title: "Jurnal",
-            component: <Journaling auth={auth} />,
+            component: <Journaling auth={auth} books={books.data} />,
         },
     ];
 
     const activeSection = sections.find(
         (section) => section.title === activeTitle
     );
-
-    useEffect(() => {
-        console.log("books", books)
-    }, [books])
 
     return (
         <Layout>

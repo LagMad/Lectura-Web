@@ -1,55 +1,61 @@
-import React, { useState } from 'react';
-import Button from '@/Components/Button';
-import { Icon } from '@iconify/react';
-import AddJournal from './journaling/AddJournal';
-import JournalCard from './journaling/JournalCard';
+import React, { useEffect, useState } from "react";
+import Button from "@/Components/Button";
+import { Icon } from "@iconify/react";
+import AddJournal from "./journaling/AddJournal";
+import JournalCard from "./journaling/JournalCard";
 
 const journals = [
     {
         id: 1,
-        title: 'Ayo Berlatih Silat',
-        author: 'Ahmad Fuadi',
-        image: '/silat.png',
-        count: '3 Jurnal dibuat',
+        title: "Ayo Berlatih Silat",
+        author: "Ahmad Fuadi",
+        image: "/silat.png",
+        count: "3 Jurnal dibuat",
         entries: [
             {
                 id: 1,
-                title: 'Refleksi Bab 1-3: Perjuangan Pendidikan',
-                content: "Membaca kisah anak-anak di Belitung yang berjuang untuk mendapatkan pendidikan membuat saya sangat tersentuh. Mereka harus berjalan jauh setiap hari, belajar di sekolah yang hampir roboh, dan dengan fasilitas yang sangat minim. Namun, semangat belajar mereka luar biasa.",
-                date: '7 Mei 2025',
+                title: "Refleksi Bab 1-3: Perjuangan Pendidikan",
+                content:
+                    "Membaca kisah anak-anak di Belitung yang berjuang untuk mendapatkan pendidikan membuat saya sangat tersentuh. Mereka harus berjalan jauh setiap hari, belajar di sekolah yang hampir roboh, dan dengan fasilitas yang sangat minim. Namun, semangat belajar mereka luar biasa.",
+                date: "7 Mei 2025",
                 published: true,
             },
             {
                 id: 2,
-                title: 'Karakter Favorit: Lintang',
-                content: 'Lintang adalah karakter yang sangat menginspirasi...',
-                date: '7 Mei 2025',
+                title: "Karakter Favorit: Lintang",
+                content: "Lintang adalah karakter yang sangat menginspirasi...",
+                date: "7 Mei 2025",
                 published: false,
             },
         ],
     },
     {
         id: 2,
-        title: 'Laut Bercerita',
-        author: 'Leila S. Chudori',
-        image: '/laut-bercerita.png',
-        count: '3 Jurnal dibuat',
+        title: "Laut Bercerita",
+        author: "Leila S. Chudori",
+        image: "/laut-bercerita.png",
+        count: "3 Jurnal dibuat",
         entries: [
             {
                 id: 1,
-                title: 'Kehilangan dan Harapan',
-                content: 'Cerita ini memberikan gambaran menyentuh tentang kehilangan dan perjuangan...',
-                date: '7 Mei 2025',
+                title: "Kehilangan dan Harapan",
+                content:
+                    "Cerita ini memberikan gambaran menyentuh tentang kehilangan dan perjuangan...",
+                date: "7 Mei 2025",
                 published: true,
             },
         ],
     },
 ];
 
-const Journaling = () => {
+const Journaling = ({ books }) => {
     const [showModal, setShowModal] = useState(false);
     const handleOpenModal = () => setShowModal(true);
     const handleCloseModal = () => setShowModal(false);
+
+    useEffect(() => {
+        console.log("journaling", books)
+    }, [books])
 
     return (
         <section>
@@ -65,7 +71,10 @@ const Journaling = () => {
 
                 <div className="bg-white px-10 py-5 rounded-2xl space-y-8">
                     <div className="bg-white py-4 font-medium flex items-center gap-5">
-                        <Icon icon="mynaui:search" className="text-xl text-cust-gray" />
+                        <Icon
+                            icon="mynaui:search"
+                            className="text-xl text-cust-gray"
+                        />
                         <input
                             type="text"
                             placeholder="Cari Jurnal..."
@@ -86,7 +95,9 @@ const Journaling = () => {
                 </div>
             </div>
 
-            {showModal && <AddJournal onClose={handleCloseModal} />}
+            {showModal && (
+                <AddJournal onClose={handleCloseModal} books={books} />
+            )}
         </section>
     );
 };
