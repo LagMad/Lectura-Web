@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Icon } from '@iconify/react';
 import DetailJournal from './DetailJournal';
+import { router } from '@inertiajs/react';
 
 const truncateContent = (content, wordLimit = 10) => {
     const words = content.split(' ');
@@ -93,7 +94,10 @@ const JournalCard = ({ image, title, author, count, entries }) => {
                                 </div>
                             </div>
                         ))}
-                        <p className="text-blue-500 text-center text-sm font-medium cursor-pointer hover:underline">
+                        <p
+                            onClick={() => router.visit('/semua-jurnal')}
+                            className="text-blue-500 text-center text-sm font-medium cursor-pointer hover:underline"
+                        >
                             Lihat semua jurnal
                         </p>
                     </div>
