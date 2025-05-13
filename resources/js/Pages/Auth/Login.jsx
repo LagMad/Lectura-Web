@@ -31,8 +31,8 @@ export default function Login({ status, canResetPassword }) {
     };
 
     return (
-        <div className="md:h-screen flex justify-center justify-items-center bg-white w-full">
-            <div className="w-1/2 h-fit my-auto">
+        <div className="md:h-screen md:flex justify-center justify-items-center bg-white w-full">
+            <div className="w-1/2 h-fit my-auto md:block hidden">
                 <div className="mx-auto w-8/12 text-3xl font-bold">
                     Selamat Datang Kembali
                 </div>
@@ -42,9 +42,9 @@ export default function Login({ status, canResetPassword }) {
                     membaca yang praktis dan menyenangkan!
                 </div>
             </div>
-            <div className="w-1/2 h-fit my-auto bg-white">
+            <div className="md:w-1/2 h-fit w-full px-8 md:px-0 my-auto bg-white">
                 <div className="flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-white">
-                    <div className="w-full sm:max-w-md mt-6 px-6 py-4 overflow-hidden sm:rounded-lg">
+                    <div className="w-full sm:max-w-md mt-6 md:px-6 py-4 overflow-hidden sm:rounded-lg">
                         <div className="text-center mb-6">
                             <h1 className="text-3xl font-bold text-blue-600 mb-1">
                                 Masuk E-Library

@@ -153,9 +153,9 @@ export default function Register() {
                     pengetahuan tanpa batas!
                 </div>
             </div>
-            <div className="w-full md:w-1/2 h-fit my-auto">
-                <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-                    <div className="w-full md:max-w-md">
+            <div className="md:w-1/2 h-fit my-auto">
+                <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 md:py-12 py-4 px-4 sm:px-6 lg:px-8">
+                    <div className="w-full max-w-md">
                         <div className="text-center mb-6">
                             <h1 className="text-2xl font-bold text-blue-600">
                                 Daftar E-Library
