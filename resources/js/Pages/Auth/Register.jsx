@@ -103,19 +103,19 @@ export default function Register() {
     };
 
     return (
-        <div className="md:h-screen flex justify-center justify-items-center bg-white w-full">
-            <div className="w-1/2 h-fit my-auto">
-                <div className="mx-auto w-8/12 text-3xl font-bold">
+        <div className="md:h-screen md:flex justify-center justify-items-center bg-white w-full">
+            <div className="w-1/2 h-fit my-auto px-4 sm:px-6 lg:px-8 md:block hidden">
+                <div className="mx-auto md:w-8/12 md:text-3xl text-2xl font-bold">
                     Daftarkan Dirimu E-Library!
                 </div>
-                <div className="mx-auto w-8/12 text-lg mt-2">
+                <div className="mx-auto md:w-8/12 md:text-lg text-md mt-2">
                     Buka akses ke ribuan buku digital, artikel, dan referensi
                     berkualitas. Buat akun sekarang dan mulai menjelajah dunia
                     pengetahuan tanpa batas!
                 </div>
             </div>
-            <div className="w-1/2 h-fit my-auto">
-                <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+            <div className="md:w-1/2 h-fit my-auto">
+                <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 md:py-12 py-4 px-4 sm:px-6 lg:px-8">
                     <div className="w-full max-w-md">
                         <div className="text-center mb-6">
                             <h1 className="text-2xl font-bold text-blue-600">
