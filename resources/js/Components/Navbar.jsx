@@ -71,7 +71,7 @@ const Navbar = () => {
                         {auth?.user ? (
                             <button
                                 onClick={handleLogout}
-                                className="px-4 py-2 bg-cust-primary-color text-white rounded hover:bg-cust-primary-hover"
+                                className="cursor-pointer px-4 py-2 bg-cust-primary-color text-white rounded hover:bg-cust-primary-hover"
                             >
                                 Logout
                             </button>
