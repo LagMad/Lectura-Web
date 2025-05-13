@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\PenggunaController;
 use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\JurnalingController;
 use App\Http\Controllers\NIPDController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Foundation\Application;
@@ -66,3 +67,6 @@ Route::get('/dashboard', function () {
 Route::get('/semua-jurnal', function () {
     return Inertia::render('Dashboard/AllJournal');
 });
+
+Route::get('/jurnal/book/{book_id}', [JurnalingController::class, 'detail'])->name('jurnal.book.detail');
+Route::get('/jurnal/{book_id}/{user_id}', [JurnalingController::class, 'detailJurnal'])->name('jurnal.detail');

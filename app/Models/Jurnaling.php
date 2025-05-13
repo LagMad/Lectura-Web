@@ -35,7 +35,7 @@ class Jurnaling extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function buku(): BelongsTo
+    public function buku()
     {
         return $this->belongsTo(Book::class, 'id_buku');
     }
@@ -45,7 +45,7 @@ class Jurnaling extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function siswa(): BelongsTo
+    public function siswa()
     {
         return $this->belongsTo(User::class, 'id_siswa');
     }

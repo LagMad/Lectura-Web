@@ -3,256 +3,180 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
-use App\Models\Jurnaling;
 use App\Models\User;
+use App\Models\Jurnaling;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class JurnalingController extends Controller
 {
-    public function show($id)
+
+    public function detailJurnal($book_id, $user_id)
+{
+    $book = Book::select('id', 'judul', 'penulis', 'cover_path', 'jumlah_halaman')
+        ->withCount('jurnaling as total_jurnal')
+        ->with(['jurnaling' => function ($query) use ($user_id) {
+    $query->where('id_siswa', $user_id)
+        ->orderBy('created_at', 'desc')
+        ->limit(1);
+}])
+
+        ->findOrFail($book_id);
+
+    // Halaman terakhir dibaca
+    $halaman_terakhir = $book->jurnaling
+    ->sortByDesc('created_at')
+    ->first()
+    ->halaman_akhir ?? 0;
+    $book->halaman_terakhir = $halaman_terakhir;
+
+    // Hitung total siswa unik (distinct id_siswa)
+    $total_siswa = Jurnaling::where('id_buku', $book_id)
+        ->select('id_siswa')
+        ->distinct()
+        ->count();
+    $book->total_siswa = $total_siswa;
+
+    // Ambil semua jurnal user untuk buku ini
+    $journals = Jurnaling::where('id_buku', $book_id)
+        ->where('id_siswa', $user_id)
+        ->orderBy('created_at', 'desc')
+        ->get()
+        ->map(function ($jurnal) {
+            return [
+                'id' => $jurnal->id,
+                'tanggal' => Carbon::parse($jurnal->created_at)->format('d M Y'),
+                'halaman_range' => $jurnal->halaman_awal . ' - ' . $jurnal->halaman_akhir,
+                'content' => $jurnal->deskripsi,
+                'created_at' => $jurnal->created_at,
+            ];
+        });
+
+    return Inertia::render('Admin/JurnalDetail', [
+        'book' => $book,
+        'journals' => $journals,
+    ]);
+}
+
+
+    public function detail(Request $request, $book_id)
     {
-        $book = Book::findOrFail($id);
+        $book = Book::withCount('jurnaling as total_jurnal')
+            ->findOrFail($book_id);
         
-        $jurnalingData = Jurnaling::where('id_buku', $id)
-            ->with('siswa:id,name')
-            ->select('id_siswa', DB::raw('COUNT(*) as total_jurnal'))
-            ->groupBy('id_siswa')
-            ->get();
-            
-        return Inertia::render('JurnalingDetail', [
-            'book' => [
-                'id' => $book->id,
-                'judul' => $book->judul,
-                'penulis' => $book->penulis,
-                'deskripsi' => $book->deskripsi,
-                'cover_image' => $book->cover_image,
-                'kategori' => $book->kategori,
-                'updated_at' => $book->updated_at->format('d M Y'),
-            ],
-            'jurnalingData' => $jurnalingData,
-            'totalSiswa' => $jurnalingData->count(),
-            'totalJurnal' => $jurnalingData->sum('total_jurnal'),
+        $book->total_siswa = $book->jurnaling->unique('id_siswa')->count();
+
+        $search = $request->input('search', '');
+        $page = $request->input('page', 1);
+        $perPage = 3;
+
+        $siswas = User::where('role', 'siswa')
+            ->whereHas('jurnalings', function ($query) use ($book_id) {
+                $query->where('id_buku', $book_id);
+            })
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
+            ->withCount(['jurnalings as total_journals' => function ($query) use ($book_id) {
+                $query->where('id_buku', $book_id);
+            }])
+            ->with(['jurnalings' => function ($query) use ($book_id) {
+                $query->where('id_buku', $book_id)
+                      ->latest()
+                      ->limit(1);
+            }])
+            ->paginate($perPage, ['*'], 'page', $page);
+
+        $formattedsiswas = $siswas->through(function ($siswa) {
+            return [
+                'id' => $siswa->id,
+                'name' => $siswa->name,
+                'email' => $siswa->email,
+                'total_journals' => $siswa->total_journals,
+                'last_updated' => $siswa->jurnalings->isNotEmpty() 
+                    ? Carbon::parse($siswa->jurnalings->first()->updated_at)->format('d M Y') 
+                    : '-'
+            ];
+        });
+
+        return Inertia::render('Admin/JurnalSiswaDetail', [
+            'book' => $book,
+            'siswa' => $formattedsiswas,
+            'totalPages' => $formattedsiswas->lastPage()
         ]);
     }
 
-    /**
-     * Show the form for creating a new jurnaling entry.
-     *
-     * @param  int  $bookId
-     * @return \Inertia\Response
-     */
-    public function create($bookId = null)
+    public function show($book_id, $siswa_id)
     {
-        $books = Book::select('id', 'judul', 'penulis')->orderBy('judul')->get();
-        $siswa = User::where('role', 'siswa')->select('id', 'name')->orderBy('name')->get();
+        $book = Book::findOrFail($book_id);
+        $siswa = User::where('role', 'siswa')->findOrFail($siswa_id);
         
-        return Inertia::render('JurnalingCreate', [
-            'books' => $books,
-            'siswa' => $siswa,
-            'selectedBookId' => $bookId,
-        ]);
-    }
-
-    /**
-     * Store a newly created jurnaling entry in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'id_buku' => 'required|exists:books,id',
-            'id_siswa' => 'required|exists:users,id',
-            'halaman_awal' => 'required|integer|min:1',
-            'halaman_akhir' => 'required|integer|min:1|gte:halaman_awal',
-            'deskripsi' => 'required|string|min:10',
-        ]);
-
-        Jurnaling::create($request->all());
-
-        return redirect()->route('jurnaling.index')
-            ->with('message', 'Jurnaling berhasil disimpan.');
-    }
-
-    /**
-     * Show the form for editing the specified jurnaling entry.
-     *
-     * @param  int  $id
-     * @return \Inertia\Response
-     */
-    public function edit($id)
-    {
-        $jurnaling = Jurnaling::findOrFail($id);
-        $books = Book::select('id', 'judul', 'penulis')->orderBy('judul')->get();
-        $siswa = User::where('role', 'siswa')->select('id', 'name')->orderBy('name')->get();
-        
-        return Inertia::render('JurnalingEdit', [
-            'jurnaling' => $jurnaling,
-            'books' => $books,
-            'siswa' => $siswa,
-        ]);
-    }
-
-    /**
-     * Update the specified jurnaling entry in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function update(Request $request, $id)
-    {
-        $jurnaling = Jurnaling::findOrFail($id);
-        
-        $request->validate([
-            'id_buku' => 'required|exists:books,id',
-            'id_siswa' => 'required|exists:users,id',
-            'halaman_awal' => 'required|integer|min:1',
-            'halaman_akhir' => 'required|integer|min:1|gte:halaman_awal',
-            'deskripsi' => 'required|string|min:10',
-        ]);
-
-        $jurnaling->update($request->all());
-
-        return redirect()->route('jurnaling.index')
-            ->with('message', 'Jurnaling berhasil diperbarui.');
-    }
-
-    /**
-     * Remove the specified jurnaling entry from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function destroy($id)
-    {
-        $jurnaling = Jurnaling::findOrFail($id);
-        $jurnaling->delete();
-
-        return redirect()->route('jurnaling.index')
-            ->with('message', 'Jurnaling berhasil dihapus.');
-    }
-
-    /**
-     * Display jurnal entries for a specific student.
-     *
-     * @param  int  $studentId
-     * @return \Inertia\Response
-     */
-    public function siswaJurnal($studentId)
-    {
-        $siswa = User::where('role', 'siswa')->findOrFail($studentId);
-        
-        $jurnalingSiswa = Jurnaling::where('id_siswa', $studentId)
-            ->with('buku:id,judul,penulis,cover_image')
+        $journals = Jurnaling::where('id_buku', $book_id)
+            ->where('id_siswa', $siswa_id)
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        return Inertia::render('SiswaJurnalPage', [
-            'siswa' => [
-                'id' => $siswa->id,
-                'name' => $siswa->name,
-            ],
-            'jurnaling' => $jurnalingSiswa,
+        return Inertia::render('Jurnal/JurnalDetail', [
+            'book' => $book,
+            'siswa' => $siswa,
+            'journals' => $journals
         ]);
     }
 
-    /**
-     * Display books with jurnaling statistics for a specific student.
-     *
-     * @param  int  $studentId
-     * @return \Inertia\Response
-     */
-    public function siswaBuku($studentId)
+    public function store(Request $request)
     {
-        $siswa = User::where('role', 'siswa')->findOrFail($studentId);
+        $validated = $request->validate([
+            'id_buku' => 'required|exists:books,id',
+            'halaman_awal' => 'required|integer',
+            'halaman_akhir' => 'required|integer',
+            'deskripsi' => 'required|string',
+        ]);
+
+        Jurnaling::create([
+            'id_buku' => $validated['id_buku'],
+            'id_siswa' => auth()->id(),
+            'halaman_awal' => $validated['halaman_awal'],
+            'halaman_akhir' => $validated['halaman_akhir'],
+            'deskripsi' => $validated['deskripsi'],
+        ]);
+
+        return redirect()->back()->with('success', 'Jurnal berhasil disimpan');
+    }
+
+    public function update(Request $request, $id)
+    {
+        $jurnal = Jurnaling::findOrFail($id);
         
-        $bukuSiswa = Book::select([
-                'books.id',
-                'books.judul',
-                'books.penulis',
-                'books.cover_image',
-                DB::raw('COUNT(jurnaling.id) as total_jurnal'),
-                DB::raw('MAX(jurnaling.created_at) as last_update')
-            ])
-            ->join('jurnaling', 'books.id', '=', 'jurnaling.id_buku')
-            ->where('jurnaling.id_siswa', $studentId)
-            ->groupBy('books.id', 'books.judul', 'books.penulis', 'books.cover_image')
-            ->orderBy('last_update', 'desc')
-            ->paginate(10);
-
-        return Inertia::render('SiswaBukuPage', [
-            'siswa' => [
-                'id' => $siswa->id,
-                'name' => $siswa->name,
-            ],
-            'books' => $bukuSiswa,
-        ]);
-    }
-
-    /**
-     * Generate report for jurnaling activities.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function report(Request $request)
-    {
-        $request->validate([
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-            'type' => ['required', Rule::in(['book', 'student'])],
-        ]);
-
-        $startDate = $request->input('start_date');
-        $endDate = $request->input('end_date');
-        $type = $request->input('type');
-
-        if ($type === 'book') {
-            $report = Book::select([
-                    'books.id',
-                    'books.judul',
-                    'books.penulis',
-                    DB::raw('COUNT(DISTINCT jurnaling.id_siswa) as total_siswa'),
-                    DB::raw('COUNT(jurnaling.id) as total_jurnal')
-                ])
-                ->leftJoin('jurnaling', 'books.id', '=', 'jurnaling.id_buku')
-                ->where(function ($q) use ($startDate, $endDate) {
-                    $q->whereBetween('jurnaling.created_at', [$startDate, $endDate])
-                      ->orWhereNull('jurnaling.created_at');
-                })
-                ->groupBy('books.id', 'books.judul', 'books.penulis')
-                ->orderBy('total_jurnal', 'desc')
-                ->get();
-        } else {
-            $report = User::where('role', 'siswa')
-                ->select([
-                    'users.id',
-                    'users.name',
-                    DB::raw('COUNT(DISTINCT jurnaling.id_buku) as total_buku'),
-                    DB::raw('COUNT(jurnaling.id) as total_jurnal')
-                ])
-                ->leftJoin('jurnaling', 'users.id', '=', 'jurnaling.id_siswa')
-                ->where(function ($q) use ($startDate, $endDate) {
-                    $q->whereBetween('jurnaling.created_at', [$startDate, $endDate])
-                      ->orWhereNull('jurnaling.created_at');
-                })
-                ->groupBy('users.id', 'users.name')
-                ->orderBy('total_jurnal', 'desc')
-                ->get();
+        if (auth()->id() !== $jurnal->id_siswa && !auth()->user()->hasRole(['admin', 'guru'])) {
+            abort(403, 'Unauthorized action.');
         }
 
-        return Inertia::render('JurnalingReport', [
-            'report' => $report,
-            'filters' => [
-                'startDate' => $startDate,
-                'endDate' => $endDate,
-                'type' => $type,
-            ],
+        $validated = $request->validate([
+            'halaman_awal' => 'required|integer',
+            'halaman_akhir' => 'required|integer',
+            'deskripsi' => 'required|string',
         ]);
+
+        $jurnal->update($validated);
+
+        return redirect()->back()->with('success', 'Jurnal berhasil diperbarui');
+    }
+
+    public function destroy($id)
+    {
+        $jurnal = Jurnaling::findOrFail($id);
+
+        if (auth()->id() !== $jurnal->id_siswa && !auth()->user()->hasRole(['admin', 'guru'])) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $jurnal->delete();
+
+        return redirect()->back()->with('success', 'Jurnal berhasil dihapus');
     }
 }
