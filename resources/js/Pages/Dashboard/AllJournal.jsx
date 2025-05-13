@@ -105,7 +105,7 @@ const AllJournal = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {journalEntries.map((entry) => (
-                    <div key={entry.id} className="bg-white p-4">
+                    <div key={entry.id} className="bg-white npp-4">
                         <div className="flex justify-between items-start mb-2">
                             <h3 className="font-semibold text-gray-800">{entry.title}</h3>
                             <span className={`text-xs px-3 py-1 rounded-full ${entry.status === 'Dipublikasi'
