@@ -139,6 +139,14 @@ $formattedBooks = $booksJurnaling->map(function ($book) {
 
         $books = $query->latest()->paginate(10)->appends($request->all());
 
+        $queryKategori = Kategori::query();
+        
+        if (!empty($search)) {
+            $queryKategori->where('kategori', 'like', "%{$search}%");
+        }
+        
+        $categories = $queryKategori->orderBy('created_at', 'desc')->paginate($perPage);
+
         return Inertia::render('Admin/Buku', [
             'books' => $books,
             'booksJurnaling' => $formattedBooks,
@@ -155,7 +163,8 @@ $formattedBooks = $booksJurnaling->map(function ($book) {
                 'last_page' => $books->lastPage(),
                 'per_page' => $books->perPage(),
                 'total' => $books->total(),
-            ]
+            ],
+            'kategoriAll' => $categories
         ]);
     }
 

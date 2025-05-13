@@ -18,22 +18,17 @@ class KategoriController extends Controller
 
         $kategori = Kategori::create($validated);
 
-        return response()->json([
-            'message' => 'Kategori berhasil ditambahkan.',
-            'data' => $kategori,
-        ], 201);
+        return redirect()->back()->with('success', 'Kategori berhasil ditambahkan.');
     }
 
     /**
-     * Hapus data kategori berdasarkan ID.
+     * Delete the specified category.
      */
     public function destroy($id)
     {
         $kategori = Kategori::findOrFail($id);
         $kategori->delete();
 
-        return response()->json([
-            'message' => 'Kategori berhasil dihapus.',
-        ]);
+        return redirect()->back()->with('success', 'Kategori berhasil dihapus.');
     }
 }
