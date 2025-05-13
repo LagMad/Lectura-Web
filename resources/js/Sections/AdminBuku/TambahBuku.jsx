@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import axios from "axios";
 
-export default function TambahBuku() {
+export default function TambahBuku({ kategori }) {
     const getCsrfToken = () => {
         const metaTag = document.querySelector('meta[name="csrf-token"]');
         if (metaTag) {
@@ -263,13 +263,11 @@ export default function TambahBuku() {
                 </p>
             </div>
 
-            {submitSuccess &&
-                duplicateBooks ==
-                    null(
-                        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 w-fit">
-                            Buku berhasil disimpan!
-                        </div>
-                    )}
+            {submitSuccess && !duplicateBooks && (
+                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 w-fit">
+                    Buku berhasil disimpan!
+                </div>
+            )}
 
             {errors.general && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 w-fit">
@@ -492,8 +490,7 @@ export default function TambahBuku() {
                             >
                                 Kategori
                             </label>
-                            <input
-                                type="text"
+                            <select
                                 id="kategori"
                                 name="kategori"
                                 value={formValues.kategori}
@@ -503,7 +500,14 @@ export default function TambahBuku() {
                                         ? "border-red-500"
                                         : "border-gray-300"
                                 } rounded`}
-                            />
+                            >
+                                <option value="">-- Pilih Kategori --</option>
+                                {kategori.map((item) => (
+                                    <option key={item.id} value={item.kategori}>
+                                        {item.kategori}
+                                    </option>
+                                ))}
+                            </select>
                             {errors.kategori && (
                                 <p className="text-red-500 text-xs mt-1">
                                     {errors.kategori}

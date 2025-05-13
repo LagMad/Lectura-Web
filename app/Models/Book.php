@@ -35,4 +35,16 @@ class Book extends Model
     {
         return $this->hasMany(Jurnaling::class, 'id_buku');
     }
+
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
+    
+    public function isFavoritedByUser($userId)
+    {
+        return $this->favorites()
+            ->where('user_id', $userId)
+            ->exists();
+    }
 }
