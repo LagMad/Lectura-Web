@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Inertia\Inertia;
 use App\Models\Book;
 use App\Models\Kategori;
+use App\Models\Jurnaling;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Cloudinary\Cloudinary;
@@ -66,49 +67,49 @@ class BookController extends Controller
         $perPage = $request->input('perPage', 10);
         $page = $request->input('page', 1);
 
-        $queryJurnaling = Book::withCount([
-            'jurnaling as total_siswa' => function ($query) {
-                $query->select(DB::raw('COUNT(DISTINCT id_siswa)'));
-            },
-            'jurnaling as total_jurnal'
-        ])
-        ->select([
-            'id',
-            'judul',
-            'penulis',
-            'cover_path',
-            'updated_at'
-        ]);
-    
-    // Pencarian
-    if (!empty($search)) {
-        $queryJurnaling->where(function ($q) use ($search) {
-            $q->where('judul', 'like', "%{$search}%")
-              ->orWhere('penulis', 'like', "%{$search}%");
-        });
-    }
-    
-    // Filter kategori
-    if ($kategori !== '' && $kategori !== 'Semua Kategori') {
-        $queryJurnaling->where('kategori', $kategori);
-    }
-    
-    // Pagination
-    $booksJurnaling = $queryJurnaling->orderBy('updated_at', 'desc')
-        ->paginate($perPage);
-    
-    // Format data untuk tampilan
-    $formattedBooks = $booksJurnaling->map(function ($book) {
-        return [
-            'id' => $book->id,
-            'judul' => $book->judul,
-            'penulis' => $book->penulis,
-            'cover_image' => $book->cover_path, // disesuaikan dengan field di model
-            'total_siswa' => $book->total_siswa ?? 0,
-            'total_jurnal' => $book->total_jurnal ?? 0,
-            'update_terakhir' => $book->updated_at->format('d M Y'),
-        ];
+$queryJurnaling = Book::select([
+    'id',
+    'judul',
+    'penulis',
+    'cover_path',
+    'updated_at'
+]);
+
+// Pencarian
+if (!empty($search)) {
+    $queryJurnaling->where(function ($q) use ($search) {
+        $q->where('judul', 'like', "%{$search}%")
+          ->orWhere('penulis', 'like', "%{$search}%");
     });
+}
+
+// Filter kategori
+if ($kategori !== '' && $kategori !== 'Semua Kategori') {
+    $queryJurnaling->where('kategori', $kategori);
+}
+
+// Pagination
+$booksJurnaling = $queryJurnaling->orderBy('updated_at', 'desc')
+    ->paginate($perPage);
+
+// Format data
+$formattedBooks = $booksJurnaling->map(function ($book) {
+    $totalJurnal = Jurnaling::where('id_buku', $book->id)->count();
+    $totalSiswa = Jurnaling::where('id_buku', $book->id)
+        ->distinct('id_siswa')
+        ->count('id_siswa');
+
+    return [
+        'id' => $book->id,
+        'judul' => $book->judul,
+        'penulis' => $book->penulis,
+        'cover_image' => $book->cover_path,
+        'total_jurnal' => $totalJurnal,
+        'total_siswa' => $totalSiswa,
+        'update_terakhir' => $book->updated_at->format('d M Y'),
+    ];
+});
+
 
         $kategoriBuku = Book::distinct()->pluck('kategori')->filter()->toArray();
         array_unshift($kategoriBuku, 'Semua Kategori');
