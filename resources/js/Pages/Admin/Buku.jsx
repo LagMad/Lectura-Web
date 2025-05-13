@@ -30,7 +30,7 @@ export default function Buku({
         >
             <div className="flex flex-col w-full">
                 <ManajemenBuku books={books} />
-                <ManajemenKategori categories={kategoriBuku} />
+                <ManajemenKategori/>
                 <JurnalingSiswa
                     booksJurnaling={booksJurnaling}
                     totalBooks={totalBooks}

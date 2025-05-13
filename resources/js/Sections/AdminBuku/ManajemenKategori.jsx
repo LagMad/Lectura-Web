@@ -190,9 +190,9 @@ export default function ManajemenKategori({ categories: initialCategories }) {
                             <th className="py-3 px-4 font-medium">
                                 Nama Kategori
                             </th>
-                            <th className="py-3 px-4 font-medium">
+                            {/* <th className="py-3 px-4 font-medium">
                                 Jumlah Buku
-                            </th>
+                            </th> */}
                             <th className="py-3 px-4 font-medium">
                                 Tanggal Dibuat
                             </th>
@@ -209,9 +209,9 @@ export default function ManajemenKategori({ categories: initialCategories }) {
                                     <td className="py-3 px-4 md:text-md text-sm">
                                         {category.nama}
                                     </td>
-                                    <td className="py-3 px-4 text-sm text-gray-500">
+                                    {/* <td className="py-3 px-4 text-sm text-gray-500">
                                         {category.jumlah_buku || 0}
-                                    </td>
+                                    </td> */}
                                     <td className="py-3 px-4 text-sm text-gray-500">
                                         {new Date(category.created_at).toLocaleDateString('id-ID')}
                                     </td>
