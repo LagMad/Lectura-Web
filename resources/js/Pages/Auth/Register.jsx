@@ -4,6 +4,7 @@ import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import axios from "axios";
+import { Icon } from '@iconify/react';
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -13,6 +14,11 @@ export default function Register() {
         password_confirmation: "",
         nipd: "",
         role: "siswa",
+    });
+
+    const [registrationStatus, setRegistrationStatus] = useState({
+        success: false,
+        message: "",
     });
 
     const [nipdStatus, setNipdStatus] = useState({
@@ -36,7 +42,7 @@ export default function Register() {
             setNipdStatus({
                 checked: true,
                 valid: false,
-                message: "Terjadi kesalahan saat memvalidasi NIPD.",
+                message: "NIPD tidak ditemukan atau sudah teregistrasi.",
             });
         }
     };
@@ -46,9 +52,7 @@ export default function Register() {
 
         if (name === "nipd") {
             const numericValue = value.replace(/\D/g, "");
-
             const truncatedValue = numericValue.slice(0, 5);
-
             setData(name, truncatedValue);
 
             setNipdStatus({
@@ -78,8 +82,20 @@ export default function Register() {
         });
     };
 
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+    const togglePasswordVisibility = (field) => {
+        if (field === 'password') {
+            setShowPassword(!showPassword);
+        } else if (field === 'confirmation') {
+            setShowConfirmPassword(!showConfirmPassword);
+        }
+    };
+
     const submit = (e) => {
         e.preventDefault();
+        setRegistrationStatus({ success: false, message: "" });
 
         // Cek validasi NIPD sebelum submit jika belum divalidasi
         if (!nipdStatus.checked) {
@@ -98,17 +114,40 @@ export default function Register() {
 
     const proceedWithSubmit = () => {
         post(route("register"), {
-            onFinish: () => reset("password", "password_confirmation"),
+            onSuccess: (page) => {
+                // Registration successful
+                setRegistrationStatus({
+                    success: true,
+                    message: "Pendaftaran berhasil! Silahkan login dengan akun baru Anda.",
+                });
+                reset("password", "password_confirmation");
+                
+                // Optionally, redirect after a short delay
+                setTimeout(() => {
+                    window.location.href = route("login");
+                }, 3000);
+            },
+            onError: (errors) => {
+                // Registration failed with validation errors
+                setRegistrationStatus({
+                    success: false,
+                    message: "Pendaftaran gagal. Silahkan periksa form Anda.",
+                });
+                console.error("Registration errors:", errors);
+            },
+            onFinish: () => {
+                reset("password", "password_confirmation");
+            },
         });
     };
 
     return (
-        <div className="md:h-screen md:flex justify-center justify-items-center bg-white w-full">
-            <div className="w-1/2 h-fit my-auto px-4 sm:px-6 lg:px-8 md:block hidden">
-                <div className="mx-auto md:w-8/12 md:text-3xl text-2xl font-bold">
-                    Daftarkan Dirimu E-Library!
+        <div className="min-h-screen md:h-screen flex flex-col md:flex-row justify-center justify-items-center bg-white w-full">
+            <div className="w-full md:w-1/2 h-fit my-auto pt-10 md:pt-0">
+                <div className="px-10 md:mx-auto w-full md:w-8/12 text-3xl font-bold text-center md:text-justify">
+                    Daftarkan Dirimu di E-Library!
                 </div>
-                <div className="mx-auto md:w-8/12 md:text-lg text-md mt-2">
+                <div className="px-10 md:mx-auto w-full md:w-8/12 text-lg mt-2 text-justify">
                     Buka akses ke ribuan buku digital, artikel, dan referensi
                     berkualitas. Buat akun sekarang dan mulai menjelajah dunia
                     pengetahuan tanpa batas!
@@ -125,6 +164,29 @@ export default function Register() {
                                 Buatlah Akun mu Sekarang Juga
                             </p>
                         </div>
+
+                        {/* Registration Status Message */}
+                        {registrationStatus.message && (
+                            <div className={`mb-4 p-4 rounded-md ${
+                                registrationStatus.success 
+                                    ? "bg-green-50 text-green-700 border border-green-200" 
+                                    : "bg-red-50 text-red-700 border border-red-200"
+                            }`}>
+                                <div className="flex">
+                                    <div className="flex-shrink-0">
+                                        <Icon 
+                                            icon={registrationStatus.success ? "mdi:check-circle" : "mdi:alert-circle"} 
+                                            className="h-5 w-5" 
+                                        />
+                                    </div>
+                                    <div className="ml-3">
+                                        <p className="text-sm font-medium">
+                                            {registrationStatus.message}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
                         <form
                             onSubmit={submit}
@@ -191,7 +253,7 @@ export default function Register() {
                                     />
                                     <button
                                         type="button"
-                                        className="ml-2 mt-1 px-3 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                        className="cursor-pointer ml-2 mt-1 px-3 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                         onClick={validateNipd}
                                         disabled={!data.nipd || processing}
                                     >
@@ -222,16 +284,30 @@ export default function Register() {
                                     htmlFor="password"
                                     value="Kata Sandi"
                                 />
-                                <TextInput
-                                    id="password"
-                                    type="password"
-                                    name="password"
-                                    value={data.password}
-                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3"
-                                    autoComplete="new-password"
-                                    onChange={handlePasswordChange}
-                                    required
-                                />
+                                <div className="relative">
+                                    <input
+                                        id="password"
+                                        type={showPassword ? "text" : "password"}
+                                        name="password"
+                                        value={data.password}
+                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 pr-10"
+                                        autoComplete="new-password"
+                                        onChange={handlePasswordChange}
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-600 focus:outline-none mt-1"
+                                        onClick={() => togglePasswordVisibility('password')}
+                                        tabIndex="-1"
+                                    >
+                                        <Icon 
+                                            icon={showPassword ? 'mdi:eye-off' : 'mdi:eye'} 
+                                            className="h-5 w-5" 
+                                            aria-hidden="true" 
+                                        />
+                                    </button>
+                                </div>
                                 <InputError
                                     message={errors.password}
                                     className="mt-2"
@@ -243,21 +319,35 @@ export default function Register() {
                                     htmlFor="password_confirmation"
                                     value="Konfirmasi Kata Sandi"
                                 />
-                                <TextInput
-                                    id="password_confirmation"
-                                    type="password"
-                                    name="password_confirmation"
-                                    value={data.password_confirmation}
-                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3"
-                                    autoComplete="new-password"
-                                    onChange={(e) =>
-                                        setData(
-                                            "password_confirmation",
-                                            e.target.value
-                                        )
-                                    }
-                                    required
-                                />
+                                <div className="relative">
+                                    <input
+                                        id="password_confirmation"
+                                        type={showConfirmPassword ? "text" : "password"}
+                                        name="password_confirmation"
+                                        value={data.password_confirmation}
+                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 pr-10"
+                                        autoComplete="new-password"
+                                        onChange={(e) =>
+                                            setData(
+                                                "password_confirmation",
+                                                e.target.value
+                                            )
+                                        }
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-600 focus:outline-none mt-1"
+                                        onClick={() => togglePasswordVisibility('confirmation')}
+                                        tabIndex="-1"
+                                    >
+                                        <Icon 
+                                            icon={showConfirmPassword ? 'mdi:eye-off' : 'mdi:eye'} 
+                                            className="h-5 w-5" 
+                                            aria-hidden="true" 
+                                        />
+                                    </button>
+                                </div>
                                 <InputError
                                     message={errors.password_confirmation}
                                     className="mt-2"
@@ -334,9 +424,9 @@ export default function Register() {
                                 <button
                                     type="submit"
                                     disabled={processing}
-                                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                    className="cursor-pointer w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                 >
-                                    Daftar
+                                    {processing ? "Mendaftar..." : "Daftar"}
                                 </button>
                             </div>
                         </form>

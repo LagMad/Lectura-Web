@@ -1,12 +1,14 @@
 import React from 'react';
 import staffOne from "../../../../public/staff-one.jpg";
 import staffTwo from "../../../../public/staff-two.jpg";
+import staffThree from "../../../../public/staff-three.jpg";
+import staffFour from "../../../../public/staff-four.jpg";
 
 const staffData = [
-    { image: staffOne, name: "Sulis", role: "CEO & Founder" },
-    { image: staffTwo, name: "Dwi Anang", role: "CTO" },
-    { image: staffOne, name: "Zilong", role: "CTO" },
-    { image: staffTwo, name: "Franco", role: "CFO" },
+    { image: staffOne, name: "Bu Sulis", },
+    { image: staffTwo, name: "Pak Dwi Anang", },
+    { image: staffThree, name: "Bu Srinurhayani", },
+    { image: staffFour, name: "Bu Widya", },
 ];
 
 const Staff = () => {
@@ -31,7 +33,6 @@ const Staff = () => {
                                 />
                             </div>
                             <h3 className='font-semibold text-base sm:text-lg'>{staff.name}</h3>
-                            <p className='text-gray-500 text-sm'>{staff.role}</p>
                         </div>
                     ))}
                 </div>
