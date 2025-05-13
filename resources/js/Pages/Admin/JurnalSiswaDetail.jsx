@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import AdminLayout from "@/Layouts/AdminLayout";
-import EditBuku from "@/Sections/AdminBuku/EditBuku";
+import ManajemenBuku from "@/Sections/AdminBuku/ManajemenBuku";
+import JurnalingSiswa from "@/Sections/AdminBuku/JurnalingSiswa";
+import JurnalSiswaDetail from "@/Sections/AdminBuku/JurnalSiswaDetail";
 
-export default function Buku({ book, kategori }) {
+export default function JurnalSiswa({ book, siswa, totalPages }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
     };
@@ -13,13 +16,16 @@ export default function Buku({ book, kategori }) {
             setIsSidebarOpen(false);
         }
     };
-
     return (
         <AdminLayout
             isSidebarOpen={isSidebarOpen}
             toggleSidebar={toggleSidebar}
         >
-            <EditBuku book={book} kategori={kategori} />
+            <JurnalSiswaDetail
+                book={book}
+                siswa={siswa}
+                totalPages={totalPages}
+            />
         </AdminLayout>
     );
 }

@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Search, ChevronLeft, ChevronRight } from "lucide-react";
-import { router } from "@inertiajs/react"; // Import Inertia router
+import { router } from "@inertiajs/react";
+import JurnalSiswaDetail from "./JurnalSiswaDetail";
 
 const JurnalingSiswa = (props) => {
     const {
@@ -9,7 +10,7 @@ const JurnalingSiswa = (props) => {
         kategoriBuku: initialKategoriBuku = ["Semua Kategori"],
         filters: initialFilters = {
             search: "",
-            kategori: "", // Default to empty string
+            kategori: "",
             page: 1,
             perPage: 10,
         },
@@ -19,7 +20,7 @@ const JurnalingSiswa = (props) => {
             per_page: 10,
             total: 0,
         },
-        onNavigate = null, // Set to null instead of empty function
+        onNavigate = null,
     } = props;
 
     // State for data
@@ -36,6 +37,10 @@ const JurnalingSiswa = (props) => {
     );
     const [loading, setLoading] = useState(false);
 
+    // Popup state
+    const [selectedBook, setSelectedBook] = useState(null);
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
+
     // Timeout ID for search debounce
     const [searchTimeout, setSearchTimeout] = useState(null);
 
@@ -46,14 +51,12 @@ const JurnalingSiswa = (props) => {
     const totalBooks = pagination.total;
 
     // Update component when props change
-    useEffect(() => {
-        // When new props arrive, update the state and set loading to false
+    React.useEffect(() => {
         if (props.booksJurnaling) setBooks(props.booksJurnaling);
         if (props.kategoriBuku) setKategoriBuku(props.kategoriBuku);
         if (props.pagination) setPagination(props.pagination);
         if (props.filters) {
             setSearchQuery(props.filters.search || "");
-            // Convert empty string kategori to "Semua Kategori" for display
             setSelectedCategory(
                 props.filters.kategori === ""
                     ? "Semua Kategori"
@@ -61,7 +64,6 @@ const JurnalingSiswa = (props) => {
             );
         }
 
-        // Always reset loading state when props change (data has arrived)
         setLoading(false);
     }, [props]);
 
@@ -120,20 +122,6 @@ const JurnalingSiswa = (props) => {
         }
     };
 
-    // Handle book detail view
-    const handleViewDetail = (bookId) => {
-        if (onNavigate) {
-            onNavigate({
-                action: "viewDetail",
-                bookId: bookId,
-            });
-        } else {
-            // Fallback to router if onNavigate is not provided
-            router.visit(`/admin/buku/${bookId}`);
-        }
-    };
-
-    // Reusable function for navigation
     const navigateWithFilters = (filterUpdates) => {
         // Make sure we're consistently sending empty string for "Semua Kategori"
         const kategoriValue =
@@ -290,10 +278,6 @@ const JurnalingSiswa = (props) => {
                                                     src={book.cover_image}
                                                     alt={book.judul}
                                                     className="w-12 h-16 object-cover mr-4"
-                                                    onError={(e) => {
-                                                        e.target.src =
-                                                            "/api/placeholder/48/64";
-                                                    }}
                                                 />
                                                 <div>
                                                     <div className="font-medium text-gray-900">
@@ -315,14 +299,15 @@ const JurnalingSiswa = (props) => {
                                             {book.update_terakhir}
                                         </td>
                                         <td className="px-6 py-4">
-                                            <button
+                                            <a
+                                                href={route(
+                                                    "jurnal.book.detail",
+                                                    book.id
+                                                )}
                                                 className="text-blue-600 hover:text-blue-700 cursor-pointer"
-                                                onClick={() =>
-                                                    handleViewDetail(book.id)
-                                                }
                                             >
                                                 Lihat Detail
-                                            </button>
+                                            </a>
                                         </td>
                                     </tr>
                                 ))}
