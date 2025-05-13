@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Umum from "../Sections/Dashboard/Umum";
 import MediaSosial from "../Sections/Dashboard/MediaSosial";
 import KataSandi from "../Sections/Dashboard/KataSandi";
 import Layout from "@/Layouts/Layout";
 import Journaling from "@/Sections/Dashboard/Journaling";
 
-const Dashboard = ({ auth }) => {
+const Dashboard = ({ auth, books }) => {
     const [activeTitle, setActiveTitle] = useState("Umum");
 
     const sections = [
@@ -23,7 +23,7 @@ const Dashboard = ({ auth }) => {
         },
         {
             title: "Jurnal",
-            component: <Journaling auth={auth} />,
+            component: <Journaling auth={auth} books={books.data} />,
         },
     ];
 
@@ -46,7 +46,14 @@ const Dashboard = ({ auth }) => {
                                 {auth.user.name}
                             </div>
                             <div className="text-sm font-medium text-cust-dark-gray">
-                                Anggota Sejak 2024
+                                Anggota Sejak{" "}
+                                {new Date(
+                                    auth.user.created_at
+                                ).toLocaleDateString("id-ID", {
+                                    day: "numeric",
+                                    month: "long",
+                                    year: "numeric",
+                                })}
                             </div>
                         </div>
                     </div>

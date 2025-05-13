@@ -2,7 +2,10 @@ import { useState, useEffect } from "react";
 import { Search, Edit, Trash2 } from "lucide-react";
 import { router } from "@inertiajs/react";
 
-export default function ManajemenKategori({ categories: initialCategories }) {
+export default function ManajemenKategori({
+    categories: initialCategories,
+    books: initialBooks,
+}) {
     const [searchTerm, setSearchTerm] = useState("");
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [categoryToDelete, setCategoryToDelete] = useState(null);
@@ -14,6 +17,10 @@ export default function ManajemenKategori({ categories: initialCategories }) {
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value);
     };
+
+    useEffect(() => {
+        console.log("initialBooks", initialBooks.data);
+    }, [initialBooks.data]);
 
     // Apply search filter
     const handleSearch = () => {
@@ -104,6 +111,12 @@ export default function ManajemenKategori({ categories: initialCategories }) {
     const endItem = initialCategories?.to || 0;
     const totalCategories = initialCategories?.total || 0;
 
+    const getBookCountForCategory = (categoryName) => {
+        if (!initialBooks || !initialBooks.data) return 0;
+        
+        return initialBooks.data.filter(book => book.kategori === categoryName).length;
+    };
+
     return (
         <div className="w-full mx-auto pt-8 px-4 sm:px-6 lg:px-8 font-sans">
             <div className="lg:flex justify-between items-center mb-2">
@@ -152,6 +165,9 @@ export default function ManajemenKategori({ categories: initialCategories }) {
                                 Nama Kategori
                             </th>
                             <th className="py-3 px-4 font-medium">
+                                Jumlah Buku
+                            </th>
+                            <th className="py-3 px-4 font-medium">
                                 Tanggal Dibuat
                             </th>
                             <th className="py-3 px-4 font-medium">Aksi</th>
@@ -160,13 +176,18 @@ export default function ManajemenKategori({ categories: initialCategories }) {
                     <tbody>
                         {initialCategories?.data &&
                         initialCategories.data.length > 0 ? (
-                            initialCategories.data.map((category) => (
+                            initialCategories.data.map((category, index) => (
                                 <tr
                                     key={category.id}
                                     className="border-t border-gray-100"
                                 >
                                     <td className="py-3 px-4 md:text-md text-sm">
                                         {category.kategori}
+                                    </td>
+                                    <td className="py-3 px-4 md:text-md text-sm">
+                                        {getBookCountForCategory(
+                                            category.kategori
+                                        )}
                                     </td>
                                     <td className="py-3 px-4 text-sm text-gray-500">
                                         {new Date(

@@ -4,9 +4,10 @@ import { Link, usePage } from "@inertiajs/react";
 export default function AdminLayout({
     children,
     isSidebarOpen,
-    toggleSidebar,
+    toggleSidebar
 }) {
     const { url } = usePage();
+    const { auth } = usePage().props
 
     // Function to check if a route is active
     const isActive = (path) => {
@@ -42,7 +43,7 @@ export default function AdminLayout({
                             </div>
                             <div className="flex items-center gap-2">
                                 <span className="text-lg font-medium text-gray-700">
-                                    Ahmad Irza
+                                    {auth.user.name.split(" ")[0]}
                                 </span>
                                 <div className="h-8 w-8 rounded-full bg-cust-blue text-white flex items-center justify-center">
                                     <User size={18} />
