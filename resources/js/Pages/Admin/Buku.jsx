@@ -3,6 +3,7 @@ import AdminLayout from "@/Layouts/AdminLayout";
 import ManajemenBuku from "@/Sections/AdminBuku/ManajemenBuku";
 import JurnalingSiswa from "@/Sections/AdminBuku/JurnalingSiswa";
 import ManajemenKategori from "@/Sections/AdminBuku/ManajemenKategori";
+import { usePage } from "@inertiajs/react";
 
 export default function Buku({
     books,
@@ -11,8 +12,10 @@ export default function Buku({
     kategoriBuku,
     filters,
     pagination,
+    kategoriAll,
 }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const { auth } = usePage().props;
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
@@ -30,7 +33,9 @@ export default function Buku({
         >
             <div className="flex flex-col w-full">
                 <ManajemenBuku books={books} />
-                <ManajemenKategori/>
+                {auth.user.role === "admin" && (
+                    <ManajemenKategori categories={kategoriAll} />
+                )}
                 <JurnalingSiswa
                     booksJurnaling={booksJurnaling}
                     totalBooks={totalBooks}
