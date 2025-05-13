@@ -12,7 +12,8 @@ const navLinks = [
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const { url, auth } = usePage().props;
+    const { url } = usePage();
+    const { auth } = usePage().props;
 
     const handleLogout = async () => {
         try {
@@ -78,7 +79,9 @@ const Navbar = () => {
                         ) : (
                             <>
                                 <Button href="/login">Sign In</Button>
-                                <Button variant="filled" href="/register">Sign Up</Button>
+                                <Button variant="filled" href="/register">
+                                    Sign Up
+                                </Button>
                             </>
                         )}
                     </div>
