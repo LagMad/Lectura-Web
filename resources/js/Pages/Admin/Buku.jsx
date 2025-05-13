@@ -34,7 +34,7 @@ export default function Buku({
             <div className="flex flex-col w-full">
                 <ManajemenBuku books={books} />
                 {auth.user.role === "admin" && (
-                    <ManajemenKategori categories={kategoriAll} />
+                    <ManajemenKategori categories={kategoriAll} books={books} />
                 )}
                 <JurnalingSiswa
                     booksJurnaling={booksJurnaling}
