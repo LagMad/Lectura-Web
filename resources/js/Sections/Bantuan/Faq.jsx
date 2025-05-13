@@ -110,8 +110,8 @@ const Faq = ({ searchQuery = '', selectedCategory = '' }) => {
                                 {displayedFaqs.map((faq, idx) => (
                                     <Disclosure key={idx} defaultOpen={idx === 0}>
                                         {({ open }) => (
-                                            <div className='bg-white rounded-xl p-6'>
-                                                <Disclosure.Button className='flex justify-between items-center w-full font-semibold text-left text-sm md:text-base lg:text-lg text-gray-900'>
+                                            <div className='bg-white rounded-xl p-6 cursor-pointer'>
+                                                <Disclosure.Button className='flex justify-between items-center w-full font-semibold text-left text-sm md:text-base lg:text-lg text-gray-900 cursor-pointer'>
                                                     <span>{faq.question}</span>
                                                     <span className="text-xl bg-gradient-to-l from-[#CACED8] to-[#2563EB] bg-clip-text text-transparent">
                                                         <Icon
