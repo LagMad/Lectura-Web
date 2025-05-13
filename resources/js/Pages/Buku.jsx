@@ -8,12 +8,52 @@ import {
     MdOutlineKeyboardArrowLeft,
     MdOutlineKeyboardArrowRight,
 } from "react-icons/md";
+import { router } from "@inertiajs/react";
 
 const Buku = ({ books }) => {
     const [activeCategory, setActiveCategory] = useState("Semua Buku");
     const [currentPage, setCurrentPage] = useState(1);
     const [isMobile, setIsMobile] = useState(false);
-    const [bookmarks, setBookmarks] = useState({});
+    const [processing, setProcessing] = useState({});
+
+    const [bookmarks, setBookmarks] = useState(() => {
+        const initialBookmarks = {};
+        books.data.forEach((book) => {
+            initialBookmarks[book.id] = book.isFavorited ?? false;
+        });
+        return initialBookmarks;
+    });
+
+    const handleBookmarkToggle = (bookId) => {
+        if (processing[bookId]) return;
+
+        setProcessing((prev) => ({ ...prev, [bookId]: true }));
+
+        const isCurrentlyFavorited = bookmarks[bookId];
+
+        if (isCurrentlyFavorited) {
+            router.delete("/favorites", {
+                data: { book_id: bookId },
+                preserveScroll: true,
+                onFinish: () => {
+                    setBookmarks((prev) => ({ ...prev, [bookId]: false }));
+                    setProcessing((prev) => ({ ...prev, [bookId]: false }));
+                },
+            });
+        } else {
+            router.post(
+                "/favorites",
+                { book_id: bookId },
+                {
+                    preserveScroll: true,
+                    onFinish: () => {
+                        setBookmarks((prev) => ({ ...prev, [bookId]: true }));
+                        setProcessing((prev) => ({ ...prev, [bookId]: false }));
+                    },
+                }
+            );
+        }
+    };
 
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -56,13 +96,6 @@ const Buku = ({ books }) => {
         (currentPage - 1) * booksPerPage,
         currentPage * booksPerPage
     );
-
-    const handleBookmarkToggle = (bookId) => {
-        setBookmarks((prevBookmarks) => ({
-            ...prevBookmarks,
-            [bookId]: !prevBookmarks[bookId],
-        }));
-    };
 
     const categoryMenu = (
         <Menu>
@@ -139,7 +172,10 @@ const Buku = ({ books }) => {
                         {currentBooks.map((book) => (
                             <div
                                 key={book.id}
-                                className="flex flex-col justify-between px-5 py-4 min-h-[350px] rounded-xl drop-shadow-xl hover:drop-shadow-2xl transition-[filter] gap-1 bg-white group"
+                                onClick={() =>
+                                    router.visit(route("books.show", book.id))
+                                }
+                                className="flex cursor-pointer flex-col justify-between px-5 py-4 min-h-[350px] rounded-xl drop-shadow-xl hover:drop-shadow-2xl transition-[filter] gap-1 bg-white group"
                             >
                                 <div className="flex flex-col gap-1">
                                     <img
@@ -158,10 +194,11 @@ const Buku = ({ books }) => {
                                     </div>
                                 </div>
                                 <button
-                                    className="self-end md:self-start"
-                                    onClick={() =>
-                                        handleBookmarkToggle(book.id)
-                                    }
+                                    className="self-end md:self-start cursor-pointer"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleBookmarkToggle(book.id);
+                                    }}
                                 >
                                     {bookmarks[book.id] ? (
                                         <FaBookmark

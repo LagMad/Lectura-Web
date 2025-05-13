@@ -38,11 +38,19 @@ class BookController extends Controller
 
     public function index()
     {
-        $books = Book::latest()->paginate(10);
+        $books = Book::with(['favorites' => function ($query) {
+            $query->where('user_id', auth()->id());
+        }])->latest()->paginate(10);
+
+        foreach ($books as $book) {
+            $book->isFavorited = $book->favorites->isNotEmpty();
+        }
+
         return Inertia::render('Buku', [
             'books' => $books,
         ]);
     }
+
 
     public function adminBuku(Request $request)
     {
