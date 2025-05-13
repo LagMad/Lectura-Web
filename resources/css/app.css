@@ -8,6 +8,10 @@
     }
 }
 
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
 @layer components {
     .container {
         @apply mx-auto px-4;
