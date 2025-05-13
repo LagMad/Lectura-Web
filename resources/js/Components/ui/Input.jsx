@@ -49,7 +49,7 @@ const Input = ({
                         className="flex outline-none rounded-lg px-5 py-3 border-[1px] border-cust-gray w-full"
                         placeholder={placeholder}
                         value={value}
-                        type={showPassword ? "text" : "password"}
+                        type={"text"}
                         required={required}
                     />
                 </div>

@@ -287,8 +287,8 @@ const Detail = () => {
                                         </span>
                                     </div>
                                 </div>
-                                <div className="container pt-10 pb-20">
-                                    <div className="container space-y-5">
+                                <div className="w-full">
+                                    <div className="space-y-5 w-full">
                                         <h1 className="font-semibold text-2xl">
                                             Buku yang Mirip
                                         </h1>

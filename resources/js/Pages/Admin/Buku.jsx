@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import AdminLayout from "@/Layouts/AdminLayout";
 import ManajemenBuku from "@/Sections/AdminBuku/ManajemenBuku";
 import JurnalingSiswa from "@/Sections/AdminBuku/JurnalingSiswa";
+import ManajemenKategori from "@/Sections/AdminBuku/ManajemenKategori";
 
 export default function Buku({
     books,
@@ -29,6 +30,7 @@ export default function Buku({
         >
             <div className="flex flex-col w-full">
                 <ManajemenBuku books={books} />
+                <ManajemenKategori categories={kategoriBuku} />
                 <JurnalingSiswa
                     booksJurnaling={booksJurnaling}
                     totalBooks={totalBooks}
