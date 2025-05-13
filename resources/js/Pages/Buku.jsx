@@ -9,10 +9,11 @@ import {
     MdOutlineKeyboardArrowRight,
 } from "react-icons/md";
 
-const Buku = () => {
+const Buku = ({ books }) => {
     const [activeCategory, setActiveCategory] = useState("Semua Buku");
     const [currentPage, setCurrentPage] = useState(1);
     const [isMobile, setIsMobile] = useState(false);
+    const [bookmarks, setBookmarks] = useState({});
 
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -47,113 +48,21 @@ const Buku = () => {
         },
     ];
 
-    const books = [
-        {
-            image: "/silat.png",
-            penulis: "A. Fuadi",
-            judul: "Buku Ayo Berlatih Silat. Let's Practice Silat",
-        },
-        {
-            image: "/mie-ayam.png",
-            penulis: "Brian Khrisna",
-            judul: "Buku Seporsi Mie Ayam Sebelum Mati",
-        },
-        {
-            image: "/laut-bercerita.png",
-            penulis: "Leila S. Chudori",
-            judul: "Buku Laut Bercerita",
-        },
-        {
-            image: "/raksasa-laut.png",
-            penulis: "Maya Lestari",
-            judul: "Buku Smong, Si Raksasa Laut. Smong the Dragon",
-        },
-        {
-            image: "/silat.png",
-            penulis: "A. Fuadi",
-            judul: "Buku Ayo Berlatih Silat. Let's Practice Silat",
-        },
-        {
-            image: "/silat.png",
-            penulis: "A. Fuadi",
-            judul: "Buku Ayo Berlatih Silat. Let's Practice Silat",
-        },
-        {
-            image: "/mie-ayam.png",
-            penulis: "Brian Khrisna",
-            judul: "Buku Seporsi Mie Ayam Sebelum Mati",
-        },
-        {
-            image: "/laut-bercerita.png",
-            penulis: "Leila S. Chudori",
-            judul: "Buku Laut Bercerita",
-        },
-        {
-            image: "/raksasa-laut.png",
-            penulis: "Maya Lestari",
-            judul: "Buku Smong, Si Raksasa Laut. Smong the Dragon",
-        },
-        {
-            image: "/silat.png",
-            penulis: "A. Fuadi",
-            judul: "Buku Ayo Berlatih Silat. Let's Practice Silat",
-        },
-        {
-            image: "/silat.png",
-            penulis: "A. Fuadi",
-            judul: "Buku Ayo Berlatih Silat. Let's Practice Silat",
-        },
-        {
-            image: "/mie-ayam.png",
-            penulis: "Brian Khrisna",
-            judul: "Buku Seporsi Mie Ayam Sebelum Mati",
-        },
-        {
-            image: "/laut-bercerita.png",
-            penulis: "Leila S. Chudori",
-            judul: "Buku Laut Bercerita",
-        },
-        {
-            image: "/raksasa-laut.png",
-            penulis: "Maya Lestari",
-            judul: "Buku Smong, Si Raksasa Laut. Smong the Dragon",
-        },
-        {
-            image: "/silat.png",
-            penulis: "A. Fuadi",
-            judul: "Buku Ayo Berlatih Silat. Let's Practice Silat",
-        },
-        {
-            image: "/silat.png",
-            penulis: "A. Fuadi",
-            judul: "Buku Ayo Berlatih Silat. Let's Practice Silat",
-        },
-        {
-            image: "/mie-ayam.png",
-            penulis: "Brian Khrisna",
-            judul: "Buku Seporsi Mie Ayam Sebelum Mati",
-        },
-        {
-            image: "/laut-bercerita.png",
-            penulis: "Leila S. Chudori",
-            judul: "Buku Laut Bercerita",
-        },
-        {
-            image: "/raksasa-laut.png",
-            penulis: "Maya Lestari",
-            judul: "Buku Smong, Si Raksasa Laut. Smong the Dragon",
-        },
-        {
-            image: "/silat.png",
-            penulis: "A. Fuadi",
-            judul: "Buku Ayo Berlatih Silat. Let's Practice Silat",
-        },
-    ];
+    // Calculate total pages from the actual data
+    const totalPages = Math.ceil(books.data.length / booksPerPage);
 
-    const totalPages = Math.ceil(books.length / booksPerPage);
-    const indexOfLastBook = currentPage * booksPerPage;
-    const indexOfFirstBook = indexOfLastBook - booksPerPage;
-    const currentBooks = books.slice(indexOfFirstBook, indexOfLastBook);
+    // Get current books for the page
+    const currentBooks = books.data.slice(
+        (currentPage - 1) * booksPerPage,
+        currentPage * booksPerPage
+    );
+
+    const handleBookmarkToggle = (bookId) => {
+        setBookmarks((prevBookmarks) => ({
+            ...prevBookmarks,
+            [bookId]: !prevBookmarks[bookId],
+        }));
+    };
 
     const categoryMenu = (
         <Menu>
@@ -227,40 +136,47 @@ const Buku = () => {
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-7 w-full ">
-                        {currentBooks.map((book, index) => {
-                            const [bookmark, setBookmark] = useState(false);
-                            return (
-                                <div
-                                    key={index}
-                                    className="flex flex-col justify-between px-5 py-4 min-h-[350px] rounded-xl drop-shadow-xl hover:drop-shadow-2xl transition-[filter] gap-1 bg-white group"
-                                >
-                                    <div className="flex flex-col gap-1">
-                                        <img
-                                            src={book.image}
-                                            className="w-full h-52 object-contain mb-2"
-                                            alt={book.judul}
-                                        />
-                                        <div className="text-xs text-cust-gray line-clamp-1 group-hover:line-clamp-none">
-                                            {book.penulis}
-                                        </div>
-                                        <div className="text-xs text-black font-semibold line-clamp-2 group-hover:line-clamp-none">
-                                            {book.judul}
-                                        </div>
+                        {currentBooks.map((book) => (
+                            <div
+                                key={book.id}
+                                className="flex flex-col justify-between px-5 py-4 min-h-[350px] rounded-xl drop-shadow-xl hover:drop-shadow-2xl transition-[filter] gap-1 bg-white group"
+                            >
+                                <div className="flex flex-col gap-1">
+                                    <img
+                                        src={
+                                            book.cover_path ||
+                                            "/default-cover.png"
+                                        }
+                                        className="w-full h-52 object-contain mb-2"
+                                        alt={book.judul}
+                                    />
+                                    <div className="text-xs text-cust-gray line-clamp-1 group-hover:line-clamp-none">
+                                        {book.penulis}
                                     </div>
-                                    <button
-                                    className="self-end md:self-start"
-                                        onClick={() => setBookmark(!bookmark)}
-                                        
-                                    >
-                                        {bookmark ? (
-                                            <FaBookmark size={24} className="text-cust-blue"/>
-                                        ) : (
-                                            <FaRegBookmark size={24} className="text-cust-blue"/>
-                                        )}
-                                    </button>
+                                    <div className="text-xs text-black font-semibold line-clamp-2 group-hover:line-clamp-none">
+                                        {book.judul}
+                                    </div>
                                 </div>
-                            );
-                        })}
+                                <button
+                                    className="self-end md:self-start"
+                                    onClick={() =>
+                                        handleBookmarkToggle(book.id)
+                                    }
+                                >
+                                    {bookmarks[book.id] ? (
+                                        <FaBookmark
+                                            size={24}
+                                            className="text-cust-blue"
+                                        />
+                                    ) : (
+                                        <FaRegBookmark
+                                            size={24}
+                                            className="text-cust-blue"
+                                        />
+                                    )}
+                                </button>
+                            </div>
+                        ))}
                     </div>
 
                     {/* Pagination Controls */}

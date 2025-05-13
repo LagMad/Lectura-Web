@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import AdminLayout from "@/Layouts/AdminLayout";
 import TambahBuku from "@/Sections/AdminBuku/TambahBuku";
 
-export default function Buku() {
+export default function Buku({ kategori }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
@@ -19,7 +19,7 @@ export default function Buku() {
             isSidebarOpen={isSidebarOpen}
             toggleSidebar={toggleSidebar}
         >
-            <TambahBuku />
+            <TambahBuku kategori={kategori} />
         </AdminLayout>
     );
 }

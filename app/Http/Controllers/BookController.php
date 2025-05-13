@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Inertia\Inertia;
 use App\Models\Book;
+use App\Models\Kategori;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Cloudinary\Cloudinary;
@@ -146,7 +147,11 @@ class BookController extends Controller
 
     public function create()
     {
-        return Inertia::render('Admin/TambahBuku');
+        $kategori = Kategori::all();
+    
+        return Inertia::render('Admin/TambahBuku', [
+            'kategori' => $kategori
+        ]);
     }
 
     public function store(Request $request)
@@ -289,11 +294,19 @@ private function checkDuplicateBook(Request $request)
     {
         $reviews = $book->reviews()->with('user')->latest()->get();
         $averageRating = $book->reviews()->avg('rating');
+        $isFavorited = false;
+        
+        if (auth()->check()) {
+            $isFavorited = $book->favorites()
+                ->where('user_id', auth()->id())
+                ->exists();
+        }
 
-        return Inertia::render('Books/Show', [
+        return Inertia::render('Buku/Detail', [
             'book' => $book,
             'reviews' => $reviews,
-            'avgRating' => $averageRating
+            'avgRating' => $averageRating,
+            'isFavorited' => $isFavorited
         ]);
     }
 
