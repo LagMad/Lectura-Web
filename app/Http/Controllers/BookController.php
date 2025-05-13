@@ -325,8 +325,11 @@ private function checkDuplicateBook(Request $request)
 
     public function edit(Book $book)
     {
+        $kategori = Kategori::All();
+
         return Inertia::render('Admin/EditBuku', [
             'book' => $book,
+            'kategori' => $kategori
         ]);
     }
 
@@ -334,105 +337,110 @@ private function checkDuplicateBook(Request $request)
     {
         $book = Book::findOrFail($id);
         
-        // Validate the request
-        $validated = $request->validate([
-            'judul' => 'string|max:255',
-            'penulis' => 'string|max:255',
-            'jumlah_halaman' => 'integer|min:1',
-            'kategori' => 'nullable|string|max:255',
-            'penerbit' => 'nullable|string|max:255',
-            'tahun_terbit' => 'nullable|string|max:4',
-            'bahasa' => 'nullable|string|max:255',
-            'deskripsi' => 'nullable|string',
-            'status' => 'in:Tersedia,Tidak Tersedia,Terkendala',
-            'cover' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'file_buku' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:10240', // 10MB max
+// Validate the request
+$validated = $request->validate([
+    'judul' => 'required|string|max:255',
+    'penulis' => 'required|string|max:255',
+    'jumlah_halaman' => 'required|integer|min:1',
+    'kategori' => 'nullable|string|max:255',
+    'penerbit' => 'nullable|string|max:255',
+    'tahun_terbit' => 'nullable|string|max:4',
+    'bahasa' => 'nullable|string|max:255',
+    'deskripsi' => 'nullable|string',
+    'status' => 'required|in:Tersedia,Tidak Tersedia,Terkendala',
+    'cover' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+    'file_buku' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:10240', // 10MB max
+]);
+
+\Log::info('Book update request data:', $request->all());
+\Log::info('Book before update:', $book->toArray());
+
+$data = $request->except(['cover', 'file_buku', '_method', '_token']);
+
+// Upload cover jika ada
+if ($request->hasFile('cover')) {
+    try {
+        // Hapus cover lama jika ada
+        if ($book->cloudinary_public_id) {
+            $this->cloudinary->uploadApi()->destroy($book->cloudinary_public_id);
+            \Log::info('Deleted old image from Cloudinary:', ['public_id' => $book->cloudinary_public_id]);
+        }
+        
+        $file = $request->file('cover');
+        $filePath = $file->getRealPath();
+        
+        $uploadResult = $this->cloudinary->uploadApi()->upload($filePath, [
+            'folder' => 'buku_covers',
+            'transformation' => [
+                'width' => 500,
+                'height' => 750,
+                'crop' => 'limit'
+            ],
+            'resource_type' => 'image',
+            'access_mode' => 'public'
         ]);
         
-        \Log::info('Book update request data:', $request->all());
-        \Log::info('Book before update:', $book->toArray());
+        $data['cover_path'] = $uploadResult['secure_url'];
+        $data['cloudinary_public_id'] = $uploadResult['public_id'];
         
-        $data = $request->except(['cover', 'file_buku', '_method', '_token']);
-        
-        // Upload cover jika ada
-        if ($request->hasFile('cover')) {
-            try {
-                if ($book->cloudinary_public_id) {
-                    $this->cloudinary->uploadApi()->destroy($book->cloudinary_public_id);
-                    \Log::info('Deleted old image from Cloudinary:', ['public_id' => $book->cloudinary_public_id]);
-                }
-                
-                $file = $request->file('cover');
-                $filePath = $file->getRealPath();
-                
-                $uploadResult = $this->cloudinary->uploadApi()->upload($filePath, [
-                    'folder' => 'buku_covers',
-                    'transformation' => [
-                        'width' => 500,
-                        'height' => 750,
-                        'crop' => 'limit'
-                    ],
-                    'resource_type' => 'image',
-                    'access_mode' => 'public'
-                ]);
-                
-                $data['cover_path'] = $uploadResult['secure_url'];
-                $data['cloudinary_public_id'] = $uploadResult['public_id'];
-                
-                \Log::info('Cloudinary upload result:', [
-                    'public_id' => $uploadResult['public_id'],
-                    'url' => $uploadResult['secure_url']
-                ]);
-            } catch (\Exception $e) {
-                \Log::error('Cloudinary upload/delete error: ' . $e->getMessage());
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Error handling cover: ' . $e->getMessage()
-                ], 500);
-            }
-        }
-
-        // Upload file ke Google Drive jika ada
-        if ($request->hasFile('file_buku')) {
-            try {
-                // Hapus file lama di Google Drive jika ada
-                if ($book->gdrive_file_id) {
-                    $this->googleDrive->deleteFile($book->gdrive_file_id);
-                    \Log::info('Deleted old file from Google Drive:', ['file_id' => $book->gdrive_file_id]);
-                }
-                
-                $file = $request->file('file_buku');
-                $fileName = $request->judul . ' - ' . $request->penulis . '.' . $file->getClientOriginalExtension();
-                
-                $driveFile = $this->googleDrive->uploadFile($file, $fileName);
-                
-                $data['link'] = $driveFile['webViewLink'];
-                $data['gdrive_file_id'] = $driveFile['id'];
-                $data['original_filename'] = $file->getClientOriginalName();
-                
-                \Log::info('Google Drive upload result:', [
-                    'file_id' => $driveFile['id'],
-                    'link' => $driveFile['webViewLink']
-                ]);
-            } catch (\Exception $e) {
-                \Log::error('Google Drive upload/delete error: ' . $e->getMessage());
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Error handling file: ' . $e->getMessage()
-                ], 500);
-            }
-        }
-
-        $updated = $book->update($data);
-        
-        \Log::info('Book after update:', $book->fresh()->toArray());
-        \Log::info('Update successful: ' . ($updated ? 'Yes' : 'No'));
-        
+        \Log::info('Cloudinary upload result:', [
+            'public_id' => $uploadResult['public_id'],
+            'url' => $uploadResult['secure_url']
+        ]);
+    } catch (\Exception $e) {
+        \Log::error('Cloudinary upload/delete error: ' . $e->getMessage());
         return response()->json([
-            'message' => 'Buku berhasil diperbarui.',
-            'success' => $updated,
-            'book' => $book->fresh()
+            'success' => false,
+            'message' => 'Error handling cover: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+// Upload file ke Google Drive jika ada
+if ($request->hasFile('file_buku')) {
+    try {
+        // Hapus file lama di Google Drive jika ada
+        if ($book->gdrive_file_id) {
+            $this->googleDrive->deleteFile($book->gdrive_file_id);
+            \Log::info('Deleted old file from Google Drive:', ['file_id' => $book->gdrive_file_id]);
+        }
+        
+        $file = $request->file('file_buku');
+        $fileName = $request->judul . ' - ' . $request->penulis . '.' . $file->getClientOriginalExtension();
+        
+        $driveFile = $this->googleDrive->uploadFile($file, $fileName);
+        
+        $data['link'] = $driveFile['webViewLink'];
+        $data['gdrive_file_id'] = $driveFile['id'];
+        $data['original_filename'] = $file->getClientOriginalName();
+        
+        // Set status menjadi Tersedia ketika file berhasil diupload
+        $data['status'] = 'Tersedia';
+        
+        \Log::info('Google Drive upload result:', [
+            'file_id' => $driveFile['id'],
+            'link' => $driveFile['webViewLink'],
+            'status' => 'Tersedia' // Log perubahan status
         ]);
+    } catch (\Exception $e) {
+        \Log::error('Google Drive upload/delete error: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'Error handling file: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+$updated = $book->update($data);
+
+\Log::info('Book after update:', $book->fresh()->toArray());
+\Log::info('Update successful: ' . ($updated ? 'Yes' : 'No'));
+
+return response()->json([
+    'success' => true,
+    'message' => 'Buku berhasil diperbarui.',
+    'data' => $book->fresh()
+]);
     }
 
     public function destroy(Book $book)

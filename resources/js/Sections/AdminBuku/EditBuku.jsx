@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import axios from "axios";
 
-export default function EditBuku({ book }) {
+export default function EditBuku({ book, kategori }) {
     const getCsrfToken = () => {
         const metaTag = document.querySelector('meta[name="csrf-token"]');
         if (metaTag) {
@@ -37,8 +37,10 @@ export default function EditBuku({ book }) {
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitSuccess, setSubmitSuccess] = useState(false);
+    const [selectedFileName, setSelectedFileName] = useState("");
 
     // Ref untuk file input
+    const coverInputRef = useRef(null);
     const fileInputRef = useRef(null);
     const [previewUrl, setPreviewUrl] = useState(book.cover_url || null);
     const bookId = book.id;
@@ -79,8 +81,8 @@ export default function EditBuku({ book }) {
         }
     };
 
-    // Handle file upload preview
-    const handleFileChange = (e) => {
+    // Handle cover file upload preview
+    const handleCoverChange = (e) => {
         const file = e.target.files[0];
         if (file) {
             if (file.type.startsWith("image/")) {
@@ -107,9 +109,44 @@ export default function EditBuku({ book }) {
         }
     };
 
-    // Form submission
-    // Fix for the handleSubmit function in your EditBuku component
+    // Handle file upload
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            // Check if file is allowed type
+            const allowedTypes = [
+                "application/pdf",
+                "application/msword",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "application/vnd.ms-excel",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "application/vnd.ms-powerpoint",
+                "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            ];
 
+            if (allowedTypes.includes(file.type)) {
+                setSelectedFileName(file.name);
+
+                // Clear file error if exists
+                if (errors.file_buku) {
+                    setErrors({
+                        ...errors,
+                        file_buku: null,
+                    });
+                }
+            } else {
+                setErrors({
+                    ...errors,
+                    file_buku:
+                        "File harus berupa PDF, DOC, DOCX, XLS, XLSX, PPT, atau PPTX",
+                });
+                e.target.value = ""; // Reset the input
+                setSelectedFileName("");
+            }
+        }
+    };
+
+    // Form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
@@ -132,8 +169,13 @@ export default function EditBuku({ book }) {
         formData.append("link", formValues.link);
         formData.append("status", formValues.status);
 
+        if (coverInputRef.current?.files[0]) {
+            formData.append("cover", coverInputRef.current.files[0]);
+        }
+
+        // Append the file_buku if present
         if (fileInputRef.current?.files[0]) {
-            formData.append("cover", fileInputRef.current.files[0]);
+            formData.append("file_buku", fileInputRef.current.files[0]);
         }
 
         try {
@@ -238,8 +280,8 @@ export default function EditBuku({ book }) {
                                 className="hidden"
                                 id="coverUpload"
                                 accept="image/*"
-                                ref={fileInputRef}
-                                onChange={handleFileChange}
+                                ref={coverInputRef}
+                                onChange={handleCoverChange}
                             />
                             <label
                                 htmlFor="coverUpload"
@@ -264,6 +306,7 @@ export default function EditBuku({ book }) {
                                         className="block text-sm font-medium text-gray-700 mb-1"
                                     >
                                         Judul Buku{" "}
+                                        <span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="text"
@@ -276,6 +319,7 @@ export default function EditBuku({ book }) {
                                                 ? "border-red-500"
                                                 : "border-gray-300"
                                         } rounded`}
+                                        required
                                     />
                                     {errors.judul && (
                                         <p className="text-red-500 text-xs mt-1">
@@ -291,6 +335,7 @@ export default function EditBuku({ book }) {
                                         className="block text-sm font-medium text-gray-700 mb-1"
                                     >
                                         Penulis{" "}
+                                        <span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="text"
@@ -303,6 +348,7 @@ export default function EditBuku({ book }) {
                                                 ? "border-red-500"
                                                 : "border-gray-300"
                                         } rounded`}
+                                        required
                                     />
                                     {errors.penulis && (
                                         <p className="text-red-500 text-xs mt-1">
@@ -318,6 +364,7 @@ export default function EditBuku({ book }) {
                                         className="block text-sm font-medium text-gray-700 mb-1"
                                     >
                                         Jumlah Halaman{" "}
+                                        <span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="text"
@@ -330,6 +377,7 @@ export default function EditBuku({ book }) {
                                                 ? "border-red-500"
                                                 : "border-gray-300"
                                         } rounded`}
+                                        required
                                     />
                                     {errors.jumlah_halaman && (
                                         <p className="text-red-500 text-xs mt-1">
@@ -338,6 +386,44 @@ export default function EditBuku({ book }) {
                                     )}
                                 </div>
 
+                                {/* File Buku Upload */}
+                                <div>
+                                    <label
+                                        htmlFor="file_buku"
+                                        className="block text-sm font-medium text-gray-700 mb-1"
+                                    >
+                                        File Buku (PDF, DOC, DOCX, XLS, XLSX,
+                                        PPT, PPTX)
+                                    </label>
+                                    <div className="flex items-center">
+                                        <input
+                                            type="file"
+                                            className="hidden"
+                                            id="file_buku"
+                                            name="file_buku"
+                                            ref={fileInputRef}
+                                            onChange={handleFileChange}
+                                            accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+                                        />
+                                        <label
+                                            htmlFor="file_buku"
+                                            className="px-4 py-2 bg-gray-200 text-gray-700 rounded cursor-pointer hover:bg-gray-300"
+                                        >
+                                            Pilih File
+                                        </label>
+                                        <span className="ml-3 text-sm text-gray-600 truncate max-w-[250px]">
+                                            {selectedFileName ||
+                                                "Tidak ada file yang dipilih"}
+                                        </span>
+                                    </div>
+                                    {errors.file_buku && (
+                                        <p className="text-red-500 text-xs mt-1">
+                                            {errors.file_buku}
+                                        </p>
+                                    )}
+                                </div>
+
+                                {/* Link Buku */}
                                 <div>
                                     <label
                                         htmlFor="link"
@@ -367,7 +453,7 @@ export default function EditBuku({ book }) {
                         </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                        {/* Kategori */}
+                        {/* Kategori Dropdown */}
                         <div>
                             <label
                                 htmlFor="kategori"
@@ -375,8 +461,7 @@ export default function EditBuku({ book }) {
                             >
                                 Kategori
                             </label>
-                            <input
-                                type="text"
+                            <select
                                 id="kategori"
                                 name="kategori"
                                 value={formValues.kategori}
@@ -386,7 +471,14 @@ export default function EditBuku({ book }) {
                                         ? "border-red-500"
                                         : "border-gray-300"
                                 } rounded`}
-                            />
+                            >
+                                <option value="">-- Pilih Kategori --</option>
+                                {kategori.map((item) => (
+                                    <option key={item.id} value={item.kategori}>
+                                        {item.kategori}
+                                    </option>
+                                ))}
+                            </select>
                             {errors.kategori && (
                                 <p className="text-red-500 text-xs mt-1">
                                     {errors.kategori}
@@ -476,7 +568,7 @@ export default function EditBuku({ book }) {
                             )}
                         </div>
 
-                        {/* Status Dropdown - New field */}
+                        {/* Status Dropdown */}
                         <div>
                             <label
                                 htmlFor="status"
