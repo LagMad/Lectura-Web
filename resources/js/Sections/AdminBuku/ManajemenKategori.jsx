@@ -4,21 +4,11 @@ import { router } from "@inertiajs/react";
 
 export default function ManajemenKategori({ categories: initialCategories }) {
     const [searchTerm, setSearchTerm] = useState("");
-    const [categories, setCategories] = useState([]);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [categoryToDelete, setCategoryToDelete] = useState(null);
     const [addModalOpen, setAddModalOpen] = useState(false);
-    const [editModalOpen, setEditModalOpen] = useState(false);
-    const [categoryToEdit, setCategoryToEdit] = useState(null);
     const [newCategoryName, setNewCategoryName] = useState("");
     const [error, setError] = useState("");
-
-    // Initialize categories from props
-    useEffect(() => {
-        if (initialCategories?.data) {
-            setCategories(initialCategories.data);
-        }
-    }, [initialCategories]);
 
     // Handle search input change
     const handleSearchChange = (e) => {
@@ -28,14 +18,13 @@ export default function ManajemenKategori({ categories: initialCategories }) {
     // Apply search filter
     const handleSearch = () => {
         router.get(
-            route("categories.index"),
+            route("books.admin"),
             {
                 search: searchTerm,
             },
             {
                 preserveState: true,
                 preserveScroll: true,
-                only: ["categories"],
             }
         );
     };
@@ -50,7 +39,7 @@ export default function ManajemenKategori({ categories: initialCategories }) {
     // Handle pagination
     const handlePageChange = (page) => {
         router.get(
-            route("categories.index", {
+            route("books.admin", {
                 page: page,
                 search: searchTerm,
             }),
@@ -58,7 +47,6 @@ export default function ManajemenKategori({ categories: initialCategories }) {
             {
                 preserveState: true,
                 preserveScroll: true,
-                only: ["categories"],
             }
         );
     };
@@ -70,7 +58,7 @@ export default function ManajemenKategori({ categories: initialCategories }) {
     };
 
     const handleDelete = () => {
-        router.delete(route("categories.destroy", categoryToDelete.id), {
+        router.delete(route("kategori.destroy", categoryToDelete.id), {
             onSuccess: () => {
                 setDeleteModalOpen(false);
                 setCategoryToDelete(null);
@@ -92,9 +80,9 @@ export default function ManajemenKategori({ categories: initialCategories }) {
         }
 
         router.post(
-            route("categories.store"),
+            route("kategori.store"),
             {
-                nama: newCategoryName,
+                kategori: newCategoryName,
             },
             {
                 onSuccess: () => {
@@ -103,40 +91,7 @@ export default function ManajemenKategori({ categories: initialCategories }) {
                     setError("");
                 },
                 onError: (errors) => {
-                    setError(errors.nama || "Terjadi kesalahan");
-                },
-            }
-        );
-    };
-
-    // Handle category edit
-    const openEditModal = (category) => {
-        setCategoryToEdit(category);
-        setNewCategoryName(category.nama);
-        setError("");
-        setEditModalOpen(true);
-    };
-
-    const handleEdit = () => {
-        if (!newCategoryName.trim()) {
-            setError("Nama kategori tidak boleh kosong");
-            return;
-        }
-
-        router.put(
-            route("categories.update", categoryToEdit.id),
-            {
-                nama: newCategoryName,
-            },
-            {
-                onSuccess: () => {
-                    setEditModalOpen(false);
-                    setCategoryToEdit(null);
-                    setNewCategoryName("");
-                    setError("");
-                },
-                onError: (errors) => {
-                    setError(errors.nama || "Terjadi kesalahan");
+                    setError(errors.kategori || "Terjadi kesalahan");
                 },
             }
         );
@@ -181,6 +136,12 @@ export default function ManajemenKategori({ categories: initialCategories }) {
                         className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded lg:text-md text-sm"
                     />
                 </div>
+                <button
+                    onClick={handleSearch}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
+                >
+                    Cari
+                </button>
             </div>
 
             <div className="overflow-x-auto">
@@ -191,38 +152,29 @@ export default function ManajemenKategori({ categories: initialCategories }) {
                                 Nama Kategori
                             </th>
                             <th className="py-3 px-4 font-medium">
-                                Jumlah Buku
-                            </th>
-                            <th className="py-3 px-4 font-medium">
                                 Tanggal Dibuat
                             </th>
                             <th className="py-3 px-4 font-medium">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {initialCategories?.data && initialCategories.data.length > 0 ? (
+                        {initialCategories?.data &&
+                        initialCategories.data.length > 0 ? (
                             initialCategories.data.map((category) => (
                                 <tr
                                     key={category.id}
                                     className="border-t border-gray-100"
                                 >
                                     <td className="py-3 px-4 md:text-md text-sm">
-                                        {category.nama}
+                                        {category.kategori}
                                     </td>
                                     <td className="py-3 px-4 text-sm text-gray-500">
-                                        {category.jumlah_buku || 0}
-                                    </td>
-                                    <td className="py-3 px-4 text-sm text-gray-500">
-                                        {new Date(category.created_at).toLocaleDateString('id-ID')}
+                                        {new Date(
+                                            category.created_at
+                                        ).toLocaleDateString("id-ID")}
                                     </td>
                                     <td className="py-3 px-4">
                                         <div className="flex gap-2">
-                                            <button
-                                                onClick={() => openEditModal(category)}
-                                                className="text-blue-600 hover:text-blue-800"
-                                            >
-                                                <Edit size={16} />
-                                            </button>
                                             <button
                                                 onClick={() =>
                                                     confirmDelete(category)
@@ -331,8 +283,8 @@ export default function ManajemenKategori({ categories: initialCategories }) {
                         </h3>
                         <p className="mb-6">
                             Apakah Anda yakin ingin menghapus kategori "
-                            {categoryToDelete?.nama}"? Tindakan ini tidak dapat
-                            dibatalkan.
+                            {categoryToDelete?.kategori}"? Tindakan ini tidak
+                            dapat dibatalkan.
                         </p>
                         <div className="flex justify-end space-x-3">
                             <button
@@ -354,7 +306,7 @@ export default function ManajemenKategori({ categories: initialCategories }) {
 
             {/* Add Category Modal */}
             {addModalOpen && (
-                <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
                         <h3 className="text-lg font-bold mb-4">
                             Tambah Kategori Baru
@@ -370,7 +322,9 @@ export default function ManajemenKategori({ categories: initialCategories }) {
                                 type="text"
                                 id="category-name"
                                 value={newCategoryName}
-                                onChange={(e) => setNewCategoryName(e.target.value)}
+                                onChange={(e) =>
+                                    setNewCategoryName(e.target.value)
+                                }
                                 className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="Masukkan nama kategori"
                             />
@@ -392,52 +346,6 @@ export default function ManajemenKategori({ categories: initialCategories }) {
                                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                             >
                                 Simpan
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Edit Category Modal */}
-            {editModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
-                        <h3 className="text-lg font-bold mb-4">
-                            Edit Kategori
-                        </h3>
-                        <div className="mb-4">
-                            <label
-                                htmlFor="edit-category-name"
-                                className="block text-sm font-medium text-gray-700 mb-1"
-                            >
-                                Nama Kategori
-                            </label>
-                            <input
-                                type="text"
-                                id="edit-category-name"
-                                value={newCategoryName}
-                                onChange={(e) => setNewCategoryName(e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Masukkan nama kategori"
-                            />
-                            {error && (
-                                <p className="text-red-500 text-xs mt-1">
-                                    {error}
-                                </p>
-                            )}
-                        </div>
-                        <div className="flex justify-end space-x-3">
-                            <button
-                                onClick={() => setEditModalOpen(false)}
-                                className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
-                            >
-                                Batal
-                            </button>
-                            <button
-                                onClick={handleEdit}
-                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                            >
-                                Perbarui
                             </button>
                         </div>
                     </div>

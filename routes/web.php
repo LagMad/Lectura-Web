@@ -6,6 +6,7 @@ use App\Http\Controllers\PenggunaController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\JurnalingController;
 use App\Http\Controllers\NIPDController;
+use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -29,6 +30,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin-pengaturan', function () {
         return Inertia::render('Admin/Pengaturan');
     });
+    Route::post('/kategori', [KategoriController::class, 'store'])->name('kategori.store');
+    Route::delete('/kategori/{id}', [KategoriController::class, 'destroy'])->name('kategori.destroy');
 });
 
 
