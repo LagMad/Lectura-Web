@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 
 export default function TambahBuku({ kategori }) {
@@ -252,7 +252,11 @@ export default function TambahBuku({ kategori }) {
     // Handle cancel button
     const handleCancel = () => {
         window.location.href = "/admin-tambah-buku";
-    };
+    }; 
+
+    useEffect(() => {
+        console.log("kategori", kategori)
+    }, [kategori])
 
     return (
         <div className="w-full lg:ml-8 lg:mr-0 ml-4 mr-4 my-6">

@@ -5,25 +5,25 @@ import KataSandi from "../Sections/Dashboard/KataSandi";
 import Layout from "@/Layouts/Layout";
 import Journaling from "@/Sections/Dashboard/Journaling";
 
-const Dashboard = () => {
+const Dashboard = ({ auth }) => {
     const [activeTitle, setActiveTitle] = useState("Umum");
 
     const sections = [
         {
             title: "Umum",
-            component: <Umum />,
+            component: <Umum auth={auth} />,
         },
         {
             title: "Kata Sandi",
-            component: <KataSandi />,
+            component: <KataSandi auth={auth} />,
         },
         {
             title: "Media Sosial",
-            component: <MediaSosial />,
+            component: <MediaSosial auth={auth} />,
         },
         {
             title: "Jurnal",
-            component: <Journaling />,
+            component: <Journaling auth={auth} />,
         },
     ];
 
@@ -33,8 +33,8 @@ const Dashboard = () => {
 
     return (
         <Layout>
-            <div className="flex flex-col lg:flex-row justify-center items-start gap-10 container py-40 bg-[#F5F5F5]">
-                <div className="flex flex-col justify-start items-start gap-8 bg-white p-10 rounded-2xl">
+            <div className="flex flex-col lg:flex-row justify-center items-start gap-10 min-h-screen px-20 py-40 bg-[#F5F5F5]">
+                <div className="flex flex-col justify-start items-start gap-8 bg-white p-10 rounded-2xl w-full lg:w-1/5">
                     <div className="flex flex-col justify-center items-center gap-3 w-full">
                         <img
                             className="w-16 h-auto"
@@ -43,7 +43,7 @@ const Dashboard = () => {
                         />
                         <div className="flex flex-col justify-center text-center items-center gap-0 w-full">
                             <div className="text-2xl font-medium">
-                                Krisna Liantara
+                                {auth.user.name}
                             </div>
                             <div className="text-sm font-medium text-cust-dark-gray">
                                 Anggota Sejak 2024
@@ -54,10 +54,11 @@ const Dashboard = () => {
                         {sections.map((section, index) => (
                             <button
                                 key={index}
-                                className={`cursor-pointer text-lg ${activeTitle === section.title
-                                    ? "font-bold text-cust-blue"
-                                    : "font-normal text-cust-gray"
-                                    }`}
+                                className={`cursor-pointer text-lg ${
+                                    activeTitle === section.title
+                                        ? "font-bold text-cust-blue"
+                                        : "font-normal text-cust-gray"
+                                }`}
                                 onClick={() => {
                                     setActiveTitle(section.title);
                                 }}
@@ -67,7 +68,7 @@ const Dashboard = () => {
                         ))}
                     </div>
                 </div>
-                <div className="lg:w-2/3">{activeSection.component}</div>
+                <div className="lg:w-4/5">{activeSection.component}</div>
             </div>
         </Layout>
     );

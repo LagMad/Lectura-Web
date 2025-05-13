@@ -2,7 +2,7 @@ import React from "react";
 import Input from "../../Components/ui/Input";
 import Button from "../../Components/ui/Button";
 
-const KataSandi = () => {
+const KataSandi = ({auth}) => {
     return (
         <div className="flex flex-col gap-16 w-full bg-white p-10 rounded-2xl">
             <div className="flex flex-col gap-5 w-full">

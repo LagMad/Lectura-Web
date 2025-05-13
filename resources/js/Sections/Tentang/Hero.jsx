@@ -12,7 +12,7 @@ const stats = [
 const Hero = () => {
     return (
         <section className=''>
-            <div className='bg-cust-tertiary-color'>
+            <div className='bg-cust-tertiary-color min-h-screen'>
                 <div className='container mx-auto flex flex-col-reverse pb-12 lg:pb-0 lg:flex-row items-center gap-10 lg:gap-0'>
                     <div className='w-full lg:w-3/5 space-y-4 text-center lg:text-left'>
                         <h1 className='font-bold text-3xl lg:text-4xl'>
