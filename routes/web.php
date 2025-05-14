@@ -53,8 +53,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/favorites', [FavoriteController::class, 'create'])->name('favorites.create');
     Route::delete('/favorites', [FavoriteController::class, 'destroy'])->name('favorites.destroy');
 
-    Route::get('/dashboard', [BookController::class, 'dashboard'])->name('dashboard');
-    Route::post('/jurnal', [JurnalingController::class, 'store'])->name('jurnal.store');
+    // Route::get('/dashboard-buku', [BookController::class, 'dashboard'])->name('books.dashboard');
+    // Route::post('/jurnal', [JurnalingController::class, 'store'])->name('jurnal.store');
     
     Route::get('/semua-jurnal', function () {
         return Inertia::render('Dashboard/AllJournal');
