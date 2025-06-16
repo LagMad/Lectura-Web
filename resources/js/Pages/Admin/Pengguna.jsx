@@ -23,7 +23,7 @@ export default function Pengguna({ users }) {
         >
             <div className="flex flex-col w-full">
                 <ManajemenPengguna users={users} />
-                <PengaturanSistem />
+                {/* <PengaturanSistem /> */}
             </div>
         </AdminLayout>
     );
