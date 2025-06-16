@@ -12,7 +12,7 @@ const Tentang = () => {
                 <Hero />
                 <Pelayanan />
                 <Staff />
-                <Iklan />
+                {/* <Iklan /> */}
             </div>
         </Layout>
     )

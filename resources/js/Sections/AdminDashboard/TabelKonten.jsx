@@ -56,7 +56,7 @@ const TabelKonten = () => {
         <div className="p-6">
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 {/* Header */}
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex flex-col lg:flex-row items-center justify-between mb-6 gap-2">
                     <h2 className="text-lg font-semibold text-gray-900">
                         Konten menurut Tahun Akademik
                     </h2>
