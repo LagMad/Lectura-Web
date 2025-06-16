@@ -37,6 +37,7 @@ class BookController extends Controller
         $this->googleDrive = $googleDrive;
     }
 
+
     public function index()
     {
         $kategori = Kategori::all();
@@ -59,24 +60,31 @@ class BookController extends Controller
 
     public function dashboard()
     {
+        // Get categories
         $kategori = Kategori::all();
 
+        // Get books with favorites
         $books = Book::with([
             'favorites' => function ($query) {
                 $query->where('user_id', auth()->id());
             }
         ])->latest()->paginate(10);
 
+        // Mark favorited books
         foreach ($books as $book) {
             $book->isFavorited = $book->favorites->isNotEmpty();
         }
 
+        // Get journals data from JurnalingController
+        $jurnalingController = new JurnalingController();
+        $journals = $jurnalingController->dashboardJurnaling();
+
         return Inertia::render('Dashboard', [
             'books' => $books,
-            'kategori' => $kategori
+            'kategori' => $kategori,
+            'journals' => $journals
         ]);
     }
-
 
     public function adminBuku(Request $request)
     {

@@ -53,14 +53,18 @@ Route::middleware('auth')->group(function () {
     Route::post('/favorites', [FavoriteController::class, 'create'])->name('favorites.create');
     Route::delete('/favorites', [FavoriteController::class, 'destroy'])->name('favorites.destroy');
 
-    // Route::get('/dashboard-buku', [BookController::class, 'dashboard'])->name('books.dashboard');
-    // Route::post('/jurnal', [JurnalingController::class, 'store'])->name('jurnal.store');
+    Route::get('/dashboard', [BookController::class, 'dashboard'])->name('books.dashboard');
+    Route::post('/jurnal', [JurnalingController::class, 'store'])->name('jurnal.store');
     
-    Route::get('/semua-jurnal', function () {
-        return Inertia::render('Dashboard/AllJournal');
-    });
+    Route::get('/semua-jurnal', [JurnalingController::class, 'allJournals'])->name('jurnal.all');
 
 });
+
+Route::middleware(['auth', 'role:admin,guru,siswa'])->group(function () {
+    Route::post('/dashboard', [JurnalingController::class, 'dashboardJurnaling'])->name('dashboardJurnal');
+    Route::post('/semua-jurnal', [JurnalingController::class, 'dashboardJurnaling'])->name('dashboardJurnal');
+});
+
 
 require __DIR__.'/auth.php';
 
