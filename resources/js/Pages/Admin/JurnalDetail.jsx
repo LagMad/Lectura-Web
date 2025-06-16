@@ -1,10 +1,35 @@
-import React from "react";
+import React, { useState } from "react";
 import { X } from "lucide-react";
 import { router } from "@inertiajs/react";
 
 const JurnalDetail = ({ book, journals = [] }) => {
+    const [isDeleting, setIsDeleting] = useState(null); // Track which journal is being deleted
+
     const handleClose = () => {
         router.visit(route("jurnal.book.detail", book.id));
+    };
+
+    const handleDelete = (journalId) => {
+        if (confirm("Yakin ingin menghapus jurnal ini?")) {
+            setIsDeleting(journalId); // Set loading state
+
+            router.delete(`/jurnal/${journalId}`, {
+                onSuccess: () => {
+                    // Success handled by Laravel redirect with success message
+                    setIsDeleting(null);
+                    // Optional: You can add a toast notification here
+                },
+                onError: (errors) => {
+                    // Handle error
+                    console.error("Error deleting journal:", errors);
+                    alert("Gagal menghapus jurnal. Silakan coba lagi.");
+                    setIsDeleting(null);
+                },
+                onFinish: () => {
+                    setIsDeleting(null);
+                },
+            });
+        }
     };
 
     // Calculate progress percentage
@@ -94,21 +119,59 @@ const JurnalDetail = ({ book, journals = [] }) => {
                                             </p>
                                         </div>
                                         <div className="flex space-x-2">
-                                            <button className="text-red-500 hover:text-red-700">
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    className="h-5 w-5"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke="currentColor"
-                                                >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        strokeWidth={2}
-                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                                    />
-                                                </svg>
+                                            <button
+                                                className={`text-red-500 hover:text-red-700 disabled:opacity-50 disabled:cursor-not-allowed ${
+                                                    isDeleting === journal.id
+                                                        ? "cursor-wait"
+                                                        : ""
+                                                }`}
+                                                onClick={() =>
+                                                    handleDelete(journal.id)
+                                                }
+                                                disabled={
+                                                    isDeleting === journal.id
+                                                }
+                                                title="Hapus jurnal"
+                                            >
+                                                {isDeleting === journal.id ? (
+                                                    // Loading spinner
+                                                    <svg
+                                                        className="animate-spin h-5 w-5"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                    >
+                                                        <circle
+                                                            className="opacity-25"
+                                                            cx="12"
+                                                            cy="12"
+                                                            r="10"
+                                                            stroke="currentColor"
+                                                            strokeWidth="4"
+                                                        />
+                                                        <path
+                                                            className="opacity-75"
+                                                            fill="currentColor"
+                                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                                        />
+                                                    </svg>
+                                                ) : (
+                                                    // Delete icon
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        className="h-5 w-5"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                        stroke="currentColor"
+                                                    >
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            strokeWidth={2}
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                                        />
+                                                    </svg>
+                                                )}
                                             </button>
                                         </div>
                                     </div>
