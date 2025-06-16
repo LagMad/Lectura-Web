@@ -137,7 +137,7 @@ export default function AdminLayout({
                                     <span>Pengguna</span>
                                 </Link>
                             </li>
-                            <li>
+                            {/* <li>
                                 <Link
                                     href="/admin-pengaturan"
                                     className={`flex items-center px-4 py-2 text-sm font-medium ${
@@ -156,7 +156,7 @@ export default function AdminLayout({
                                     />
                                     <span>Pengaturan</span>
                                 </Link>
-                            </li>
+                            </li> */}
                         </ul>
                     </div>
                     <div className="absolute bottom-0 w-full border-t border-gray-200 p-4">
