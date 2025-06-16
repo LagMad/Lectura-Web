@@ -55,6 +55,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/dashboard', [BookController::class, 'dashboard'])->name('dashboard');
     Route::post('/jurnal', [JurnalingController::class, 'store'])->name('jurnal.store');
+    Route::delete('/jurnal/{id}', [JurnalingController::class, 'destroy'])->name('jurnal.destroy');
     
     Route::get('/semua-jurnal', function () {
         return Inertia::render('Dashboard/AllJournal');
