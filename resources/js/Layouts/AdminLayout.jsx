@@ -1,13 +1,13 @@
-import { Menu, LogOut, User, BookOpen, Settings, Bell } from "lucide-react";
+import { Menu, LogOut, User, BookOpen, Settings, Bell, LayoutDashboardIcon, LayoutDashboard } from "lucide-react";
 import { Link, usePage } from "@inertiajs/react";
 
 export default function AdminLayout({
     children,
     isSidebarOpen,
-    toggleSidebar
+    toggleSidebar,
 }) {
     const { url } = usePage();
-    const { auth } = usePage().props
+    const { auth } = usePage().props;
 
     // Function to check if a route is active
     const isActive = (path) => {
@@ -74,6 +74,26 @@ export default function AdminLayout({
                     </div>
                     <div className="py-4">
                         <ul className="space-y-1">
+                            <li>
+                                <Link
+                                    href="/admin-dashboard"
+                                    className={`flex items-center px-4 py-2 text-sm font-medium ${
+                                        isActive("/admin-dashboard")
+                                            ? "text-cust-blue bg-blue-50 hover:bg-blue-100"
+                                            : "text-gray-700 hover:bg-gray-100"
+                                    }`}
+                                >
+                                    <LayoutDashboard
+                                        size={18}
+                                        className={`mr-3 ${
+                                            isActive("/admin-dashboard")
+                                                ? "text-cust-blue"
+                                                : "text-gray-500"
+                                        }`}
+                                    />
+                                    <span>Dashboard</span>
+                                </Link>
+                            </li>
                             <li>
                                 <Link
                                     href="/admin-buku"
