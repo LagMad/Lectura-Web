@@ -11,30 +11,39 @@ const truncateContent = (content, wordLimit = 10) => {
     return content;
 };
 
-const JournalCard = ({ image, title, author, count, entries }) => {
+const JournalCard = ({
+    image,
+    title,
+    author,
+    count,
+    entries,
+    onEditJournal,
+}) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [selectedEntry, setSelectedEntry] = useState(null);
     const [showDetailModal, setShowDetailModal] = useState(false);
-    const [isDeleting, setIsDeleting] = useState(null); // Track which entry is being deleted
+    const [isDeleting, setIsDeleting] = useState(null);
 
     const toggleExpand = () => setIsExpanded(!isExpanded);
 
-    const handleEdit = (entryId) => {
-        // Navigate to edit page
-        router.visit(`/jurnal/${entryId}/edit`);
+    const handleEdit = (entry) => {
+        if (onEditJournal) {
+            onEditJournal(entry); // Pass entry object lengkap
+        } else {
+            // Fallback ke navigate jika prop tidak ada
+            router.visit(`/jurnal/${entry.id}/edit`);
+        }
     };
 
     const handleDelete = (entryId) => {
         if (confirm("Yakin ingin menghapus jurnal ini?")) {
-            setIsDeleting(entryId); // Set loading state
+            setIsDeleting(entryId);
 
             router.delete(`/jurnal/${entryId}`, {
                 onSuccess: () => {
-                    // Success handled by Laravel redirect with success message
                     setIsDeleting(null);
                 },
                 onError: (errors) => {
-                    // Handle error
                     console.error("Error deleting journal:", errors);
                     alert("Gagal menghapus jurnal. Silakan coba lagi.");
                     setIsDeleting(null);
@@ -47,7 +56,6 @@ const JournalCard = ({ image, title, author, count, entries }) => {
     };
 
     const handlePublish = (entryId) => {
-        // Toggle publish status
         router.patch(
             `/jurnal/${entryId}/toggle-publish`,
             {},
@@ -131,8 +139,8 @@ const JournalCard = ({ image, title, author, count, entries }) => {
                                         <div className="flex items-center gap-3">
                                             <button
                                                 onClick={() =>
-                                                    handleEdit(entry.id)
-                                                }
+                                                    handleEdit(entry)
+                                                } // Pass entry object
                                                 title="Edit"
                                                 disabled={
                                                     isDeleting === entry.id
@@ -171,12 +179,12 @@ const JournalCard = ({ image, title, author, count, entries }) => {
                                 </div>
                             </div>
                         ))}
-                        <p
+                        {/* <p
                             onClick={() => router.visit("/semua-jurnal")}
                             className="text-blue-500 text-center text-sm font-medium cursor-pointer hover:underline"
                         >
                             Lihat semua jurnal
-                        </p>
+                        </p> */}
                     </div>
                 )}
             </div>

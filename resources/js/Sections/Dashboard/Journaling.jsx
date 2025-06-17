@@ -3,13 +3,26 @@ import Button from "@/Components/Button";
 import { Icon } from "@iconify/react";
 import AddJournal from "./journaling/AddJournal";
 import JournalCard from "./journaling/JournalCard";
+import EditJournal from "./journaling/EditJournal";
 
 const Journaling = ({ books, jurnaling }) => {
     const [showModal, setShowModal] = useState(false);
+    const [selectedJournal, setSelectedJournal] = useState(null);
+    const [showModalEdit, setShowModalEdit] = useState(false);
     const [transformedJournals, setTransformedJournals] = useState([]);
 
     const handleOpenModal = () => setShowModal(true);
     const handleCloseModal = () => setShowModal(false);
+
+    const handleEditJournal = (journal) => {
+        setSelectedJournal(journal);
+        setShowModalEdit(true);
+    };
+
+    const handleCloseEdit = () => {
+        setShowModalEdit(false);
+        setSelectedJournal(null);
+    };
 
     useEffect(() => {
         console.log("jurnaling data:", jurnaling);
@@ -45,7 +58,7 @@ const Journaling = ({ books, jurnaling }) => {
                             year: "numeric",
                         }
                     ),
-                    published: true, 
+                    published: true,
                     halaman_awal: jurnal.halaman_awal,
                     halaman_akhir: jurnal.halaman_akhir,
                 });
@@ -90,15 +103,19 @@ const Journaling = ({ books, jurnaling }) => {
                     </div>
                     <div className="space-x-2 lg:space-x-8 space-y-2 lg:space-y-0">
                         <Button variant="filled">Semua Jurnal</Button>
-                        <Button variant="secondary">Terbaru</Button>
-                        <Button variant="secondary">Belum Selesai</Button>
+                        {/* <Button variant="secondary">Terbaru</Button>
+                        <Button variant="secondary">Belum Selesai</Button> */}
                     </div>
                 </div>
 
                 <div className="space-y-5">
                     {transformedJournals.length > 0 ? (
                         transformedJournals.map((journal) => (
-                            <JournalCard key={journal.id} {...journal} />
+                            <JournalCard
+                                key={journal.id}
+                                {...journal}
+                                onEditJournal={handleEditJournal}
+                            />
                         ))
                     ) : (
                         <div className="text-center py-8 text-gray-500">
@@ -110,6 +127,13 @@ const Journaling = ({ books, jurnaling }) => {
 
             {showModal && (
                 <AddJournal onClose={handleCloseModal} books={books} />
+            )}
+
+            {showModalEdit && selectedJournal && (
+                <EditJournal
+                    journal={selectedJournal}
+                    onClose={handleCloseEdit}
+                />
             )}
         </section>
     );
