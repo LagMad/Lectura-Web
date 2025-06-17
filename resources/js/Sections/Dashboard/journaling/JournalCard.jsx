@@ -11,16 +11,7 @@ const truncateContent = (content, wordLimit = 10) => {
     return content;
 };
 
-const JournalCard = ({
-    id,
-    book_cover,
-    book_title,
-    date,
-    description,
-    start_page,
-    end_page,
-    created_at,
-}) => {
+const JournalCard = ({ image, title, author, count, entries }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [selectedEntry, setSelectedEntry] = useState(null);
     const [showDetailModal, setShowDetailModal] = useState(false);
@@ -72,8 +63,8 @@ const JournalCard = ({
         );
     };
 
-    const handleOpenDetail = (journal) => {
-        setSelectedEntry(journal);
+    const handleOpenDetail = (entry) => {
+        setSelectedEntry(entry);
         setShowDetailModal(true);
     };
 
@@ -113,7 +104,7 @@ const JournalCard = ({
 
                 {isExpanded && (
                     <div className="mt-6 space-y-6 pt-4">
-                        {/* {entries.map((entry) => (
+                        {entries.map((entry) => (
                             <div key={entry.id} className="pb-4">
                                 <div className="flex justify-between items-start">
                                     <div
@@ -194,9 +185,9 @@ const JournalCard = ({
                 open={showDetailModal}
                 onClose={handleCloseDetail}
                 journalEntry={selectedEntry}
-                bookTitle={book_title}
-                // bookAuthor={author}
-                bookImage={book_cover}
+                bookTitle={title}
+                bookAuthor={author}
+                bookImage={image}
             />
         </>
     );

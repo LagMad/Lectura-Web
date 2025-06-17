@@ -19,7 +19,6 @@ Route::middleware(['auth', 'role:admin,guru'])->group(function () {
     Route::put('/update-buku/{book}', [BookController::class, 'update'])->name('books.update');
     Route::delete('/hapus-buku/{book}', [BookController::class, 'destroy'])->name('books.destroy');
     Route::get('/admin-buku', [BookController::class, 'adminBuku'])->name('books.admin');
-    Route::get('/admin-dashboard', [BookController::class, 'adminDashboard'])->name('admin.dashboard');
 
     Route::get('/jurnal/book/{book_id}', [JurnalingController::class, 'detail'])->name('jurnal.book.detail');
     Route::get('/jurnal/{book_id}/{user_id}', [JurnalingController::class, 'detailJurnal'])->name('jurnal.detail');
@@ -54,7 +53,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/favorites', [FavoriteController::class, 'create'])->name('favorites.create');
     Route::delete('/favorites', [FavoriteController::class, 'destroy'])->name('favorites.destroy');
 
-    Route::get('/dashboard', [BookController::class, 'dashboard'])->name('books.dashboard');
+    Route::get('/dashboard', [BookController::class, 'dashboard'])->name('dashboard');
     Route::post('/jurnal', [JurnalingController::class, 'store'])->name('jurnal.store');
     Route::delete('/jurnal/{id}', [JurnalingController::class, 'destroy'])->name('jurnal.destroy');
     
@@ -62,10 +61,6 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('Dashboard/AllJournal');
     });
 
-Route::middleware(['auth', 'role:admin,guru,siswa'])->group(function () {
-    Route::post('/dashboard', [JurnalingController::class, 'dashboardJournals'])->name('dashboard.umum');
-    // Route::post('/semua-jurnal', [JurnalingController::class, 'dashboardJournals'])->name('dashboard.');
 });
 
-
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
