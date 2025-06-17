@@ -6,10 +6,13 @@ const Button = ({ children, variant = 'outline', href, ...props }) => {
     const outline = 'border-2 border-cust-primary-color text-cust-primary-color font-semibold';
     const filled = 'bg-cust-primary-color border-2 border-cust-primary-color text-white font-semibold';
     const secondary = 'border border-gray-400 text-black font-base';
+    const tertiary = 'border-2 bg-white border-cust-primary-color text-cust-primary-color font-semibold'
 
-    const classes = `${base} ${variant === 'filled' ? filled
+    const classes = `${base} 
+    ${variant === 'filled' ? filled
             : variant === 'secondary' ? secondary
-            : outline
+                : variant === 'tertiary' ? tertiary
+                    : outline
         }`;
 
     if (href) {
