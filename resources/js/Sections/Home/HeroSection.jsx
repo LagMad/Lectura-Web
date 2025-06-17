@@ -31,8 +31,8 @@ const HeroSection = () => {
     ];
 
     return (
-        <section className="container mx-auto space-y-10">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 container">
+        <section className="space-y-10">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="md:col-span-2">
                     <div className="h-64 sm:h-80 md:h-96 bg-purple-200 rounded-3xl shadow-md overflow-hidden group">
                         <img
@@ -56,7 +56,7 @@ const HeroSection = () => {
                 </div>
             </div>
 
-            <div className='container'>
+            <div className=''>
                 <h1 className='font-bold text-xl lg:text-2xl mb-6'>Cari Berdasarkan Kategori</h1>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
                     {categories.map((cat, index) => (

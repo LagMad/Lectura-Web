@@ -37,6 +37,7 @@ class BookController extends Controller
         $this->googleDrive = $googleDrive;
     }
 
+
     public function index()
     {
         $kategori = Kategori::all();
@@ -58,22 +59,22 @@ class BookController extends Controller
     }
 
     public function dashboard()
-{
+    {
 
-    // Ambil semua books
-    $books = Book::latest()->paginate(10);
+        // Ambil semua books
+        $books = Book::latest()->paginate(10);
 
-    // Ambil jurnaling berdasarkan user yang login
-    $jurnaling = Jurnaling::with('buku')
-        ->where('id_siswa', auth()->id())
-        ->latest()
-        ->paginate(10);
+        // Ambil jurnaling berdasarkan user yang login
+        $jurnaling = Jurnaling::with('buku')
+            ->where('id_siswa', auth()->id())
+            ->latest()
+            ->paginate(10);
 
-    return Inertia::render('Dashboard', [
-        'books' => $books,        // Semua buku
-        'jurnaling' => $jurnaling, // Jurnaling user yang login
-    ]);
-}
+        return Inertia::render('Dashboard', [
+            'books' => $books,        // Semua buku
+            'jurnaling' => $jurnaling, // Jurnaling user yang login
+        ]);
+    }
 
 
     public function adminBuku(Request $request)
@@ -501,5 +502,13 @@ class BookController extends Controller
             return redirect()->route('books.admin')
                 ->with('error', 'Terjadi kesalahan saat menghapus buku: ' . $e->getMessage());
         }
+    }
+
+    public function adminDashboard()
+    {
+        return Inertia::render('Admin/Dashboard', [
+            // You can pass data here if needed
+            // 'users' => User::all(), for example
+        ]);
     }
 }

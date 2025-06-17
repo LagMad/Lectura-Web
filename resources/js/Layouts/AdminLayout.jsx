@@ -1,13 +1,13 @@
-import { Menu, LogOut, User, BookOpen, Settings, Bell } from "lucide-react";
+import { Menu, LogOut, User, BookOpen, Settings, Bell, LayoutDashboardIcon, LayoutDashboard } from "lucide-react";
 import { Link, usePage } from "@inertiajs/react";
 
 export default function AdminLayout({
     children,
     isSidebarOpen,
-    toggleSidebar
+    toggleSidebar,
 }) {
     const { url } = usePage();
-    const { auth } = usePage().props
+    const { auth } = usePage().props;
 
     // Function to check if a route is active
     const isActive = (path) => {
@@ -76,6 +76,26 @@ export default function AdminLayout({
                         <ul className="space-y-1">
                             <li>
                                 <Link
+                                    href="/admin-dashboard"
+                                    className={`flex items-center px-4 py-2 text-sm font-medium ${
+                                        isActive("/admin-dashboard")
+                                            ? "text-cust-blue bg-blue-50 hover:bg-blue-100"
+                                            : "text-gray-700 hover:bg-gray-100"
+                                    }`}
+                                >
+                                    <LayoutDashboard
+                                        size={18}
+                                        className={`mr-3 ${
+                                            isActive("/admin-dashboard")
+                                                ? "text-cust-blue"
+                                                : "text-gray-500"
+                                        }`}
+                                    />
+                                    <span>Dashboard</span>
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
                                     href="/admin-buku"
                                     className={`flex items-center px-4 py-2 text-sm font-medium ${
                                         isActive("/admin-buku") ||
@@ -117,7 +137,7 @@ export default function AdminLayout({
                                     <span>Pengguna</span>
                                 </Link>
                             </li>
-                            <li>
+                            {/* <li>
                                 <Link
                                     href="/admin-pengaturan"
                                     className={`flex items-center px-4 py-2 text-sm font-medium ${
@@ -136,7 +156,7 @@ export default function AdminLayout({
                                     />
                                     <span>Pengaturan</span>
                                 </Link>
-                            </li>
+                            </li> */}
                         </ul>
                     </div>
                     <div className="absolute bottom-0 w-full border-t border-gray-200 p-4">

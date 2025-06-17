@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ArrowLeft, Search, BookOpen } from 'lucide-react';
 import { Icon } from '@iconify/react';
 import Button from '@/Components/Button';
+import { Link } from '@inertiajs/react';
 
-const AllJournal = () => {
+const AllJournal = ({ auth, journals, categories, stats, filters }) => {
     const book = {
         title: "Ayo Berlatih Silat",
         author: "Ahmad Fuadi",
@@ -56,13 +57,17 @@ const AllJournal = () => {
         }
     ];
 
+    useEffect(() => {
+        console.log("journals", journals)
+    }, [journals])
+
     return (
         <div className="container py-10 bg-gray-50 min-h-screen font-[poppins] space-y-6">
             <div className="flex items-center">
-                <button className="flex items-center">
+                <Link href={"/dashboard"} className="flex items-center">
                     <ArrowLeft size={18} className="mr-1" />
                     <span>Kembali</span>
-                </button>
+                </Link>
             </div>
 
             <div className="bg-white rounded-xl shadow-lg p-6">

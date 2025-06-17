@@ -86,7 +86,7 @@ const Navbar = () => {
 
     return (
         <nav className="bg-white fixed w-full z-50 shadow-sm">
-            <div className="container mx-auto py-6 flex justify-between items-center">
+            <div className="px-5 sm:px-10 md:px-16 lg:px-20 xl:px-40 py-6 flex justify-between items-center">
                 <div className="flex items-center gap-5 xl:gap-10">
                     <h1 className="font-bold text-cust-blue text-2xl xl:text-3xl">
                         E-Library

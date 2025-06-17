@@ -1,15 +1,11 @@
-import React from 'react'
+import React from "react";
 
 const SloganSection = () => {
     return (
         <section>
-            <div className='container'>
-                <img 
-                src="slogan.webp" 
-                alt="slogan" />
-            </div>
+            <img src="slogan.webp" alt="slogan" />
         </section>
-    )
-}
+    );
+};
 
-export default SloganSection
+export default SloganSection;

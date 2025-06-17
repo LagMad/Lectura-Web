@@ -51,10 +51,12 @@ const BukuMinggu = ({ books }) => {
         <div className="container">
             <div className="flex flex-col justify-center items-start gap-5 sm:gap-8 lg:gap-10 w-full p-5 sm:p-8 lg:p-10 pb-10 sm:pb-16 lg:pb-24 bg-[#EFF6FF] rounded-xl sm:rounded-2xl">
                 <div className="flex flex-col justify-center items-center gap-3 sm:gap-4 lg:gap-5 w-full">
+                    {/* Judul */}
                     <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold w-full text-center">
                         Buku Terlaris Minggu Ini
                     </h2>
                     <hr className="h-0.5 bg-black w-2/3 sm:w-1/2 lg:w-1/3 self-center rounded-full" />
+                    {/* Deskripsi */}
                     <p className="w-full sm:w-2/3 md:w-1/2 lg:w-1/3 text-center text-sm sm:text-base leading-tight">
                         Lagi rame dibaca! Buku-buku ini lagi jadi incaran para
                         pembaca e-library minggu ini. Sudah baca belum?
@@ -63,11 +65,13 @@ const BukuMinggu = ({ books }) => {
 
                 <div className="w-full flex flex-col lg:flex-row">
                     <div className="flex flex-col justify-start items-start w-full bg-[#54473F] p-3 sm:p-4 rounded-xl sm:rounded-2xl gap-3 sm:gap-5">
+                        {/* Sub Judul */}
                         <h3 className="text-xl sm:text-2xl lg:text-3xl font-extrabold w-full text-white">
                             SEPANJANG{" "}
                             <span className="text-[#F0F1C5]">TERLARIS</span>{" "}
                             MINGGU INI
                         </h3>
+                        {/* Gambar Orang */}
                         <img
                             className="h-auto w-full"
                             src="/girl-reading-on-sofa.svg"
@@ -84,7 +88,7 @@ const BukuMinggu = ({ books }) => {
                                 Lihat Semua
                             </button>
                         </div>
-
+                        {/* Buku */}
                         {booksData.length > 0 ? (
                             <>
                                 <Swiper

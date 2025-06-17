@@ -19,6 +19,7 @@ Route::middleware(['auth', 'role:admin,guru'])->group(function () {
     Route::put('/update-buku/{book}', [BookController::class, 'update'])->name('books.update');
     Route::delete('/hapus-buku/{book}', [BookController::class, 'destroy'])->name('books.destroy');
     Route::get('/admin-buku', [BookController::class, 'adminBuku'])->name('books.admin');
+    Route::get('/admin-dashboard', [BookController::class, 'adminDashboard'])->name('admin.dashboard');
 
     Route::get('/jurnal/book/{book_id}', [JurnalingController::class, 'detail'])->name('jurnal.book.detail');
     Route::get('/jurnal/{book_id}/{user_id}', [JurnalingController::class, 'detailJurnal'])->name('jurnal.detail');
@@ -65,4 +66,3 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
-

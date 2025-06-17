@@ -9,63 +9,64 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Models\Kategori;
 
 class JurnalingController extends Controller
 {
 
     public function detailJurnal($book_id, $user_id)
-{
-    $book = Book::select('id', 'judul', 'penulis', 'cover_path', 'jumlah_halaman')
-        ->withCount('jurnaling as total_jurnal')
-        ->with(['jurnaling' => function ($query) use ($user_id) {
-    $query->where('id_siswa', $user_id)
-        ->orderBy('created_at', 'desc')
-        ->limit(1);
-}])
+    {
+        $book = Book::select('id', 'judul', 'penulis', 'cover_path', 'jumlah_halaman')
+            ->withCount('jurnaling as total_jurnal')
+            ->with(['jurnaling' => function ($query) use ($user_id) {
+                $query->where('id_siswa', $user_id)
+                    ->orderBy('created_at', 'desc')
+                    ->limit(1);
+            }])
 
-        ->findOrFail($book_id);
+            ->findOrFail($book_id);
 
-    // Halaman terakhir dibaca
-    $halaman_terakhir = $book->jurnaling
-    ->sortByDesc('created_at')
-    ->first()
-    ->halaman_akhir ?? 0;
-    $book->halaman_terakhir = $halaman_terakhir;
+        // Halaman terakhir dibaca
+        $halaman_terakhir = $book->jurnaling
+            ->sortByDesc('created_at')
+            ->first()
+            ->halaman_akhir ?? 0;
+        $book->halaman_terakhir = $halaman_terakhir;
 
-    // Hitung total siswa unik (distinct id_siswa)
-    $total_siswa = Jurnaling::where('id_buku', $book_id)
-        ->select('id_siswa')
-        ->distinct()
-        ->count();
-    $book->total_siswa = $total_siswa;
+        // Hitung total siswa unik (distinct id_siswa)
+        $total_siswa = Jurnaling::where('id_buku', $book_id)
+            ->select('id_siswa')
+            ->distinct()
+            ->count();
+        $book->total_siswa = $total_siswa;
 
-    // Ambil semua jurnal user untuk buku ini
-    $journals = Jurnaling::where('id_buku', $book_id)
-        ->where('id_siswa', $user_id)
-        ->orderBy('created_at', 'desc')
-        ->get()
-        ->map(function ($jurnal) {
-            return [
-                'id' => $jurnal->id,
-                'tanggal' => Carbon::parse($jurnal->created_at)->format('d M Y'),
-                'halaman_range' => $jurnal->halaman_awal . ' - ' . $jurnal->halaman_akhir,
-                'content' => $jurnal->deskripsi,
-                'created_at' => $jurnal->created_at,
-            ];
-        });
+        // Ambil semua jurnal user untuk buku ini
+        $journals = Jurnaling::where('id_buku', $book_id)
+            ->where('id_siswa', $user_id)
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($jurnal) {
+                return [
+                    'id' => $jurnal->id,
+                    'tanggal' => Carbon::parse($jurnal->created_at)->format('d M Y'),
+                    'halaman_range' => $jurnal->halaman_awal . ' - ' . $jurnal->halaman_akhir,
+                    'content' => $jurnal->deskripsi,
+                    'created_at' => $jurnal->created_at,
+                ];
+            });
 
-    return Inertia::render('Admin/JurnalDetail', [
-        'book' => $book,
-        'journals' => $journals,
-    ]);
-}
+        return Inertia::render('Admin/JurnalDetail', [
+            'book' => $book,
+            'journals' => $journals,
+        ]);
+    }
 
 
     public function detail(Request $request, $book_id)
     {
         $book = Book::withCount('jurnaling as total_jurnal')
             ->findOrFail($book_id);
-        
+
         $book->total_siswa = $book->jurnaling->unique('id_siswa')->count();
 
         $search = $request->input('search', '');
@@ -79,7 +80,7 @@ class JurnalingController extends Controller
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('email', 'like', "%{$search}%");
+                        ->orWhere('email', 'like', "%{$search}%");
                 });
             })
             ->withCount(['jurnalings as total_journals' => function ($query) use ($book_id) {
@@ -87,8 +88,8 @@ class JurnalingController extends Controller
             }])
             ->with(['jurnalings' => function ($query) use ($book_id) {
                 $query->where('id_buku', $book_id)
-                      ->latest()
-                      ->limit(1);
+                    ->latest()
+                    ->limit(1);
             }])
             ->paginate($perPage, ['*'], 'page', $page);
 
@@ -98,8 +99,8 @@ class JurnalingController extends Controller
                 'name' => $siswa->name,
                 'email' => $siswa->email,
                 'total_journals' => $siswa->total_journals,
-                'last_updated' => $siswa->jurnalings->isNotEmpty() 
-                    ? Carbon::parse($siswa->jurnalings->first()->updated_at)->format('d M Y') 
+                'last_updated' => $siswa->jurnalings->isNotEmpty()
+                    ? Carbon::parse($siswa->jurnalings->first()->updated_at)->format('d M Y')
                     : '-'
             ];
         });
@@ -115,7 +116,7 @@ class JurnalingController extends Controller
     {
         $book = Book::findOrFail($book_id);
         $siswa = User::where('role', 'siswa')->findOrFail($siswa_id);
-        
+
         $journals = Jurnaling::where('id_buku', $book_id)
             ->where('id_siswa', $siswa_id)
             ->orderBy('created_at', 'desc')
@@ -151,7 +152,7 @@ class JurnalingController extends Controller
     public function update(Request $request, $id)
     {
         $jurnal = Jurnaling::findOrFail($id);
-        
+
         if (auth()->id() !== $jurnal->id_siswa && !auth()->user()->hasRole(['admin', 'guru'])) {
             abort(403, 'Unauthorized action.');
         }

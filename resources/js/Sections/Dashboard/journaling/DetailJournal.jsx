@@ -2,7 +2,7 @@ import React from 'react';
 import { Icon } from '@iconify/react';
 import Button from '@/Components/Button';
 
-const DetailJournal = ({ open, onClose, journalEntry, bookTitle, bookAuthor, bookImage }) => {
+const DetailJournal = ({ open, onClose, journalEntry, bookTitle, bookAuthor = "test", bookImage }) => {
     if (!open || !journalEntry) return null;
 
     return (
