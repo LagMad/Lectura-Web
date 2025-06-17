@@ -5,7 +5,7 @@ import KataSandi from "../Sections/Dashboard/KataSandi";
 import Layout from "@/Layouts/Layout";
 import Journaling from "@/Sections/Dashboard/Journaling";
 
-const Dashboard = ({ auth, books, journals }) => {
+const Dashboard = ({ auth, books, jurnaling }) => {
     const [activeTitle, setActiveTitle] = useState("Umum");
 
     const sections = [
@@ -26,8 +26,8 @@ const Dashboard = ({ auth, books, journals }) => {
             component: (
                 <Journaling
                     auth={auth}
-                    books={books}
-                    jurnaling={journals}
+                    books={books.data}
+                    jurnaling={jurnaling.data}
                 />
             ),
         },
@@ -36,14 +36,6 @@ const Dashboard = ({ auth, books, journals }) => {
     const activeSection = sections.find(
         (section) => section.title === activeTitle
     );
-
-    useEffect(() => {
-        console.log("journals", journals)
-    }, [journals])
-
-    useEffect(() => {
-        console.log("books", books)
-    }, [books])
 
     return (
         <Layout>
@@ -75,7 +67,7 @@ const Dashboard = ({ auth, books, journals }) => {
                         {sections.map((section, index) => (
                             <button
                                 key={index}
-                                className={`cursor-pointer text-lg text-left ${
+                                className={`cursor-pointer text-lg ${
                                     activeTitle === section.title
                                         ? "font-bold text-cust-blue"
                                         : "font-normal text-cust-gray"
