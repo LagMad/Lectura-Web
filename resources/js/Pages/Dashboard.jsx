@@ -5,7 +5,7 @@ import KataSandi from "../Sections/Dashboard/KataSandi";
 import Layout from "@/Layouts/Layout";
 import Journaling from "@/Sections/Dashboard/Journaling";
 
-const Dashboard = ({ auth, books, jurnaling }) => {
+const Dashboard = ({ auth, books, journals }) => {
     const [activeTitle, setActiveTitle] = useState("Umum");
 
     const sections = [
@@ -26,8 +26,8 @@ const Dashboard = ({ auth, books, jurnaling }) => {
             component: (
                 <Journaling
                     auth={auth}
-                    books={books.data}
-                    jurnaling={jurnaling.data}
+                    books={books}
+                    jurnaling={journals}
                 />
             ),
         },

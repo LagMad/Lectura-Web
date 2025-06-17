@@ -61,8 +61,8 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth', 'role:admin,guru,siswa'])->group(function () {
-    Route::post('/dashboard', [JurnalingController::class, 'dashboardJurnaling'])->name('dashboardJurnal');
-    Route::post('/semua-jurnal', [JurnalingController::class, 'dashboardJurnaling'])->name('dashboardJurnal');
+    Route::post('/dashboard', [JurnalingController::class, 'dashboardJournals'])->name('dashboard.umum');
+    // Route::post('/semua-jurnal', [JurnalingController::class, 'dashboardJournals'])->name('dashboard.');
 });
 
 
