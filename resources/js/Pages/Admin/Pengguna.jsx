@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import AdminLayout from "@/Layouts/AdminLayout";
 import ManajemenPengguna from "@/Sections/AdminPengguna/ManajemenPengguna";
 import PengaturanSistem from "@/Sections/AdminPengguna/PengaturanSistem";
+import ManajemenFaq from "@/Sections/AdminPengguna/ManajemenFaq";
 
 export default function Pengguna({ users }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -21,9 +22,10 @@ export default function Pengguna({ users }) {
             isSidebarOpen={isSidebarOpen}
             toggleSidebar={toggleSidebar}
         >
-            <div className="flex flex-col w-full">
+            <div className="flex flex-col w-full font-[poppins]">
                 <ManajemenPengguna users={users} />
-                {/* <PengaturanSistem /> */}
+                <ManajemenFaq />
+                <PengaturanSistem />
             </div>
         </AdminLayout>
     );

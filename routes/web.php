@@ -42,6 +42,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/', [HomeController::class, 'index'])->name('home');
     Route::get('/buku', [BookController::class, 'index'])->name('books.index');
     Route::get('/detail-buku/{book}', [BookController::class, 'show'])->name('books.show');
+    Route::put('/{id}', [JurnalingController::class, 'update'])->name('jurnal.update');
 
     Route::get('/bantuan', function () {
         return Inertia::render('Bantuan');
