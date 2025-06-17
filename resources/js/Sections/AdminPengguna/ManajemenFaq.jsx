@@ -55,15 +55,15 @@ export default function ManajemenFaq() {
     const getStatusColor = (status) => status === 'Sudah Dijawab' ? 'text-green-600 bg-green-50' : 'text-yellow-600 bg-yellow-50';
 
     return (
-        <section className="w-full mx-auto pt-8 px-4 sm:px-6 lg:px-8 font-[poppins]">
+        <section className="flex flex-col w-full mx-auto pt-8 px-4 sm:px-6 lg:px-8 gap-5 font-[poppins]">
             <Head title="Manajemen FAQ" />
 
-            <div className="mb-6">
+            <div className="">
                 <h2 className="text-2xl font-bold">Managemen FAQ</h2>
                 <p className="text-sm text-gray-500">Kelola pertanyaan yang sering diajukan oleh pengguna</p>
             </div>
 
-            <div className="mb-6 flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
                 <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                     <input
@@ -134,7 +134,7 @@ const Dropdown = ({ value, onChange, options }) => (
 );
 
 const Pagination = ({ page, totalPages, onPageChange }) => (
-    <div className="mt-6 flex items-center justify-between">
+    <div className="flex items-center justify-between">
         <div className="text-sm text-gray-700">
             Halaman {page} dari {totalPages}
         </div>

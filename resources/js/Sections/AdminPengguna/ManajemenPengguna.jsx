@@ -157,7 +157,7 @@ export default function ManajemenPengguna({ users }) {
     };
 
     return (
-        <div className="w-full mx-auto pt-8 px-4 sm:px-6 lg:px-8 ">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 ">
             <Head title="Manajemen Pengguna" />
 
             {flashMessage && (

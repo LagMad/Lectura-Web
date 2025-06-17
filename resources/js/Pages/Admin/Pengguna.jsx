@@ -22,10 +22,10 @@ export default function Pengguna({ users }) {
             isSidebarOpen={isSidebarOpen}
             toggleSidebar={toggleSidebar}
         >
-            <div className="flex flex-col w-full font-[poppins]">
+            <div className="flex flex-col w-full font-[poppins] py-10">
                 <ManajemenPengguna users={users} />
                 <ManajemenFaq />
-                <PengaturanSistem />
+                {/* <PengaturanSistem /> */}
             </div>
         </AdminLayout>
     );
