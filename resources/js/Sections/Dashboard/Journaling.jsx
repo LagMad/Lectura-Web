@@ -4,58 +4,65 @@ import { Icon } from "@iconify/react";
 import AddJournal from "./journaling/AddJournal";
 import JournalCard from "./journaling/JournalCard";
 
-const journals = [
-    {
-        id: 1,
-        title: "Ayo Berlatih Silat",
-        author: "Ahmad Fuadi",
-        image: "/silat.png",
-        count: "3 Jurnal dibuat",
-        entries: [
-            {
-                id: 1,
-                title: "Refleksi Bab 1-3: Perjuangan Pendidikan",
-                content:
-                    "Membaca kisah anak-anak di Belitung yang berjuang untuk mendapatkan pendidikan membuat saya sangat tersentuh. Mereka harus berjalan jauh setiap hari, belajar di sekolah yang hampir roboh, dan dengan fasilitas yang sangat minim. Namun, semangat belajar mereka luar biasa.",
-                date: "7 Mei 2025",
-                published: true,
-            },
-            {
-                id: 2,
-                title: "Karakter Favorit: Lintang",
-                content: "Lintang adalah karakter yang sangat menginspirasi...",
-                date: "7 Mei 2025",
-                published: false,
-            },
-        ],
-    },
-    {
-        id: 2,
-        title: "Laut Bercerita",
-        author: "Leila S. Chudori",
-        image: "/laut-bercerita.png",
-        count: "3 Jurnal dibuat",
-        entries: [
-            {
-                id: 1,
-                title: "Kehilangan dan Harapan",
-                content:
-                    "Cerita ini memberikan gambaran menyentuh tentang kehilangan dan perjuangan...",
-                date: "7 Mei 2025",
-                published: true,
-            },
-        ],
-    },
-];
-
-const Journaling = ({ books }) => {
+const Journaling = ({ books, jurnaling }) => {
     const [showModal, setShowModal] = useState(false);
+    const [transformedJournals, setTransformedJournals] = useState([]);
+
     const handleOpenModal = () => setShowModal(true);
     const handleCloseModal = () => setShowModal(false);
 
     useEffect(() => {
-        console.log("journaling", books)
-    }, [books])
+        console.log("jurnaling data:", jurnaling);
+
+        // Transform jurnaling data ke format yang dibutuhkan JournalCard
+        if (jurnaling) {
+            // Group jurnaling berdasarkan buku
+            const groupedByBook = jurnaling.reduce((acc, jurnal) => {
+                const bookId = jurnal.id_buku;
+
+                if (!acc[bookId]) {
+                    acc[bookId] = {
+                        id: bookId,
+                        title: jurnal.buku?.judul || "Judul tidak tersedia",
+                        author:
+                            jurnal.buku?.penulis || "Penulis tidak tersedia",
+                        image: jurnal.buku?.cover_path || "/default-book.png",
+                        count: `1 Jurnal dibuat`,
+                        entries: [],
+                    };
+                }
+
+                // Tambahkan entry jurnal
+                acc[bookId].entries.push({
+                    id: jurnal.id,
+                    title: `Halaman ${jurnal.halaman_awal}-${jurnal.halaman_akhir}`,
+                    content: jurnal.deskripsi || "Tidak ada deskripsi",
+                    date: new Date(jurnal.created_at).toLocaleDateString(
+                        "id-ID",
+                        {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                        }
+                    ),
+                    published: true, 
+                    halaman_awal: jurnal.halaman_awal,
+                    halaman_akhir: jurnal.halaman_akhir,
+                });
+
+                // Update count
+                acc[
+                    bookId
+                ].count = `${acc[bookId].entries.length} Jurnal dibuat`;
+
+                return acc;
+            }, {});
+
+            // Convert object to array
+            const journalsArray = Object.values(groupedByBook);
+            setTransformedJournals(journalsArray);
+        }
+    }, [jurnaling]);
 
     return (
         <section>
@@ -89,9 +96,15 @@ const Journaling = ({ books }) => {
                 </div>
 
                 <div className="space-y-5">
-                    {journals.map((journal) => (
-                        <JournalCard key={journal.id} {...journal} />
-                    ))}
+                    {transformedJournals.length > 0 ? (
+                        transformedJournals.map((journal) => (
+                            <JournalCard key={journal.id} {...journal} />
+                        ))
+                    ) : (
+                        <div className="text-center py-8 text-gray-500">
+                            Belum ada jurnal yang dibuat
+                        </div>
+                    )}
                 </div>
             </div>
 

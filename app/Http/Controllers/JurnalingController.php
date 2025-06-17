@@ -168,15 +168,16 @@ class JurnalingController extends Controller
     }
 
     public function destroy($id)
-    {
-        $jurnal = Jurnaling::findOrFail($id);
+{
+    $jurnal = Jurnaling::findOrFail($id);
 
-        if (auth()->id() !== $jurnal->id_siswa && !auth()->user()->hasRole(['admin', 'guru'])) {
-            abort(403, 'Unauthorized action.');
-        }
-
-        $jurnal->delete();
-
-        return redirect()->back()->with('success', 'Jurnal berhasil dihapus');
+    // Cek apakah user adalah pemilik jurnal ATAU admin/guru
+    if (auth()->id() !== $jurnal->id_siswa && !in_array(auth()->user()->role, ['admin', 'guru'])) {
+        abort(403, 'Unauthorized action.');
     }
+
+    $jurnal->delete();
+
+    return redirect()->back()->with('success', 'Jurnal berhasil dihapus');
+}
 }
