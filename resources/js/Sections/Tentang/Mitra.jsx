@@ -12,7 +12,7 @@ const Mitra = () => {
                     <img
                         src={MitraImage}
                         alt="Mitra Kami"
-                        className='max-w-3xl h-auto'
+                        className='w-2/3'
                     />
                 </div>
             </div>
