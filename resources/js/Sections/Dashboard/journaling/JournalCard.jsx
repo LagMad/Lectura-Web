@@ -179,12 +179,12 @@ const JournalCard = ({
                                 </div>
                             </div>
                         ))}
-                        <p
+                        {/* <p
                             onClick={() => router.visit("/semua-jurnal")}
                             className="text-blue-500 text-center text-sm font-medium cursor-pointer hover:underline"
                         >
                             Lihat semua jurnal
-                        </p>
+                        </p> */}
                     </div>
                 )}
             </div>

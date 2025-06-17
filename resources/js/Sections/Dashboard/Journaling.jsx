@@ -103,8 +103,8 @@ const Journaling = ({ books, jurnaling }) => {
                     </div>
                     <div className="space-x-2 lg:space-x-8 space-y-2 lg:space-y-0">
                         <Button variant="filled">Semua Jurnal</Button>
-                        <Button variant="secondary">Terbaru</Button>
-                        <Button variant="secondary">Belum Selesai</Button>
+                        {/* <Button variant="secondary">Terbaru</Button>
+                        <Button variant="secondary">Belum Selesai</Button> */}
                     </div>
                 </div>
 
