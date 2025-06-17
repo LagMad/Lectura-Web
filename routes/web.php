@@ -56,9 +56,11 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/dashboard', [BookController::class, 'dashboard'])->name('books.dashboard');
     Route::post('/jurnal', [JurnalingController::class, 'store'])->name('jurnal.store');
-
-    Route::get('/semua-jurnal', [JurnalingController::class, 'allJournals'])->name('jurnal.all');
-});
+    Route::delete('/jurnal/{id}', [JurnalingController::class, 'destroy'])->name('jurnal.destroy');
+    
+    Route::get('/semua-jurnal', function () {
+        return Inertia::render('Dashboard/AllJournal');
+    });
 
 Route::middleware(['auth', 'role:admin,guru,siswa'])->group(function () {
     Route::post('/dashboard', [JurnalingController::class, 'dashboardJournals'])->name('dashboard.umum');

@@ -169,149 +169,16 @@ class JurnalingController extends Controller
     }
 
     public function destroy($id)
-    {
-        $jurnal = Jurnaling::findOrFail($id);
+{
+    $jurnal = Jurnaling::findOrFail($id);
 
-        if (auth()->id() !== $jurnal->id_siswa && !auth()->user()->hasRole(['admin', 'guru'])) {
-            abort(403, 'Unauthorized action.');
-        }
-
-        $jurnal->delete();
-
-        return redirect()->back()->with('success', 'Jurnal berhasil dihapus');
+    // Cek apakah user adalah pemilik jurnal ATAU admin/guru
+    if (auth()->id() !== $jurnal->id_siswa && !in_array(auth()->user()->role, ['admin', 'guru'])) {
+        abort(403, 'Unauthorized action.');
     }
 
-    public function dashboardJurnaling()
-    {
-        // Get authenticated user
-        $user = auth()->user();
+    $jurnal->delete();
 
-        // Get user's journaling entries
-        $journals = Jurnaling::where('id_siswa', $user->id)
-            ->with('buku:id,judul,penulis,cover_path') // Include book details
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($journal) {
-                return [
-                    'id' => $journal->id,
-                    'book_id' => $journal->id_buku,
-                    'book_title' => $journal->buku->judul,
-                    'book_cover' => $journal->buku->cover_path,
-                    'start_page' => $journal->halaman_awal,
-                    'end_page' => $journal->halaman_akhir,
-                    'description' => $journal->deskripsi,
-                    'date' => Carbon::parse($journal->created_at)->format('d M Y'),
-                    'created_at' => $journal->created_at
-                ];
-            });
-
-        return $journals;
-    }
-
-    public function dashboardJournals(Request $request)
-    {
-        // This method will render the journals on the dashboard
-        // It reuses the functionality of allJournals but can render to a different view
-
-        // Get authenticated user
-        $user = auth()->user();
-
-        // For filtering
-        $search = $request->input('search', '');
-        $kategori = $request->input('kategori', '');
-        $sortBy = $request->input('sortBy', 'latest'); // Default sort by latest
-
-        // Get user's journaling entries with book details
-        $query = Jurnaling::where('id_siswa', $user->id)
-            ->with(['buku' => function ($query) {
-                $query->select('id', 'judul', 'penulis', 'cover_path', 'jumlah_halaman', 'kategori');
-            }]);
-
-        // Apply search filter
-        if (!empty($search)) {
-            $query->whereHas('buku', function ($q) use ($search) {
-                $q->where('judul', 'like', "%{$search}%")
-                    ->orWhere('penulis', 'like', "%{$search}%");
-            });
-        }
-
-        // Apply category filter
-        if (!empty($kategori)) {
-            $query->whereHas('buku', function ($q) use ($kategori) {
-                $q->where('kategori', $kategori);
-            });
-        }
-
-        // Apply sorting
-        switch ($sortBy) {
-            case 'oldest':
-                $query->orderBy('created_at', 'asc');
-                break;
-            case 'title_asc':
-                $query->join('books', 'jurnalings.id_buku', '=', 'books.id')
-                    ->orderBy('books.judul', 'asc')
-                    ->select('jurnalings.*');
-                break;
-            case 'title_desc':
-                $query->join('books', 'jurnalings.id_buku', '=', 'books.id')
-                    ->orderBy('books.judul', 'desc')
-                    ->select('jurnalings.*');
-                break;
-            default: // 'latest'
-                $query->orderBy('created_at', 'desc');
-                break;
-        }
-
-        // Paginate the results
-        $journals = $query->paginate(10)->through(function ($journal) {
-            return [
-                'id' => $journal->id,
-                'book_id' => $journal->id_buku,
-                'book_title' => $journal->buku->judul,
-                'book_author' => $journal->buku->penulis,
-                'book_category' => $journal->buku->kategori,
-                'book_cover' => $journal->buku->cover_path,
-                'book_total_pages' => $journal->buku->jumlah_halaman,
-                'start_page' => $journal->halaman_awal,
-                'end_page' => $journal->halaman_akhir,
-                'pages_read' => $journal->halaman_akhir - $journal->halaman_awal + 1,
-                'progress_percentage' => round(($journal->halaman_akhir / $journal->buku->jumlah_halaman) * 100, 1),
-                'description' => $journal->deskripsi,
-                'date' => Carbon::parse($journal->created_at)->format('d M Y'),
-                'created_at' => $journal->created_at
-            ];
-        });
-
-        // Get all book categories for filter dropdown
-        $categories = Book::whereHas('jurnaling', function ($query) use ($user) {
-            $query->where('id_siswa', $user->id);
-        })->distinct('kategori')->pluck('kategori')->filter()->values();
-
-        // Get reading statistics
-        $stats = [
-            'total_books' => Jurnaling::where('id_siswa', $user->id)
-                ->distinct('id_buku')
-                ->count('id_buku'),
-            'total_journals' => Jurnaling::where('id_siswa', $user->id)->count(),
-            'this_month_journals' => Jurnaling::where('id_siswa', $user->id)
-                ->whereMonth('created_at', Carbon::now()->month)
-                ->whereYear('created_at', Carbon::now()->year)
-                ->count(),
-            'latest_journal' => Jurnaling::where('id_siswa', $user->id)
-                ->latest()
-                ->first()
-                ?->created_at?->diffForHumans() ?? 'No journals yet'
-        ];
-
-        return Inertia::render('Dashboard', [
-            'journals' => $journals,
-            'categories' => $categories,
-            'stats' => $stats,
-            'filters' => [
-                'search' => $search,
-                'kategori' => $kategori,
-                'sortBy' => $sortBy
-            ]
-        ]);
-    }
+    return redirect()->back()->with('success', 'Jurnal berhasil dihapus');
+}
 }

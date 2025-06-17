@@ -24,21 +24,52 @@ const JournalCard = ({
     const [isExpanded, setIsExpanded] = useState(false);
     const [selectedEntry, setSelectedEntry] = useState(null);
     const [showDetailModal, setShowDetailModal] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(null); // Track which entry is being deleted
 
     const toggleExpand = () => setIsExpanded(!isExpanded);
 
-    const handleEdit = (id) => {
-        alert(`Edit jurnal ${id}`);
+    const handleEdit = (entryId) => {
+        // Navigate to edit page
+        router.visit(`/jurnal/${entryId}/edit`);
     };
 
-    const handleDelete = (id) => {
+    const handleDelete = (entryId) => {
         if (confirm("Yakin ingin menghapus jurnal ini?")) {
-            alert(`Delete jurnal ${id}`);
+            setIsDeleting(entryId); // Set loading state
+
+            router.delete(`/jurnal/${entryId}`, {
+                onSuccess: () => {
+                    // Success handled by Laravel redirect with success message
+                    setIsDeleting(null);
+                },
+                onError: (errors) => {
+                    // Handle error
+                    console.error("Error deleting journal:", errors);
+                    alert("Gagal menghapus jurnal. Silakan coba lagi.");
+                    setIsDeleting(null);
+                },
+                onFinish: () => {
+                    setIsDeleting(null);
+                },
+            });
         }
     };
 
-    const handlePublish = (id) => {
-        alert(`Publikasikan jurnal ${id}`);
+    const handlePublish = (entryId) => {
+        // Toggle publish status
+        router.patch(
+            `/jurnal/${entryId}/toggle-publish`,
+            {},
+            {
+                onSuccess: () => {
+                    // Success message will be handled by Laravel
+                },
+                onError: (errors) => {
+                    console.error("Error publishing journal:", errors);
+                    alert("Gagal mengubah status publikasi.");
+                },
+            }
+        );
     };
 
     const handleOpenDetail = (journal) => {
@@ -60,14 +91,16 @@ const JournalCard = ({
                 >
                     <div className="flex items-center gap-5">
                         <img
-                            src={book_cover}
+                            src={image}
                             alt="book cover"
                             className="w-20 rounded-xl"
                         />
                         <div>
-                            <h2 className="font-medium">{book_title}</h2>
-                            {/* <p className="text-sm text-gray-500">author</p> */}
-                            <p className="text-xs text-gray-600 mt-3">count</p>
+                            <h2 className="font-medium">{title}</h2>
+                            <p className="text-sm text-gray-500">{author}</p>
+                            <p className="text-xs text-gray-600 mt-3">
+                                {count}
+                            </p>
                         </div>
                     </div>
                     <Icon
@@ -83,12 +116,19 @@ const JournalCard = ({
                         {/* {entries.map((entry) => (
                             <div key={entry.id} className="pb-4">
                                 <div className="flex justify-between items-start">
-                                    <div onClick={() => handleOpenDetail(entry)} className="cursor-pointer">
-                                        <h3 className="font-semibold text-sm">{entry.title}</h3>
+                                    <div
+                                        onClick={() => handleOpenDetail(entry)}
+                                        className="cursor-pointer"
+                                    >
+                                        <h3 className="font-semibold text-sm">
+                                            {entry.title}
+                                        </h3>
                                         <p className="text-sm text-gray-500 truncate">
                                             {truncateContent(entry.content)}
                                         </p>
-                                        <p className="text-xs text-gray-400 mt-5">{entry.date}</p>
+                                        <p className="text-xs text-gray-400 mt-5">
+                                            {entry.date}
+                                        </p>
                                     </div>
 
                                     <div className="flex flex-col items-end gap-5">
@@ -98,70 +138,48 @@ const JournalCard = ({
                                             </span>
                                         )}
                                         <div className="flex items-center gap-3">
-                                            <button onClick={() => handleEdit(entry.id)} title="Edit">
-                                                <Icon icon="lucide:edit" className="text-blue-600 text-lg hover:scale-110" />
+                                            <button
+                                                onClick={() =>
+                                                    handleEdit(entry.id)
+                                                }
+                                                title="Edit"
+                                                disabled={
+                                                    isDeleting === entry.id
+                                                }
+                                                className="disabled:opacity-50"
+                                            >
+                                                <Icon
+                                                    icon="lucide:edit"
+                                                    className="text-blue-600 text-lg hover:scale-110"
+                                                />
                                             </button>
-                                            <button onClick={() => handleDelete(entry.id)} title="Hapus">
-                                                <Icon icon="tabler:trash" className="text-red-600 text-lg hover:scale-110" />
+                                            <button
+                                                onClick={() =>
+                                                    handleDelete(entry.id)
+                                                }
+                                                title="Hapus"
+                                                disabled={
+                                                    isDeleting === entry.id
+                                                }
+                                                className="disabled:opacity-50"
+                                            >
+                                                {isDeleting === entry.id ? (
+                                                    <Icon
+                                                        icon="eos-icons:loading"
+                                                        className="text-red-600 text-lg animate-spin"
+                                                    />
+                                                ) : (
+                                                    <Icon
+                                                        icon="tabler:trash"
+                                                        className="text-red-600 text-lg hover:scale-110"
+                                                    />
+                                                )}
                                             </button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        ))} */}
-                        <div key={id} className="pb-4">
-                            <div className="flex justify-between items-start">
-                                <div
-                                    onClick={() => handleOpenDetail()}
-                                    className="cursor-pointer"
-                                >
-                                    <h3 className="font-semibold text-sm">
-                                        {book_title}
-                                    </h3>
-                                    <p className="text-sm text-gray-500 truncate">
-                                        {truncateContent(description)}
-                                    </p>
-                                    <p className="text-xs text-gray-400 mt-5">
-                                        Ditulis pada tanggal{" "}
-                                        {new Date(
-                                            created_at
-                                        ).toLocaleDateString("id-ID", {
-                                            day: "numeric",
-                                            month: "long",
-                                            year: "numeric",
-                                        })}
-                                    </p>
-                                </div>
-
-                                <div className="flex flex-col items-end gap-5">
-                                    {created_at && (
-                                        <span className="bg-green-200 text-green-800 text-xs px-3 py-1 rounded-full font-medium">
-                                            Dipublikasi
-                                        </span>
-                                    )}
-                                    <div className="flex items-center gap-3">
-                                        <button
-                                            onClick={() => handleEdit(id)}
-                                            title="Edit"
-                                        >
-                                            <Icon
-                                                icon="lucide:edit"
-                                                className="text-blue-600 text-lg hover:scale-110"
-                                            />
-                                        </button>
-                                        <button
-                                            onClick={() => handleDelete(id)}
-                                            title="Hapus"
-                                        >
-                                            <Icon
-                                                icon="tabler:trash"
-                                                className="text-red-600 text-lg hover:scale-110"
-                                            />
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        ))}
                         <p
                             onClick={() => router.visit("/semua-jurnal")}
                             className="text-blue-500 text-center text-sm font-medium cursor-pointer hover:underline"
