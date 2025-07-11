@@ -338,6 +338,13 @@ class BookController extends Controller
         $averageRating = $book->reviews()->avg('rating');
         $isFavorited = false;
 
+        // Get other books in the same category, excluding the current one
+        $relatedBooks = Book::where('kategori', $book->kategori) // same category
+            ->whereKeyNot($book->id)                            // exclude the one being viewed
+            ->latest()                                          // order by created_at DESC
+            ->take(10)                                          // limit to 10
+            ->get();
+
         if (auth()->check()) {
             $isFavorited = $book->favorites()
                 ->where('user_id', auth()->id())
@@ -345,12 +352,14 @@ class BookController extends Controller
         }
 
         return Inertia::render('Buku/Detail', [
-            'book' => $book,
-            'reviews' => $reviews,
-            'avgRating' => $averageRating,
-            'isFavorited' => $isFavorited
+            'book'         => $book,
+            'reviews'      => $reviews,
+            'avgRating'    => $averageRating,
+            'isFavorited'  => $isFavorited,
+            'relatedBooks' => $relatedBooks,
         ]);
     }
+
 
     public function edit(Book $book)
     {

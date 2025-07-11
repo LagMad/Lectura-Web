@@ -8,6 +8,7 @@ use App\Http\Controllers\JurnalingController;
 use App\Http\Controllers\NIPDController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ReviewController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -43,6 +44,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/buku', [BookController::class, 'index'])->name('books.index');
     Route::get('/detail-buku/{book}', [BookController::class, 'show'])->name('books.show');
     Route::put('/{id}', [JurnalingController::class, 'update'])->name('jurnal.update');
+    // Review routes
+    Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
+    Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 
     Route::get('/bantuan', function () {
         return Inertia::render('Bantuan');

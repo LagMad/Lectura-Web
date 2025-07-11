@@ -6,7 +6,9 @@ use App\Models\Review;
 use App\Models\Book;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
+use Illuminate\Validation\Rule;
 
 class ReviewController extends Controller
 {
@@ -20,7 +22,7 @@ class ReviewController extends Controller
         $reviews = Review::with(['book', 'user'])
             ->latest()
             ->paginate(10);
-            
+
         return Inertia::render('Reviews/Index', [
             'reviews' => $reviews
         ]);
@@ -36,13 +38,13 @@ class ReviewController extends Controller
     {
         $book = null;
         $books = [];
-        
+
         if ($bookId) {
             $book = Book::findOrFail($bookId);
         } else {
             $books = Book::all();
         }
-        
+
         return Inertia::render('Reviews/Create', [
             'book' => $book,
             'books' => $books,
@@ -57,11 +59,25 @@ class ReviewController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'book_id' => 'required|exists:books,id',
-            'rating' => 'required|integer|min:1|max:5',
-            'comment' => 'required|string|min:10',
-        ]);
+        $request->validate(
+            [
+                'book_id' => [
+                    'required',
+                    'exists:books,id',
+                    // user tidak boleh mereview buku yang sama dua kali
+                    Rule::unique('reviews')
+                        ->where(fn($q) => $q->where('user_id', Auth::id())),
+                ],
+                'rating'  => 'required|integer|min:1|max:5',
+                'comment' => 'required|string|min:10|max:500',
+            ],
+            [
+                // Pesan kustom
+                'book_id.unique' => 'Kereen!! Kamu sudah pernah mereview buku ini! :D',
+                'comment.min'    => 'Jangan kependekan dong, komentar minimal 10 karakter :(',
+            ]
+        );
+
 
         $review = Review::create([
             'book_id' => $request->book_id,
@@ -70,7 +86,7 @@ class ReviewController extends Controller
             'comment' => $request->comment,
         ]);
 
-        return redirect()->route('books.show', $review->book_id)
+        return Redirect::route('books.show', $review->book_id)
             ->with('success', 'Review added successfully!');
     }
 
@@ -83,7 +99,7 @@ class ReviewController extends Controller
     public function show($id)
     {
         $review = Review::with(['book', 'user'])->findOrFail($id);
-        
+
         return Inertia::render('Reviews/Show', [
             'review' => $review
         ]);
@@ -98,12 +114,12 @@ class ReviewController extends Controller
     public function edit($id)
     {
         $review = Review::findOrFail($id);
-        
+
         // Check if the authenticated user is the owner of this review
         if ($review->user_id != Auth::id()) {
             return redirect()->back()->with('error', 'You are not authorized to edit this review.');
         }
-        
+
         return Inertia::render('Reviews/Edit', [
             'review' => $review
         ]);
@@ -119,12 +135,12 @@ class ReviewController extends Controller
     public function update(Request $request, $id)
     {
         $review = Review::findOrFail($id);
-        
+
         // Check if the authenticated user is the owner of this review
         if ($review->user_id != Auth::id()) {
             return redirect()->back()->with('error', 'You are not authorized to update this review.');
         }
-        
+
         $request->validate([
             'rating' => 'required|integer|min:1|max:5',
             'comment' => 'required|string|min:10',
@@ -148,12 +164,12 @@ class ReviewController extends Controller
     public function destroy($id)
     {
         $review = Review::findOrFail($id);
-        
+
         // Check if the authenticated user is the owner of this review
         if ($review->user_id != Auth::id()) {
             return redirect()->back()->with('error', 'You are not authorized to delete this review.');
         }
-        
+
         $bookId = $review->book_id;
         $review->delete();
 
@@ -174,7 +190,7 @@ class ReviewController extends Controller
             ->with('user')
             ->latest()
             ->paginate(10);
-            
+
         return Inertia::render('Reviews/BookReviews', [
             'book' => $book,
             'reviews' => $reviews
@@ -192,7 +208,7 @@ class ReviewController extends Controller
             ->with('book')
             ->latest()
             ->paginate(10);
-            
+
         return Inertia::render('Reviews/MyReviews', [
             'reviews' => $reviews
         ]);
