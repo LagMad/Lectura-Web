@@ -49,13 +49,19 @@ const Navbar = () => {
         }
 
         setIsSearching(true);
-        
+
         // Filter books based on search term
-        const filteredBooks = books ? books.filter(book => 
-            book.title.toLowerCase().includes(value.toLowerCase()) ||
-            (book.author && book.author.toLowerCase().includes(value.toLowerCase()))
-        ) : [];
-        
+        const filteredBooks = books
+            ? books.filter(
+                  (book) =>
+                      book.title.toLowerCase().includes(value.toLowerCase()) ||
+                      (book.author &&
+                          book.author
+                              .toLowerCase()
+                              .includes(value.toLowerCase()))
+              )
+            : [];
+
         // Limit results to 5 books
         setSearchResults(filteredBooks.slice(0, 5));
     };
@@ -69,7 +75,7 @@ const Navbar = () => {
             ) {
                 setIsDropdownOpen(false);
             }
-            
+
             if (
                 searchRef.current &&
                 !searchRef.current.contains(event.target)
@@ -110,7 +116,10 @@ const Navbar = () => {
                 </div>
 
                 <div className="items-center flex gap-4 w-1/2 justify-end">
-                    <div className="relative w-full max-w-xs lg:w-1/3 xl:w-full xl:max-w-xs" ref={searchRef}>
+                    <div
+                        className="relative w-full max-w-xs lg:w-1/3 xl:w-full xl:max-w-xs"
+                        ref={searchRef}
+                    >
                         <input
                             type="text"
                             placeholder="Cari buku..."
@@ -122,7 +131,7 @@ const Navbar = () => {
                             icon="mdi:magnify"
                             className="absolute right-3 top-2.5 text-gray-500 text-lg"
                         />
-                        
+
                         {/* Search Results Dropdown */}
                         {isSearching && searchResults.length > 0 && (
                             <div className="absolute left-0 right-0 mt-2 bg-white rounded-md shadow-lg z-20 border border-gray-200 max-h-60 overflow-y-auto">
@@ -145,23 +154,30 @@ const Navbar = () => {
                                                 </div>
                                             )}
                                             <div>
-                                                <div className="font-medium">{book.title}</div>
-                                                <div className="text-xs text-gray-500">{book.author || "Unknown Author"}</div>
+                                                <div className="font-medium">
+                                                    {book.title}
+                                                </div>
+                                                <div className="text-xs text-gray-500">
+                                                    {book.author ||
+                                                        "Unknown Author"}
+                                                </div>
                                             </div>
                                         </div>
                                     </a>
                                 ))}
                             </div>
                         )}
-                        
+
                         {/* No Results Message */}
-                        {isSearching && searchTerm && searchResults.length === 0 && (
-                            <div className="absolute left-0 right-0 mt-2 bg-white rounded-md shadow-lg z-20 border border-gray-200">
-                                <div className="px-4 py-3 text-sm text-gray-500 text-center">
-                                    Tidak ada buku yang ditemukan
+                        {isSearching &&
+                            searchTerm &&
+                            searchResults.length === 0 && (
+                                <div className="absolute left-0 right-0 mt-2 bg-white rounded-md shadow-lg z-20 border border-gray-200">
+                                    <div className="px-4 py-3 text-sm text-gray-500 text-center">
+                                        Tidak ada buku yang ditemukan
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
                     </div>
                     <div className="hidden lg:flex gap-4 items-center">
                         {auth?.user ? (
@@ -192,6 +208,27 @@ const Navbar = () => {
                                             <div className="flex items-center gap-2">
                                                 <Icon icon="mdi:view-dashboard" />
                                                 <span>Dashboard</span>
+                                            </div>
+                                        </a>
+                                        {auth?.user.role === "admin" ||
+                                            ("guru" && (
+                                                <a
+                                                    href="/admin-dashboard"
+                                                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-cust-primary-color transition-colors"
+                                                >
+                                                    <div className="flex items-center gap-2">
+                                                        <Icon icon="mdi:view-dashboard" />
+                                                        <span>Dashboard</span>
+                                                    </div>
+                                                </a>
+                                            ))}
+                                        <a
+                                            href="/admin-dashboard"
+                                            className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-cust-primary-color transition-colors"
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <Icon icon="mdi:view-dashboard" />
+                                                <span>Admin</span>
                                             </div>
                                         </a>
                                         <button

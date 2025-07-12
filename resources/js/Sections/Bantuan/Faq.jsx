@@ -1,202 +1,207 @@
-import React, { useState } from 'react'
-import { Disclosure } from '@headlessui/react'
-import { Icon } from '@iconify/react'
-import Button from '@/Components/Button'
+import React, { useEffect, useState } from "react";
+import { Disclosure } from "@headlessui/react";
+import { Icon } from "@iconify/react";
+import Button from "@/Components/Button";
+import { useForm } from "@inertiajs/inertia-react";
 
-const faqList = [
-    {
-        question: 'Apa itu E-Library Sekolah?',
-        answer: 'E-Library Sekolah adalah perpustakaan digital yang memungkinkan siswa, guru, dan staf untuk mengakses berbagai koleksi buku pelajaran, fiksi, referensi, dan lainnya secara online, kapan saja dan di mana saja.',
-        category: 'Informasi Umum',
-    },
-    {
-        question: 'Siapa saja yang bisa mengakses E-Library ini?',
-        answer: 'E-Library ini hanya dapat diakses oleh siswa, guru, dan staf sekolah yang telah memiliki akun resmi dari pihak sekolah.',
-        category: 'Layanan Perpustakaan',
-    },
-    {
-        question: 'Bagaimana cara mendaftar akun di E-Library?',
-        answer: 'Akun biasanya dibuat oleh admin sekolah. Jika Anda belum memiliki akun, silakan hubungi wali kelas atau petugas perpustakaan sekolah.',
-        category: 'Informasi Umum',
-    },
-    {
-        question: 'Apakah menggunakan E-Library dikenakan biaya?',
-        answer: 'Tidak. Seluruh layanan E-Library ini gratis bagi seluruh anggota komunitas sekolah.',
-        category: 'Layanan Perpustakaan',
-    },
-    {
-        category: 'Layanan Perpustakaan',
-        question: 'Bagaimana cara meminjam buku di perpustakaan?',
-        answer: 'Kamu bisa meminjam buku dengan membawa kartu pelajar dan memilih buku yang tersedia di rak. Kemudian, lapor ke petugas untuk proses peminjaman.',
-    },
-    {
-        category: 'Layanan Perpustakaan',
-        question: 'Berapa lama durasi peminjaman buku?',
-        answer: 'Durasi peminjaman buku adalah 7 hari dan dapat diperpanjang sebanyak 1 kali.',
-    },
+const Faq = ({ searchQuery = "", selectedCategory = "", faqList = [] }) => {
+    const [showAll, setShowAll] = useState(false);
 
-    {
-        category: 'Sumber Daya Digital',
-        question: 'Bagaimana cara mengakses e-book dari rumah?',
-        answer: 'Login ke platform E-Library dengan akun yang diberikan oleh sekolah, lalu pilih menu e-book untuk membaca atau mengunduh.',
-    },
-    {
-        category: 'Sumber Daya Digital',
-        question: 'Apakah saya bisa mengunduh video pembelajaran?',
-        answer: 'Sebagian video pembelajaran dapat diunduh, tergantung pada hak akses dan lisensi materi tersebut.',
-    },
-
-    {
-        category: 'Ruang Belajar',
-        question: 'Bagaimana cara memesan ruang belajar?',
-        answer: 'Ruang belajar dapat dipesan melalui aplikasi sekolah atau langsung ke petugas perpustakaan.',
-    },
-    {
-        category: 'Ruang Belajar',
-        question: 'Apakah ruang belajar bisa digunakan untuk kelompok?',
-        answer: 'Ya, ruang belajar dapat digunakan untuk belajar kelompok dengan maksimal 6 orang.',
-    },
-
-    {
-        category: 'Informasi Umum',
-        question: 'Jam operasional perpustakaan?',
-        answer: 'Perpustakaan buka dari pukul 07.30 sampai 16.00 pada hari Senin hingga Jumat.',
-    },
-    {
-        category: 'Informasi Umum',
-        question: 'Siapa yang bisa mengakses layanan perpustakaan?',
-        answer: 'Semua siswa, guru, dan staf sekolah yang terdaftar dapat mengakses layanan perpustakaan.',
-    },
-];
-
-const Faq = ({ searchQuery = '', selectedCategory = '' }) => {
-    const [showAll, setShowAll] = useState(false)
-
-    const [formData, setFormData] = useState({
-        nama: '',
-        nis: '',
-        pertanyaan: '',
+    const { data, setData, post, processing, errors, reset } = useForm({
+        nama: "",
+        nipd: "",
+        pertanyaan: "",
     });
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
-    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log('Data Pertanyaan:', formData);
-        setFormData({ nama: '', nis: '', pertanyaan: '' });
+
+        post(route("faq.store"), {
+            onSuccess: () => {
+                reset();
+                alert("Pertanyaan berhasil dikirim!");
+            },
+            onError: (error) => {
+                console.error("Form submission errors: ", errors);
+                alert("Pertanyaan gagal dikirim ;(");
+            },
+        });
     };
 
-    const filteredFaqs = faqList.filter((faq) => {
-        const matchCategory = selectedCategory ? faq.category === selectedCategory : true
-        const matchSearch = faq.question.toLowerCase().includes(searchQuery.toLowerCase())
-        return matchCategory && matchSearch
-    })
+    useEffect(() => {
+        console.log("faqList", faqList);
+    }, [faqList]);
 
-    const displayedFaqs = showAll ? filteredFaqs : filteredFaqs.slice(0, 5)
+    const visibleFaqs = showAll ? faqList : faqList.slice(0, 5);
+
+    const toggleShowAll = () => {
+        setShowAll(!showAll);
+    };
 
     return (
         <section>
-            <div className='bg-[#F9FAFB] container'>
-                <div className='container mx-auto py-20'>
-                    <div className='space-y-4 container'>
-                        {filteredFaqs.length > 0 ? (
+            <div className="bg-[#F9FAFB] container">
+                <div className="container mx-auto py-20">
+                    <div className="space-y-4 container">
+                        {faqList.length > 0 ? (
                             <>
-                                {displayedFaqs.map((faq, idx) => (
-                                    <Disclosure key={idx} defaultOpen={idx === 0}>
+                                {visibleFaqs.map((faq, idx) => (
+                                    <Disclosure
+                                        key={idx}
+                                        defaultOpen={idx === 0}
+                                    >
                                         {({ open }) => (
-                                            <div className='bg-white rounded-xl p-6 cursor-pointer'>
-                                                <Disclosure.Button className='flex justify-between items-center w-full font-semibold text-left text-sm md:text-base lg:text-lg text-gray-900 cursor-pointer'>
-                                                    <span>{faq.question}</span>
+                                            <div className="bg-white rounded-xl cursor-pointer shadow-lg">
+                                                <Disclosure.Button className="flex justify-between items-center w-full p-6 font-semibold text-left text-sm md:text-base lg:text-lg text-gray-900 cursor-pointer">
+                                                    <span>{faq.question} <span className="text-xs text-gray-300"> - {faq.category}</span></span>
                                                     <span className="text-xl bg-gradient-to-l from-[#CACED8] to-[#2563EB] bg-clip-text text-transparent">
                                                         <Icon
                                                             icon="iconamoon:arrow-down-2"
-                                                            className={`transition-transform text-cust-blue duration-200 ${open ? 'rotate-180' : ''}`}
+                                                            className={`transition-transform text-cust-blue duration-200 ${
+                                                                open
+                                                                    ? "rotate-180"
+                                                                    : ""
+                                                            }`}
                                                         />
                                                     </span>
                                                 </Disclosure.Button>
-                                                <Disclosure.Panel className='pt-2 text-xs md:text-sm lg:text-base text-gray-600'>
+                                                <Disclosure.Panel className="rounded-b-xl p-6 text-xs md:text-sm lg:text-base text-gray-600 bg-cust-light-blue">
                                                     {faq.answer}
                                                 </Disclosure.Panel>
                                             </div>
                                         )}
                                     </Disclosure>
                                 ))}
-                                {!showAll && filteredFaqs.length > 5 && (
-                                    <div className='text-end  pt-4'>
+                                {faqList.length > 5 && (
+                                    <div className="text-end  pt-4">
                                         <button
-                                            onClick={() => setShowAll(true)}
-                                            className='text-sm font-medium text-blue-600 hover:underline'
+                                            onClick={toggleShowAll}
+                                            className="text-sm font-medium text-blue-600 hover:underline cursor-pointer"
                                         >
-                                            Lihat semua pertanyaan
+                                            {showAll
+                                                ? "Lihat lebih sedikit"
+                                                : "Lihat semua pertanyaan"}
                                         </button>
                                     </div>
                                 )}
                             </>
                         ) : (
-                            <div className="text-center text-gray-500">Pertanyaan tidak ditemukan.</div>
+                            <div className="text-center text-gray-500">
+                                Pertanyaan tidak ditemukan.
+                            </div>
                         )}
                     </div>
                 </div>
             </div>
 
-            <div className='container mx-auto py-14'>
-                <div className='container space-y-10'>
-                    <div className='text-center'>
-                        <h1 className='font-bold text-xl lg:text-4xl'>Masih Memiliki Pertanyaan?</h1>
-                        <p className='text-sm lg:font-lg mt-2'>Tidak dapat menemukan apa yang Anda cari? Kantor Perpustakaan kami di sini untuk membantu</p>
+            <div className="container mx-auto py-14">
+                <div className="container space-y-10">
+                    <div className="text-center">
+                        <h1 className="font-bold text-xl lg:text-4xl">
+                            Masih Memiliki Pertanyaan?
+                        </h1>
+                        <p className="text-sm lg:font-lg mt-2">
+                            Tidak dapat menemukan apa yang Anda cari? Kantor
+                            Perpustakaan kami di sini untuk membantu
+                        </p>
                     </div>
 
-                    <form className="max-w-xl mx-auto space-y-4" onSubmit={handleSubmit}>
-                        <div className="flex items-center border rounded-lg px-4 py-2 gap-2">
-                            <Icon icon="ix:user-profile-filled" className="text-cust-dark-gray text-xl" />
-                            <input
-                                type="text"
-                                name="nama"
-                                placeholder="Nama kalian"
-                                className="w-full outline-none"
-                                value={formData.nama}
-                                onChange={handleChange}
-                            />
+                    <form
+                        className="max-w-xl mx-auto space-y-4"
+                        onSubmit={handleSubmit}
+                    >
+                        <div className="space-y-1">
+                            <div className="flex items-center border rounded-lg px-4 py-2 gap-2">
+                                <Icon
+                                    icon="ix:user-profile-filled"
+                                    className="text-cust-dark-gray text-xl"
+                                />
+                                <input
+                                    type="text"
+                                    name="nama"
+                                    placeholder="Nama kalian"
+                                    className="w-full outline-none"
+                                    value={data.nama}
+                                    onChange={(e) =>
+                                        setData("nama", e.target.value)
+                                    }
+                                    disabled={processing}
+                                    required
+                                />
+                            </div>
+                            {errors.nama && (
+                                <p className="text-red-500 text-sm">
+                                    {errors.nama}
+                                </p>
+                            )}
                         </div>
 
-                        <div className="flex items-center border rounded-lg px-4 py-2 gap-2">
-                            <Icon icon="la:id-card" className="text-cust-dark-gray text-xl" />
-                            <input
-                                type="text"
-                                name="nis"
-                                placeholder="NIS kalian"
-                                className="w-full outline-none"
-                                value={formData.nis}
-                                onChange={handleChange}
-                            />
+                        <div className="space-y-1">
+                            <div className="flex items-center border rounded-lg px-4 py-2 gap-2">
+                                <Icon
+                                    icon="la:id-card"
+                                    className="text-cust-dark-gray text-xl"
+                                />
+                                <input
+                                    type="text"
+                                    name="nipd"
+                                    placeholder="NIPD kalian"
+                                    className="w-full outline-none"
+                                    value={data.nipd}
+                                    onChange={(e) =>
+                                        setData("nipd", e.target.value)
+                                    }
+                                    disabled={processing}
+                                    required
+                                />
+                            </div>
+                            {errors.nipd && (
+                                <p className="text-red-500 text-sm">
+                                    {errors.nipd}
+                                </p>
+                            )}
                         </div>
 
-                        <div className="flex items-start border rounded-lg px-4 py-2 gap-2">
-                            <Icon icon="mdi:help-circle-outline" className="text-cust-dark-gray text-xl mt-1" />
-                            <textarea
-                                name="pertanyaan"
-                                placeholder="Tuliskan pertanyaan nya disini"
-                                rows="4"
-                                className="w-full outline-none resize-none"
-                                value={formData.pertanyaan}
-                                onChange={handleChange}
-                            ></textarea>
+                        <div className="space-y-1">
+                            <div className="flex items-start border rounded-lg px-4 py-2 gap-2">
+                                <Icon
+                                    icon="mdi:help-circle-outline"
+                                    className="text-cust-dark-gray text-xl mt-1"
+                                />
+                                <textarea
+                                    name="pertanyaan"
+                                    placeholder="Tuliskan pertanyaan nya disini"
+                                    rows="4"
+                                    className="w-full outline-none resize-none"
+                                    value={data.pertanyaan}
+                                    onChange={(e) => {
+                                        setData("pertanyaan", e.target.value);
+                                    }}
+                                    disabled={processing}
+                                    required
+                                ></textarea>
+                            </div>
+                            {errors.pertanyaan && (
+                                <p className="text-red-500 text-sm">
+                                    {errors.pertanyaan}
+                                </p>
+                            )}
                         </div>
 
                         <div className="text-right">
-                            <Button variant='filled' type="submit">Kirim</Button>
+                            <Button
+                                variant="filled"
+                                type="submit"
+                                disabled={processing}
+                            >
+                                {processing ? "Mengirim" : "Kirim"}
+                            </Button>
                         </div>
                     </form>
                 </div>
             </div>
         </section>
-    )
-}
+    );
+};
 
-export default Faq
+export default Faq;

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\FaqController;
 use App\Http\Controllers\PenggunaController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\JurnalingController;
@@ -24,6 +25,10 @@ Route::middleware(['auth', 'role:admin,guru'])->group(function () {
 
     Route::get('/jurnal/book/{book_id}', [JurnalingController::class, 'detail'])->name('jurnal.book.detail');
     Route::get('/jurnal/{book_id}/{user_id}', [JurnalingController::class, 'detailJurnal'])->name('jurnal.detail');
+
+    // Route::get('/admin/faq-questions', [FaqController::class, 'adminIndex'])->name('admin.faq.index');
+    Route::put('/admin/faq-questions/{faq}', [FaqController::class, 'adminUpdate'])->name('admin.faq.update');
+    Route::delete('/admin/faq-questions/{faq}', [FaqController::class, 'adminDestroy'])->name('admin.faq.destroy');
 });
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
@@ -49,9 +54,11 @@ Route::middleware('auth')->group(function () {
     Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
     Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 
-    Route::get('/bantuan', function () {
-        return Inertia::render('Bantuan');
-    });
+    // Route::get('/bantuan', function () {
+    //     return Inertia::render('Bantuan');
+    // });
+    Route::get('/bantuan', [FaqController::class, 'index'])->name('faq.index');
+    Route::post('/faq/question', [FaqController::class, 'store'])->name('faq.store');
 
     Route::get('/tentang', function () {
         return Inertia::render('Tentang');
@@ -63,11 +70,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [BookController::class, 'dashboard'])->name('dashboard');
     Route::post('/jurnal', [JurnalingController::class, 'store'])->name('jurnal.store');
     Route::delete('/jurnal/{id}', [JurnalingController::class, 'destroy'])->name('jurnal.destroy');
-    
+
     Route::get('/semua-jurnal', function () {
         return Inertia::render('Dashboard/AllJournal');
     });
-
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

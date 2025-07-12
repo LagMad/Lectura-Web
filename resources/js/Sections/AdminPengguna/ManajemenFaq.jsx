@@ -1,50 +1,384 @@
-import React, { useReducer, useMemo, useEffect } from 'react';
-import { Head } from '@inertiajs/react';
-import { Search, ChevronDown, Edit, Trash2 } from "lucide-react";
-
-const faqData = [
-    { id: '#FAQ001', question: 'Bagaimana cara meminjam buku di perpustakaan?', author: 'Budi Santoso', date: '08 Mei 2025', status: 'Sudah Dijawab' },
-    { id: '#FAQ002', question: 'Berapa lama batas waktu peminjaman buku?', author: 'Dewi Lestari', date: '06 Mei 2025', status: 'Belum Dijawab' },
-    { id: '#FAQ003', question: 'Apakah ada denda jika terlambat mengembalikan buku?', author: 'Eja Sutedja', date: '03 Mei 2025', status: 'Belum Dijawab' },
-    { id: '#FAQ004', question: 'Bagaimana cara mengakses e-book di perpustakaan digital?', author: 'Anita Wijaya', date: '03 Mei 2025', status: 'Sudah Dijawab' },
-    { id: '#FAQ005', question: 'Apakah perpustakaan buka pada hari libur nasional?', author: 'Siti Nurmaliza', date: '02 Mei 2025', status: 'Sudah Dijawab' },
-    { id: '#FAQ006', question: 'Bagaimana cara mendaftar menjadi anggota perpustakaan?', author: 'Ahmad Rizki', date: '01 Mei 2025', status: 'Belum Dijawab' },
-    { id: '#FAQ007', question: 'Apakah bisa meminjam buku tanpa kartu perpustakaan?', author: 'Maya Sari', date: '30 Apr 2025', status: 'Sudah Dijawab' },
-    { id: '#FAQ008', question: 'Dimana lokasi perpustakaan cabang terdekat?', author: 'Rudi Hartono', date: '29 Apr 2025', status: 'Belum Dijawab' },
-    { id: '#FAQ009', question: 'Apakah ada layanan reservasi buku online?', author: 'Linda Putri', date: '28 Apr 2025', status: 'Sudah Dijawab' },
-    { id: '#FAQ012', question: 'Bagaimana cara mengunduh e-book gratis?', author: 'Bayu Setiawan', date: '25 Apr 2025', status: 'Belum Dijawab' }
-];
+import { useState, useReducer, useMemo, useEffect } from "react";
+import { Head, useForm } from "@inertiajs/react";
+import { Search, Edit, Trash2, X, Save } from "lucide-react";
 
 const initialState = {
-    search: '',
-    status: 'Semua Status',
-    date: 'Semua Tanggal',
+    search: "",
+    status: "Semua Status",
+    date: "Semua Tanggal",
     page: 1,
 };
 
-function reducer(state, action) {
+const reducer = (state, action) => {
     switch (action.type) {
-        case 'SET_SEARCH': return { ...state, search: action.value, page: 1 };
-        case 'SET_STATUS': return { ...state, status: action.value, page: 1 };
-        case 'SET_DATE': return { ...state, date: action.value };
-        case 'SET_PAGE': return { ...state, page: action.value };
-        default: return state;
+        case "SET_SEARCH":
+            return { ...state, search: action.value, page: 1 };
+        case "SET_STATUS":
+            return { ...state, status: action.value, page: 1 };
+        case "SET_DATE":
+            return { ...state, date: action.value, page: 1 };
+        case "SET_PAGE":
+            return { ...state, page: action.value };
+        default:
+            return state;
     }
-}
+};
 
-const itemsPerPage = 5;
+const itemsPerPage = 10;
 
-export default function ManajemenFaq() {
+// Dropdown component
+const Dropdown = ({ value, onChange, options }) => (
+    <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
+    >
+        {options.map((option) => (
+            <option key={option} value={option}>
+                {option}
+            </option>
+        ))}
+    </select>
+);
+
+// Pagination component
+const Pagination = ({ page, totalPages, onPageChange }) => (
+    <div className="flex items-center justify-between">
+        <div className="text-sm text-gray-700">
+            Halaman {page} dari {totalPages}
+        </div>
+        <div className="flex space-x-1">
+            <button
+                onClick={() => onPageChange(page - 1)}
+                disabled={page === 1}
+                className="px-3 py-2 text-sm text-gray-500 disabled:text-gray-300"
+            >
+                ‹
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => (
+                <button
+                    key={i + 1}
+                    onClick={() => onPageChange(i + 1)}
+                    className={`px-3 py-2 text-sm rounded ${
+                        page === i + 1
+                            ? "bg-blue-500 text-white"
+                            : "text-gray-500 hover:bg-gray-100"
+                    }`}
+                >
+                    {i + 1}
+                </button>
+            ))}
+            <button
+                onClick={() => onPageChange(page + 1)}
+                disabled={page === totalPages}
+                className="px-3 py-2 text-sm text-gray-500 disabled:text-gray-300"
+            >
+                ›
+            </button>
+        </div>
+    </div>
+);
+
+// Edit Modal Component - Fixed Version
+const EditModal = ({ faq, isOpen, onClose, onSave }) => {
+    const { data, setData, put, processing, errors, reset } = useForm({
+        nama: "",
+        nipd: "",
+        pertanyaan: "",
+        jawaban: "",
+        status: "pending",
+        kategori: "",
+    });
+
+    // Reset form data when FAQ changes or modal opens
+    useEffect(() => {
+        if (faq && isOpen) {
+            setData({
+                nama: faq.nama || "",
+                nipd: faq.nipd || "",
+                pertanyaan: faq.pertanyaan || "",
+                jawaban: faq.jawaban || "",
+                status: faq.status || "pending",
+                kategori: faq.kategori || "",
+            });
+        }
+    }, [faq, isOpen, reset]);
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        put(route("admin.faq.update", faq.id), {
+            onSuccess: () => {
+                onClose();
+                reset();
+            },
+        });
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 pt-0">
+            <div className="bg-white rounded-lg p-6 w-full md:w-1/3 max-h-[600px] overflow-y-auto">
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold">Edit FAQ</h2>
+                    <button
+                        onClick={onClose}
+                        className="text-gray-500 hover:text-gray-700"
+                    >
+                        <X className="w-6 h-6" />
+                    </button>
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium mb-1">
+                            Nama Pengirim
+                        </label>
+                        <input
+                            type="text"
+                            value={data.nama}
+                            onChange={(e) => setData("nama", e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            required
+                        />
+                        {errors.nama && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.nama}
+                            </p>
+                        )}
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-1">
+                            NIPD
+                        </label>
+                        <input
+                            type="text"
+                            value={data.nipd}
+                            onChange={(e) => setData("nipd", e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            required
+                            readOnly
+                        />
+                        {errors.nipd && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.nipd}
+                            </p>
+                        )}
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-1">
+                            Pertanyaan
+                        </label>
+                        <textarea
+                            value={data.pertanyaan}
+                            onChange={(e) =>
+                                setData("pertanyaan", e.target.value)
+                            }
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            rows="3"
+                            required
+                        />
+                        {errors.pertanyaan && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.pertanyaan}
+                            </p>
+                        )}
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-1">
+                            Jawaban
+                        </label>
+                        <textarea
+                            value={data.jawaban}
+                            onChange={(e) => setData("jawaban", e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            rows="4"
+                            placeholder="Masukkan jawaban..."
+                        />
+                        {errors.jawaban && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.jawaban}
+                            </p>
+                        )}
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-1">
+                            Status
+                        </label>
+                        <select
+                            value={data.status}
+                            onChange={(e) => setData("status", e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        >
+                            <option value="pending">Pending</option>
+                            <option value="answered">Answered</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                        {errors.status && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.status}
+                            </p>
+                        )}
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-1">
+                            Kategori
+                        </label>
+                        <input
+                            type="text"
+                            value={data.kategori}
+                            onChange={(e) =>
+                                setData("kategori", e.target.value)
+                            }
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            placeholder="Masukkan kategori..."
+                        />
+                        {errors.kategori && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.kategori}
+                            </p>
+                        )}
+                    </div>
+
+                    <div className="flex justify-end space-x-3 pt-4">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                        >
+                            Batal
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={processing}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-2"
+                        >
+                            <Save className="w-4 h-4" />
+                            <span>
+                                {processing ? "Menyimpan..." : "Simpan"}
+                            </span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+};
+
+// Delete Modal Component
+const DeleteModal = ({ faq, isOpen, onClose, onDelete }) => {
+    const { delete: destroy, processing } = useForm();
+
+    const handleDelete = () => {
+        destroy(route("admin.faq.destroy", faq.id), {
+            onSuccess: () => {
+                onClose();
+            },
+        });
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold text-red-600">
+                        Hapus FAQ
+                    </h2>
+                    <button
+                        onClick={onClose}
+                        className="text-gray-500 hover:text-gray-700"
+                    >
+                        <X className="w-6 h-6" />
+                    </button>
+                </div>
+
+                <div className="mb-6">
+                    <p className="text-gray-600 mb-4">
+                        Apakah Anda yakin ingin menghapus FAQ ini?
+                    </p>
+                    <div className="bg-gray-50 p-3 rounded-lg">
+                        <p className="text-sm text-gray-700">
+                            <strong>Pertanyaan:</strong> {faq?.pertanyaan}
+                        </p>
+                        <p className="text-sm text-gray-700 mt-2">
+                            <strong>Pengirim:</strong> {faq?.nama}
+                        </p>
+                    </div>
+                </div>
+
+                <div className="flex justify-end space-x-3">
+                    <button
+                        onClick={onClose}
+                        className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                    >
+                        Batal
+                    </button>
+                    <button
+                        onClick={handleDelete}
+                        disabled={processing}
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 flex items-center space-x-2"
+                    >
+                        <Trash2 className="w-4 h-4" />
+                        <span>{processing ? "Menghapus..." : "Hapus"}</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default function ManajemenFaq({ faqList = [] }) {
     const [state, dispatch] = useReducer(reducer, initialState);
-    const { search, status, page } = state;
+    const [editModal, setEditModal] = useState({ isOpen: false, faq: null });
+    const [deleteModal, setDeleteModal] = useState({
+        isOpen: false,
+        faq: null,
+    });
+    const { search, status, page, date } = state;
 
     const filteredData = useMemo(() => {
-        return faqData.filter(faq => {
-            const matchSearch = faq.question.toLowerCase().includes(search.toLowerCase()) || faq.author.toLowerCase().includes(search.toLowerCase());
-            const matchStatus = status === 'Semua Status' || faq.status === status;
-            return matchSearch && matchStatus;
+        const now = new Date(); // current time in local TZ
+        const startOfToday = new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate()
+        );
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        // make Monday the first day of the week (ISO‑8601)
+        const mondayOffset = (startOfToday.getDay() + 6) % 7; // 0 = Mon, …, 6 = Sun
+        const startOfWeek = new Date(startOfToday);
+        startOfWeek.setDate(startOfToday.getDate() - mondayOffset);
+
+        return faqList.filter((faq) => {
+            const matchSearch =
+                faq.jawaban?.toLowerCase().includes(search.toLowerCase()) ||
+                faq.nama?.toLowerCase().includes(search.toLowerCase()) ||
+                faq.pertanyaan?.toLowerCase().includes(search.toLowerCase());
+            const matchStatus =
+                status === "Semua Status" || faq.status === status;
+            // created_at is what we filter on – change to updated_at if you want
+            const created = new Date(faq.created_at);
+            const matchDate =
+                date === "Semua Tanggal"
+                    ? true
+                    : date === "Hari Ini"
+                    ? created >= startOfToday
+                    : date === "Minggu Ini"
+                    ? created >= startOfWeek
+                    : date === "Bulan Ini"
+                    ? created >= startOfMonth
+                    : true; // fallback (should never hit)
+
+            return matchSearch && matchStatus && matchDate;
         });
-    }, [search, status]);
+    }, [faqList, search, status, date]);
 
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
     const currentData = useMemo(() => {
@@ -52,7 +386,43 @@ export default function ManajemenFaq() {
         return filteredData.slice(start, start + itemsPerPage);
     }, [filteredData, page]);
 
-    const getStatusColor = (status) => status === 'Sudah Dijawab' ? 'text-green-600 bg-green-50' : 'text-yellow-600 bg-yellow-50';
+    const getStatusColor = (status) =>
+        status === "answered"
+            ? "text-green-600 bg-green-50"
+            : status === "rejected"
+            ? "text-red-600 bg-red-50"
+            : "text-yellow-600 bg-yellow-50";
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return (
+            date.toLocaleString("id-ID", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+                timeZone: "Asia/Jakarta",
+            }) + " WIB"
+        );
+    };
+
+    const handleEdit = (faq) => {
+        setEditModal({ isOpen: true, faq });
+    };
+
+    const handleDelete = (faq) => {
+        setDeleteModal({ isOpen: true, faq });
+    };
+
+    const closeEditModal = () => {
+        setEditModal({ isOpen: false, faq: null });
+    };
+
+    const closeDeleteModal = () => {
+        setDeleteModal({ isOpen: false, faq: null });
+    };
 
     return (
         <section className="flex flex-col w-full mx-auto pt-8 px-4 sm:px-6 lg:px-8 gap-5 font-[poppins]">
@@ -60,7 +430,9 @@ export default function ManajemenFaq() {
 
             <div className="">
                 <h2 className="text-2xl font-bold">Managemen FAQ</h2>
-                <p className="text-sm text-gray-500">Kelola pertanyaan yang sering diajukan oleh pengguna</p>
+                <p className="text-sm text-gray-500">
+                    Kelola pertanyaan yang sering diajukan oleh pengguna
+                </p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
@@ -68,16 +440,43 @@ export default function ManajemenFaq() {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                     <input
                         type="text"
-                        placeholder="Cari Pertanyaan..."
+                        placeholder="Cari Pertanyaan, Jawaban, atau Pengirim..."
                         className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                         value={search}
-                        onChange={(e) => dispatch({ type: 'SET_SEARCH', value: e.target.value })}
+                        onChange={(e) =>
+                            dispatch({
+                                type: "SET_SEARCH",
+                                value: e.target.value,
+                            })
+                        }
                     />
                 </div>
 
                 <div className="flex gap-3">
-                    <Dropdown value={state.date} onChange={(v) => dispatch({ type: 'SET_DATE', value: v })} options={['Semua Tanggal', 'Hari Ini', 'Minggu Ini', 'Bulan Ini']} />
-                    <Dropdown value={status} onChange={(v) => dispatch({ type: 'SET_STATUS', value: v })} options={['Semua Status', 'Sudah Dijawab', 'Belum Dijawab']} />
+                    <Dropdown
+                        value={state.date}
+                        onChange={(v) =>
+                            dispatch({ type: "SET_DATE", value: v })
+                        }
+                        options={[
+                            "Semua Tanggal",
+                            "Hari Ini",
+                            "Minggu Ini",
+                            "Bulan Ini",
+                        ]}
+                    />
+                    <Dropdown
+                        value={status}
+                        onChange={(v) =>
+                            dispatch({ type: "SET_STATUS", value: v })
+                        }
+                        options={[
+                            "Semua Status",
+                            "answered",
+                            "pending",
+                            "rejected",
+                        ]}
+                    />
                 </div>
             </div>
 
@@ -85,78 +484,118 @@ export default function ManajemenFaq() {
                 <table className="w-full">
                     <thead className="bg-gray-50">
                         <tr>
-                            {['ID', 'Pertanyaan', 'Pengirim', 'Tanggal Masuk', 'Status', 'Aksi'].map((h, i) => (
-                                <th key={i} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{h}</th>
+                            {[
+                                "ID",
+                                "Kategori",
+                                "Pertanyaan",
+                                "Jawaban",
+                                "Pengirim",
+                                "Tanggal Masuk",
+                                "Terakhir Edit",
+                                "Status",
+                                "Aksi",
+                            ].map((h, i) => (
+                                <th
+                                    key={i}
+                                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                >
+                                    {h}
+                                </th>
                             ))}
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                         {currentData.map((faq, i) => (
-                            <tr key={i} className="hover:bg-gray-50">
-                                <td className="px-6 py-4 text-sm font-medium text-gray-900">{faq.id}</td>
-                                <td className="px-6 py-4 text-sm text-gray-900 max-w-xs">{faq.question}</td>
-                                <td className="px-6 py-4 text-sm text-gray-900">{faq.author}</td>
-                                <td className="px-6 py-4 text-sm text-gray-900">{faq.date}</td>
+                            <tr key={faq.id} className="hover:bg-gray-50">
+                                <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                                    {faq.id}
+                                </td>
+                                <td className="px-6 py-4 text-sm text-gray-900">
+                                    {faq.kategori || "-"}
+                                </td>
+                                <td className="px-6 py-4 text-sm text-gray-900 max-w-xs">
+                                    <div
+                                        className="truncate"
+                                        title={faq.pertanyaan}
+                                    >
+                                        {faq.pertanyaan}
+                                    </div>
+                                </td>
+                                <td className="px-6 py-4 text-sm text-gray-900 max-w-xs">
+                                    <div
+                                        className="truncate"
+                                        title={faq.jawaban}
+                                    >
+                                        {faq.jawaban || "-"}
+                                    </div>
+                                </td>
+                                <td className="px-6 py-4 text-sm text-gray-900">
+                                    {faq.nama}
+                                </td>
+                                <td className="px-6 py-4 text-sm text-gray-900">
+                                    {formatDate(faq.created_at)}
+                                </td>
+                                <td className="px-6 py-4 text-sm text-gray-900">
+                                    {formatDate(faq.updated_at)}
+                                </td>
                                 <td className="px-6 py-4">
-                                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(faq.status)}`}>
+                                    <span
+                                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
+                                            faq.status
+                                        )}`}
+                                    >
                                         {faq.status}
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 text-sm">
-                                    <div className="flex space-x-2 text-gray-500">
-                                        <button><EyeIcon /></button>
-                                        <button><Edit className="w-4 h-4 text-green-500" /></button>
-                                        <button><Trash2 className="w-4 h-4 text-red-500" /></button>
+                                    <div className="flex space-x-2">
+                                        <button
+                                            onClick={() => handleEdit(faq)}
+                                            className="text-blue-600 hover:text-blue-800"
+                                            title="Edit FAQ"
+                                        >
+                                            <Edit className="w-4 h-4" />
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(faq)}
+                                            className="text-red-600 hover:text-red-800"
+                                            title="Delete FAQ"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
+
+                {currentData.length === 0 && (
+                    <div className="text-center py-8 text-gray-500">
+                        Tidak ada data FAQ yang ditemukan.
+                    </div>
+                )}
             </div>
 
-            <Pagination page={page} totalPages={totalPages} onPageChange={(p) => dispatch({ type: 'SET_PAGE', value: p })} />
+            <Pagination
+                page={page}
+                totalPages={totalPages}
+                onPageChange={(p) => dispatch({ type: "SET_PAGE", value: p })}
+            />
+
+            {/* Edit Modal */}
+            <EditModal
+                faq={editModal.faq}
+                isOpen={editModal.isOpen}
+                onClose={closeEditModal}
+            />
+
+            {/* Delete Modal */}
+            <DeleteModal
+                faq={deleteModal.faq}
+                isOpen={deleteModal.isOpen}
+                onClose={closeDeleteModal}
+            />
         </section>
     );
 }
-
-const Dropdown = ({ value, onChange, options }) => (
-    <div className="relative">
-        <select
-            className="appearance-none border border-gray-300 rounded-lg px-4 py-2 pr-10 focus:ring-2 focus:ring-blue-500"
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-        >
-            {options.map(opt => <option key={opt}>{opt}</option>)}
-        </select>
-        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
-    </div>
-);
-
-const Pagination = ({ page, totalPages, onPageChange }) => (
-    <div className="flex items-center justify-between">
-        <div className="text-sm text-gray-700">
-            Halaman {page} dari {totalPages}
-        </div>
-        <div className="flex space-x-1">
-            <button onClick={() => onPageChange(page - 1)} disabled={page === 1} className="px-3 py-2 text-sm text-gray-500 disabled:text-gray-300">‹</button>
-            {Array.from({ length: totalPages }, (_, i) => (
-                <button
-                    key={i + 1}
-                    onClick={() => onPageChange(i + 1)}
-                    className={`px-3 py-2 text-sm rounded ${page === i + 1 ? 'bg-blue-500 text-white' : 'text-gray-500 hover:bg-gray-100'}`}
-                >
-                    {i + 1}
-                </button>
-            ))}
-            <button onClick={() => onPageChange(page + 1)} disabled={page === totalPages} className="px-3 py-2 text-sm text-gray-500 disabled:text-gray-300">›</button>
-        </div>
-    </div>
-);
-
-const EyeIcon = () => (
-    <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-    </svg>
-);
