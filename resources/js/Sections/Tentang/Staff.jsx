@@ -12,6 +12,9 @@ const staffData = [
 ];
 
 const Staff = ({ staff }) => {
+    const kepala = staff.find((s) => s.jabatan === "Kepala Perpustakaan");
+    const lain = staff.filter((s) => s.jabatan !== "Kepala Perpustakaan");
+
     return (
         <section className="py-12">
             <div className="container mx-auto space-y-10">
@@ -25,37 +28,42 @@ const Staff = ({ staff }) => {
                     </p>
                 </div>
 
-                {/* <div className="flex flex-col items-center hover:scale-105 transition-all ease-in-out">
-                    <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden mb-4">
-                        <img
-                            src={"/anonym.png"}
-                            alt={`Kepala Perpustakaan`}
-                            className="w-full h-full object-cover"
-                        />
+                {kepala && (
+                    <div className="flex flex-col items-center hover:scale-105 transition-all ease-in-out">
+                        <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden mb-4">
+                            <img
+                                src={kepala.photo_path || "/anonym.png"}
+                                alt={`Kepala Perpustakaan - ${kepala.nama}`}
+                                className="w-full h-full object-cover object-top"
+                            />
+                        </div>
+                        <h3 className="font-semibold text-base sm:text-lg">
+                            {kepala.nama}
+                        </h3>
+                        <h5 className="font-normal text-xs sm:text-sm text-gray-500">
+                            {kepala.jabatan}
+                        </h5>
                     </div>
-                    <h3 className="font-semibold text-base sm:text-lg">
-                        Ibu Rini
-                    </h3>
-                </div> */}
+                )}
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-10 justify-items-center">
-                    {staff.map((data, index) => (
+                    {lain.map((s) => (
                         <div
-                            key={index}
+                            key={s.id}
                             className="flex flex-col items-center hover:scale-105 transition-all ease-in-out"
                         >
                             <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden mb-4">
                                 <img
-                                    src={data?.photo_path || "/anonym.png"}
-                                    alt={`Foto ${data.nama}`}
+                                    src={s.photo_path || "/anonym.png"}
+                                    alt={`Foto ${s.nama}`}
                                     className="w-full h-full object-cover object-top"
                                 />
                             </div>
                             <h3 className="font-semibold text-base sm:text-lg text-center">
-                                {data.nama}
+                                {s.nama}
                             </h3>
                             <h5 className="font-normal text-xs sm:text-sm text-center text-gray-500">
-                                {data.nama}
+                                {s.jabatan}
                             </h5>
                         </div>
                     ))}

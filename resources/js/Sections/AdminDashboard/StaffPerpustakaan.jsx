@@ -267,6 +267,9 @@ export default function StaffPerpustakaan({ staff = [] }) {
                                 {errors.jabatan}
                             </p>
                         )}
+                        <div className="text-xs text-gray-500 mt-2">
+                            Masukkan "Kepala Perpustakaan" agar posisi di paling atas
+                        </div>
                     </div>
 
                     <div>
