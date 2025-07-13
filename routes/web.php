@@ -10,6 +10,8 @@ use App\Http\Controllers\NIPDController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\StaffPerpustakaanController;
+use App\Http\Controllers\TentangController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -21,7 +23,7 @@ Route::middleware(['auth', 'role:admin,guru'])->group(function () {
     Route::put('/update-buku/{book}', [BookController::class, 'update'])->name('books.update');
     Route::delete('/hapus-buku/{book}', [BookController::class, 'destroy'])->name('books.destroy');
     Route::get('/admin-buku', [BookController::class, 'adminBuku'])->name('books.admin');
-    Route::get('/admin-dashboard', [BookController::class, 'adminDashboard'])->name('admin.dashboard');
+    Route::get('/admin-dashboard', [StaffPerpustakaanController::class, 'adminDashboard'])->name('admin.dashboard');
 
     Route::get('/jurnal/book/{book_id}', [JurnalingController::class, 'detail'])->name('jurnal.book.detail');
     Route::get('/jurnal/{book_id}/{user_id}', [JurnalingController::class, 'detailJurnal'])->name('jurnal.detail');
@@ -39,6 +41,13 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     });
     Route::post('/kategori', [KategoriController::class, 'store'])->name('kategori.store');
     Route::delete('/kategori/{id}', [KategoriController::class, 'destroy'])->name('kategori.destroy');
+
+    Route::get('/staff',            [StaffPerpustakaanController::class, 'index'])->name('staff.index');
+    Route::get('/staff/create',     [StaffPerpustakaanController::class, 'create'])->name('staff.create');
+    Route::post('/staff',            [StaffPerpustakaanController::class, 'store'])->name('staff.store');
+    Route::get('/staff/{staff}',    [StaffPerpustakaanController::class, 'edit'])->name('staff.edit');
+    Route::put('/staff/{staff}', [StaffPerpustakaanController::class, 'update'])->name('staff.update');
+    Route::delete('/staff/{staff}',    [StaffPerpustakaanController::class, 'destroy'])->name('staff.destroy');
 });
 
 
@@ -60,9 +69,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/bantuan', [FaqController::class, 'index'])->name('faq.index');
     Route::post('/faq/question', [FaqController::class, 'store'])->name('faq.store');
 
-    Route::get('/tentang', function () {
-        return Inertia::render('Tentang');
-    });
+    Route::get('/tentang', [TentangController::class, 'index'])
+        ->name('tentang');
 
     Route::post('/favorites', [FavoriteController::class, 'create'])->name('favorites.create');
     Route::delete('/favorites', [FavoriteController::class, 'destroy'])->name('favorites.destroy');

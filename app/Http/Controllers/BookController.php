@@ -512,12 +512,4 @@ class BookController extends Controller
                 ->with('error', 'Terjadi kesalahan saat menghapus buku: ' . $e->getMessage());
         }
     }
-
-    public function adminDashboard()
-    {
-        return Inertia::render('Admin/Dashboard', [
-            // You can pass data here if needed
-            // 'users' => User::all(), for example
-        ]);
-    }
 }
