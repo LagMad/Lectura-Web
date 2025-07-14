@@ -54,9 +54,9 @@ const Navbar = () => {
         const filteredBooks = books
             ? books.filter(
                   (book) =>
-                      book.title.toLowerCase().includes(value.toLowerCase()) ||
-                      (book.author &&
-                          book.author
+                      book.judul.toLowerCase().includes(value.toLowerCase()) ||
+                      (book.penulis &&
+                          book.penulis
                               .toLowerCase()
                               .includes(value.toLowerCase()))
               )
@@ -142,10 +142,10 @@ const Navbar = () => {
                                         className="block px-4 py-2 text-gray-700 hover:bg-gray-100 border-b border-gray-100 last:border-b-0"
                                     >
                                         <div className="flex items-start">
-                                            {book.cover_image ? (
+                                            {book.cover_path ? (
                                                 <img
-                                                    src={book.cover_image}
-                                                    alt={book.title}
+                                                    src={book.cover_path}
+                                                    alt={book.judul}
                                                     className="w-10 h-14 object-cover mr-3"
                                                 />
                                             ) : (
@@ -155,10 +155,10 @@ const Navbar = () => {
                                             )}
                                             <div>
                                                 <div className="font-medium">
-                                                    {book.title}
+                                                    {book.judul}
                                                 </div>
                                                 <div className="text-xs text-gray-500">
-                                                    {book.author ||
+                                                    {book.penulis ||
                                                         "Unknown Author"}
                                                 </div>
                                             </div>
