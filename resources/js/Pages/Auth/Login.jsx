@@ -32,14 +32,17 @@ export default function Login({ status, canResetPassword }) {
 
     return (
         <div className="md:h-screen md:flex justify-center justify-items-center bg-white w-full">
-            <div className="w-1/2 h-fit my-auto md:block hidden">
-                <div className="mx-auto w-8/12 text-3xl font-bold">
-                    Selamat Datang Kembali
-                </div>
-                <div className="mx-auto w-8/12 text-lg mt-2">
-                    Akses koleksi buku digital favoritmu dan lanjutkan
-                    petualangan membaca. Masuk untuk menikmati pengalaman
-                    membaca yang praktis dan menyenangkan!
+            <div className="relative w-full md:w-1/2 h-fit md:h-screen py-10 flex flex-col justify-center items-center bg-[url('/auth-page.jpg')] bg-no-repeat bg-cover bg-center">
+                <div className="absolute inset-0 bg-black/50 z-0" />
+                <div className="z-10 px-5 md:px-20 space-y-5">
+                    <div className="text-2xl md:text-4xl font-bold text-[#E9DFC3] text-center md:text-justify">
+                        Selamat Datang Kembali
+                    </div>
+                    <div className="text-base md:text-xl text-center md:text-justify mt-2 text-white">
+                        Akses koleksi buku digital favoritmu dan lanjutkan
+                        petualangan membaca. Masuk untuk menikmati pengalaman
+                        membaca yang praktis dan menyenangkan!
+                    </div>
                 </div>
             </div>
             <div className="md:w-1/2 h-fit w-full px-8 md:px-0 my-auto bg-white">

@@ -12,6 +12,7 @@ const navLinks = [
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const [isScrolled, setIsScrolled] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [searchResults, setSearchResults] = useState([]);
@@ -20,6 +21,20 @@ const Navbar = () => {
     const { auth, books } = usePage().props;
     const dropdownRef = useRef(null);
     const searchRef = useRef(null);
+
+    useEffect(() => {
+        if (url === "/") {
+            const handleScroll = () => {
+                const threshold = 150; // px
+                setIsScrolled(window.scrollY > threshold);
+            };
+            handleScroll();
+
+            window.addEventListener("scroll", handleScroll);
+            return () => window.removeEventListener("scroll", handleScroll);
+        }
+        setIsScrolled(true);
+    }, [url]);
 
     const handleLogout = async () => {
         try {
@@ -91,7 +106,11 @@ const Navbar = () => {
     }, []);
 
     return (
-        <nav className="bg-white fixed w-full z-50 shadow-sm">
+        <nav
+            className={`${
+                isScrolled ? "bg-white shadow-sm" : "bg-transparent"
+            } fixed w-full z-50 transition-all duration-300 ease-in-out`}
+        >
             <div className="px-5 sm:px-10 md:px-16 lg:px-20 xl:px-40 py-6 flex justify-between items-center">
                 <div className="flex items-center gap-5 xl:gap-10">
                     <h1 className="font-bold text-cust-blue text-2xl xl:text-3xl">
@@ -104,8 +123,12 @@ const Navbar = () => {
                                     href={link.href}
                                     className={`transition-colors duration-200 hover:text-cust-primary-color ${
                                         url === link.href
-                                            ? "text-cust-blue font-bold"
-                                            : "text-gray-700"
+                                            ? isScrolled
+                                                ? "text-cust-blue font-bold underline underline-offset-8"
+                                                : "text-white font-bold underline underline-offset-8"
+                                            : isScrolled
+                                            ? "text-gray-700"
+                                            : "text-white"
                                     }`}
                                 >
                                     {link.name}
@@ -125,11 +148,17 @@ const Navbar = () => {
                             placeholder="Cari buku..."
                             value={searchTerm}
                             onChange={handleSearchChange}
-                            className="w-full border border-gray-400 rounded-lg py-2 px-4 pr-10 text-sm placeholder-gray-500"
+                            className={`w-full border rounded-lg py-2 px-4 pr-10 text-sm ${
+                                isScrolled
+                                    ? "placeholder-gray-500 border-gray-400"
+                                    : "placeholder-white border-white"
+                            } focus:bg-white transition-all duration-300 ease-in-out`}
                         />
                         <Icon
                             icon="mdi:magnify"
-                            className="absolute right-3 top-2.5 text-gray-500 text-lg"
+                            className={`absolute right-3 top-2.5 ${
+                                isScrolled ? "text-gray-500 " : " text-white"
+                            } text-lg transition-all duration-300 ease-in-out`}
                         />
 
                         {/* Search Results Dropdown */}
@@ -186,9 +215,15 @@ const Navbar = () => {
                                     onClick={() =>
                                         setIsDropdownOpen(!isDropdownOpen)
                                     }
-                                    className="flex items-center gap-1 text-gray-700 font-medium cursor-pointer hover:text-cust-primary-color transition-colors"
+                                    className={`flex items-center gap-1 font-medium cursor-pointer hover:text-cust-primary-color transition-colors`}
                                 >
-                                    <span>
+                                    <span
+                                        className={`${
+                                            isScrolled
+                                                ? "text-gray-700 "
+                                                : "text-white"
+                                        } transition-all duration-300 ease-in-out`}
+                                    >
                                         Halo, {auth.user.name.split(" ")[0]}!
                                     </span>
                                     <Icon
@@ -197,6 +232,11 @@ const Navbar = () => {
                                                 ? "mdi:chevron-up"
                                                 : "mdi:chevron-down"
                                         }
+                                        className={`${
+                                            isScrolled
+                                                ? "text-gray-700 "
+                                                : "text-white"
+                                        } transition-all duration-300 ease-in-out`}
                                     />
                                 </button>
                                 {isDropdownOpen && (
@@ -233,7 +273,7 @@ const Navbar = () => {
                                         </a>
                                         <button
                                             onClick={handleLogout}
-                                            className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-cust-primary-color transition-colors"
+                                            className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-cust-primary-color transition-colors cursor-pointer"
                                         >
                                             <div className="flex items-center gap-2">
                                                 <Icon icon="mdi:logout" />

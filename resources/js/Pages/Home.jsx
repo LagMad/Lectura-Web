@@ -6,12 +6,14 @@ import BukuSemester from "../Sections/Home/BukuSemester";
 import HeroSection from "../Sections/Home/HeroSection";
 import SloganSection from "../Sections/Home/SloganSection";
 import BookShowcase from "@/Sections/Home/BookShowcase";
+import KategoriBuku from "@/Sections/Home/KategoriBuku";
 
 const Home = ({ books }) => {
     return (
         <Layout>
-            <div className="flex flex-col gap-7 lg:gap-16 px-5 sm:px-10 md:px-16 lg:px-20 xl:px-40 py-28 bg-cust-background-color">
-                <HeroSection />
+            <HeroSection />
+            <div className="flex flex-col gap-7 lg:gap-16 px-5 sm:px-10 md:px-16 lg:px-20 xl:px-40 pt-12 pb-28 bg-cust-background-color">
+                <KategoriBuku />
                 <SloganSection />
                 <BookShowcase
                     books={books}
