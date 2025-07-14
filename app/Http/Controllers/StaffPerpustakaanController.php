@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Pengumuman;
 use App\Models\StaffPerpustakaan;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -280,10 +281,12 @@ class StaffPerpustakaanController extends Controller
     {
         $latestUsers = User::latest()->get();
         $staff       = StaffPerpustakaan::orderBy('nama')->get();
+        $pengumuman = Pengumuman::latest()->get();
 
         return Inertia::render('Admin/Dashboard', [
-            'users' => $latestUsers,   // dipakai komponen Statistik / TabelKonten
-            'staff' => $staff,         // dipakai komponen <StaffPerpustakaan />
+            'users' => $latestUsers,
+            'staff' => $staff,
+            'pengumuman' => $pengumuman
         ]);
     }
 }

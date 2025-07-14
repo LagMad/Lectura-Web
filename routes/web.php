@@ -9,6 +9,7 @@ use App\Http\Controllers\JurnalingController;
 use App\Http\Controllers\NIPDController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PengumumanController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\StaffPerpustakaanController;
 use App\Http\Controllers\TentangController;
@@ -31,6 +32,13 @@ Route::middleware(['auth', 'role:admin,guru'])->group(function () {
     // Route::get('/admin/faq-questions', [FaqController::class, 'adminIndex'])->name('admin.faq.index');
     Route::put('/admin/faq-questions/{faq}', [FaqController::class, 'adminUpdate'])->name('admin.faq.update');
     Route::delete('/admin/faq-questions/{faq}', [FaqController::class, 'adminDestroy'])->name('admin.faq.destroy');
+
+    Route::prefix('pengumuman')->name('admin.pengumuman.')->group(function () {
+        Route::get('/', [PengumumanController::class, 'index'])->name('index');
+        Route::post('/', [PengumumanController::class, 'store'])->name('store');
+        Route::put('/{id}', [PengumumanController::class, 'update'])->name('update');
+        Route::delete('/{id}', [PengumumanController::class, 'destroy'])->name('destroy');
+    });
 });
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
@@ -81,6 +89,11 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/semua-jurnal', function () {
         return Inertia::render('Dashboard/AllJournal');
+    });
+
+    Route::prefix('pengumuman')->name('pengumuman.')->group(function () {
+        Route::get('/', [PengumumanController::class, 'publicIndex'])->name('public.index');
+        Route::get('/{id}', [PengumumanController::class, 'show'])->name('show');
     });
 });
 

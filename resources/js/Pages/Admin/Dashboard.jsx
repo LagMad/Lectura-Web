@@ -6,8 +6,9 @@ import Statistik from "@/Sections/AdminDashboard/Statistik";
 import TabelKonten from "@/Sections/AdminDashboard/TabelKonten";
 import Title from "@/Sections/AdminDashboard/Title";
 import StaffPerpustakaan from "@/Sections/AdminDashboard/StaffPerpustakaan";
+import ManajemenPengumuman from "@/Sections/AdminDashboard/ManajemenPengumuman";
 
-export default function Dashboard({ users, staff }) {
+export default function Dashboard({ users, staff, pengumuman }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const toggleSidebar = () => {
@@ -21,8 +22,8 @@ export default function Dashboard({ users, staff }) {
     };
 
     useEffect(() => {
-        console.log("staff", staff);
-    }, [staff]);
+        console.log("pengumuman", pengumuman);
+    }, [pengumuman]);
 
     return (
         <AdminLayout
@@ -32,6 +33,7 @@ export default function Dashboard({ users, staff }) {
             <div className="flex flex-col w-full">
                 <Title />
                 <Statistik />
+                <ManajemenPengumuman pengumuman={pengumuman}/>
                 <StaffPerpustakaan staff={staff} />
                 <TabelKonten />
             </div>
