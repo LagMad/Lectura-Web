@@ -38,15 +38,26 @@ class BookController extends Controller
     }
 
 
-    public function index()
+    public function index(Request $request)
     {
         $kategori = Kategori::all();
+
+        // Get the category filter from request
+        $categoryFilter = $request->get('category');
 
         $books = Book::with([
             'favorites' => function ($query) {
                 $query->where('user_id', auth()->id());
             }
-        ])->latest()->paginate(10);
+        ])
+            ->when($categoryFilter, function ($query, $category) {
+                // Filter by category if provided and not "Semua Buku"
+                if ($category !== 'Semua Buku') {
+                    $query->where('kategori', $category);
+                }
+            })
+            ->latest()
+            ->paginate(10);
 
         foreach ($books as $book) {
             $book->isFavorited = $book->favorites->isNotEmpty();
@@ -54,7 +65,10 @@ class BookController extends Controller
 
         return Inertia::render('Buku', [
             'books' => $books,
-            'kategori' => $kategori
+            'kategori' => $kategori,
+            'filters' => [
+                'category' => $categoryFilter,
+            ],
         ]);
     }
 

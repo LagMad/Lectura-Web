@@ -13,7 +13,7 @@ const Home = ({ books }) => {
         <Layout>
             <HeroSection />
             <div className="flex flex-col gap-7 lg:gap-16 px-5 sm:px-10 md:px-16 lg:px-20 xl:px-40 pt-12 pb-28 bg-cust-background-color">
-                <KategoriBuku />
+                <KategoriBuku books={books}/>
                 <SloganSection />
                 <BookShowcase
                     books={books}
