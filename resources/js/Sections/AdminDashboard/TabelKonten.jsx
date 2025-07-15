@@ -305,7 +305,7 @@ const TabelKonten = () => {
                 {totalEntries > 0 && (
                     <div className="flex items-center justify-between mt-6">
                         <p className="text-sm text-gray-700">
-                            Showing {startEntry} to {endEntry} of {totalEntries} entries
+                            Data {startEntry} - {endEntry} dari {totalEntries} data
                             {yearFilter !== "Semua Tahun" && (
                                 <span className="text-gray-500"> (filtered by {yearFilter})</span>
                             )}

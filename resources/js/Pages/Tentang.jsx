@@ -6,7 +6,11 @@ import Pelayanan from "@/Sections/Tentang/Pelayanan";
 import Staff from "@/Sections/Tentang/Staff";
 import React, { useEffect } from "react";
 
-const Tentang = ({ staff, books, user }) => {
+const Tentang = ({ staff, books, user, videos }) => {
+
+    useEffect(() => {
+        console.log("videos", videos)
+    }, [videos])
 
     return (
         <Layout>
@@ -14,7 +18,7 @@ const Tentang = ({ staff, books, user }) => {
                 <Hero staff={staff} books={books} user={user}/>
                 {/* <Pelayanan /> */}
                 <Staff staff={staff}/>
-                <MediaLibrary />
+                <MediaLibrary videos={videos}/>
                 <Mitra />
             </div>
         </Layout>

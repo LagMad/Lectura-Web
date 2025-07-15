@@ -273,20 +273,4 @@ class StaffPerpustakaanController extends Controller
             return back()->with('error', 'Gagal menghapus staf: ' . $e->getMessage());
         }
     }
-
-    /* ============================================================
-     |  ADMIN DASHBOARD
-     * ============================================================*/
-    public function adminDashboard()
-    {
-        $latestUsers = User::latest()->get();
-        $staff       = StaffPerpustakaan::orderBy('nama')->get();
-        $pengumuman = Pengumuman::latest()->get();
-
-        return Inertia::render('Admin/Dashboard', [
-            'users' => $latestUsers,
-            'staff' => $staff,
-            'pengumuman' => $pengumuman
-        ]);
-    }
 }

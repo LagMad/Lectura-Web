@@ -18,7 +18,7 @@ const Home = ({ books, pengumuman }) => {
                 <SloganSection />
                 <BookShowcase
                     books={books}
-                    judul={"Buku Terlaris Minggu Ini"}
+                    judul={"Buku dengan Rating Tertinggi"}
                     subjudul={
                         <>
                             SEPANJANG{" "}
@@ -27,13 +27,13 @@ const Home = ({ books, pengumuman }) => {
                         </>
                     }
                     deskripsi={
-                        "Lagi rame dibaca! Buku-buku ini lagi jadi incaran para pembaca e-library minggu ini. Sudah baca belum?"
+                        "Buku-buku koleksi perpustakaan yang paling populer dan disukai siswa nih! Kamu sendiri udah pernah baca belum?"
                     }
                     image={"/girl-reading-on-sofa.svg"}
                 />
                 <BookShowcase
                     books={books}
-                    judul={"Bacaan Favorit Pekan Ini"}
+                    judul={"Karya Siswa"}
                     subjudul={
                         <>
                             BACAAN{" "}
@@ -48,7 +48,7 @@ const Home = ({ books, pengumuman }) => {
                 />
                 <BookShowcase
                     books={books}
-                    judul={"Buku Favorit Sepanjang Semester"}
+                    judul={"Karya Guru"}
                     subjudul={
                         <>
                             SEPANJANG{" "}

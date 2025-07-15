@@ -52,7 +52,7 @@ const Dropdown = ({ value, onChange, options }) => (
 
 // Pagination component
 const Pagination = ({ page, totalPages, onPageChange }) => (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between px-6 py-3">
         <div className="text-sm text-gray-700">
             Halaman {page} dari {totalPages}
         </div>
@@ -470,7 +470,7 @@ export default function ManajemenPengumuman({ pengumuman = [] }) {
                 </div>
                 <button
                     onClick={() => setAddModal(true)}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2 cursor-pointer"
                 >
                     <Plus className="w-4 h-4" />
                     <span>Tambah Pengumuman</span>
@@ -627,13 +627,14 @@ export default function ManajemenPengumuman({ pengumuman = [] }) {
                         Tidak ada data pengumuman yang ditemukan.
                     </div>
                 )}
+                <Pagination
+                    page={page}
+                    totalPages={totalPages}
+                    onPageChange={(p) =>
+                        dispatch({ type: "SET_PAGE", value: p })
+                    }
+                />
             </div>
-
-            <Pagination
-                page={page}
-                totalPages={totalPages}
-                onPageChange={(p) => dispatch({ type: "SET_PAGE", value: p })}
-            />
 
             {/* Add Modal */}
             <PengumumanModal

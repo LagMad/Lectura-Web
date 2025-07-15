@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useForm, router } from "@inertiajs/react";
 import { Plus, Edit, Trash2, X, FileText, Eye } from "lucide-react";
 
-/* ------------------------------------------------------------------
-   REUSABLE MODAL WRAPPER
------------------------------------------------------------------- */
+const ITEMS_PER_PAGE = 10;
+
 const Modal = ({ show, onClose, children }) => {
     if (!show) return null;
     return (
@@ -22,11 +21,63 @@ const Modal = ({ show, onClose, children }) => {
     );
 };
 
+function Pagination({ page, totalPages, onChange }) {
+    if (totalPages <= 1) return null;
+
+    return (
+        <div className="flex items-center justify-between px-6 py-3">
+            <div className="text-sm text-gray-700">
+                Halaman {page} dari {totalPages}
+            </div>
+            <div className="flex space-x-1">
+                <button
+                    onClick={() => onChange(page - 1)}
+                    disabled={page === 1}
+                    className="px-3 py-2 text-sm text-gray-500 disabled:text-gray-300"
+                >
+                    ‹
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => (
+                    <button
+                        key={i + 1}
+                        onClick={() => onChange(i + 1)}
+                        className={`px-3 py-2 text-sm rounded ${
+                            page === i + 1
+                                ? "bg-blue-500 text-white"
+                                : "text-gray-500 hover:bg-gray-100"
+                        }`}
+                    >
+                        {i + 1}
+                    </button>
+                ))}
+                <button
+                    onClick={() => onChange(page + 1)}
+                    disabled={page === totalPages}
+                    className="px-3 py-2 text-sm text-gray-500 disabled:text-gray-300"
+                >
+                    ›
+                </button>
+            </div>
+        </div>
+    );
+}
+
 /* ------------------------------------------------------------------
    MAIN SECTION
 ------------------------------------------------------------------ */
 export default function StaffPerpustakaan({ staff = [] }) {
     const [modal, setModal] = useState({ type: null, item: null });
+    const [page, setPage] = useState(1);
+
+    /* ---------- PAGINATION ---------- */
+    const totalPages = Math.ceil(staff.length / ITEMS_PER_PAGE);
+    const currentStaff = useMemo(
+        () => staff.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE),
+        [staff, page]
+    );
+
+    // reset ke halaman 1 kalau data berubah (mis. habis tambah / hapus)
+    useEffect(() => setPage(1), [staff]);
 
     /* ------------------ ADD / EDIT FORM ------------------ */
     const { data, setData, reset, errors, processing, post, put } = useForm({
@@ -119,9 +170,9 @@ export default function StaffPerpustakaan({ staff = [] }) {
                 <h2 className="text-xl font-bold">Staf Perpustakaan</h2>
                 <button
                     onClick={() => setModal({ type: "add", item: null })}
-                    className="inline-flex items-center gap-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                    className="inline-flex items-center gap-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 cursor-pointer"
                 >
-                    <Plus className="w-4 h-4" /> Tambah
+                    <Plus className="w-4 h-4" /> Tambah Staff
                 </button>
             </div>
 
@@ -142,7 +193,7 @@ export default function StaffPerpustakaan({ staff = [] }) {
                         </tr>
                     </thead>
                     <tbody>
-                        {staff.map((s) => (
+                        {currentStaff.map((s) => (
                             <tr key={s.id} className="hover:bg-gray-50">
                                 <td className="px-6 py-4">{s.id}</td>
                                 <td className="px-6 py-4">
@@ -221,6 +272,11 @@ export default function StaffPerpustakaan({ staff = [] }) {
                         )}
                     </tbody>
                 </table>
+                <Pagination
+                    page={page}
+                    totalPages={totalPages}
+                    onChange={setPage}
+                />
             </div>
 
             {/* ---------------- ADD / EDIT MODAL ---------------- */}
@@ -268,7 +324,8 @@ export default function StaffPerpustakaan({ staff = [] }) {
                             </p>
                         )}
                         <div className="text-xs text-gray-500 mt-2">
-                            Masukkan "Kepala Perpustakaan" agar posisi di paling atas
+                            Masukkan "Kepala Perpustakaan" agar posisi di paling
+                            atas
                         </div>
                     </div>
 

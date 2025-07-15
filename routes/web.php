@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\FaqController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\PengumumanController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\StaffPerpustakaanController;
 use App\Http\Controllers\TentangController;
+use App\Http\Controllers\YoutubeVideoController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -24,12 +26,13 @@ Route::middleware(['auth', 'role:admin,guru'])->group(function () {
     Route::put('/update-buku/{book}', [BookController::class, 'update'])->name('books.update');
     Route::delete('/hapus-buku/{book}', [BookController::class, 'destroy'])->name('books.destroy');
     Route::get('/admin-buku', [BookController::class, 'adminBuku'])->name('books.admin');
-    Route::get('/admin-dashboard', [StaffPerpustakaanController::class, 'adminDashboard'])->name('admin.dashboard');
+    Route::get('/admin-dashboard', [AdminController::class, 'adminDashboard'])->name('admin.dashboard');
 
     Route::get('/jurnal/book/{book_id}', [JurnalingController::class, 'detail'])->name('jurnal.book.detail');
     Route::get('/jurnal/{book_id}/{user_id}', [JurnalingController::class, 'detailJurnal'])->name('jurnal.detail');
 
     // Route::get('/admin/faq-questions', [FaqController::class, 'adminIndex'])->name('admin.faq.index');
+    Route::post('/admin/faq-questions', [FaqController::class, 'adminStore'])->name('admin.faq.store');
     Route::put('/admin/faq-questions/{faq}', [FaqController::class, 'adminUpdate'])->name('admin.faq.update');
     Route::delete('/admin/faq-questions/{faq}', [FaqController::class, 'adminDestroy'])->name('admin.faq.destroy');
 
@@ -38,6 +41,13 @@ Route::middleware(['auth', 'role:admin,guru'])->group(function () {
         Route::post('/', [PengumumanController::class, 'store'])->name('store');
         Route::put('/{id}', [PengumumanController::class, 'update'])->name('update');
         Route::delete('/{id}', [PengumumanController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::prefix('video')->name('admin.video.')->group(function () {
+        Route::get('/',        [YoutubeVideoController::class, 'index'])->name('index');   // /video
+        Route::post('/',       [YoutubeVideoController::class, 'store'])->name('store');   // /video
+        Route::put('/{video}', [YoutubeVideoController::class, 'update'])->name('update'); // /video/{id}
+        Route::delete('/{video}', [YoutubeVideoController::class, 'destroy'])->name('destroy');
     });
 });
 

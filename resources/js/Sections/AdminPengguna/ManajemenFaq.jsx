@@ -1,6 +1,18 @@
 import { useState, useReducer, useMemo, useEffect } from "react";
-import { Head, useForm } from "@inertiajs/react";
-import { Search, Edit, Trash2, X, Save } from "lucide-react";
+import { Head, useForm, usePage } from "@inertiajs/react";
+import {
+    Search,
+    Edit,
+    Trash2,
+    X,
+    Save,
+    Plus,
+    Eye,
+    EyeOff,
+    FileText,
+    Image,
+    ExternalLink,
+} from "lucide-react";
 
 const initialState = {
     search: "",
@@ -8,6 +20,28 @@ const initialState = {
     date: "Semua Tanggal",
     page: 1,
 };
+
+const CATEGORIES = [
+    "Informasi Umum",
+    "Layanan Perpustakaan",
+    "Sumber Daya Digital",
+    "Ruang Belajar",
+];
+
+const SelectInput = ({ value, onChange }) => (
+    <select
+        value={value}
+        onChange={onChange}
+        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+    >
+        <option value="">— pilih kategori —</option>
+        {CATEGORIES.map((cat) => (
+            <option key={cat} value={cat}>
+                {cat}
+            </option>
+        ))}
+    </select>
+);
 
 const reducer = (state, action) => {
     switch (action.type) {
@@ -226,23 +260,15 @@ const EditModal = ({ faq, isOpen, onClose, onSave }) => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium mb-1">
+                        <label className="block font-medium mb-1">
                             Kategori
                         </label>
-                        <input
-                            type="text"
+                        <SelectInput
                             value={data.kategori}
                             onChange={(e) =>
                                 setData("kategori", e.target.value)
                             }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                            placeholder="Masukkan kategori..."
                         />
-                        {errors.kategori && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.kategori}
-                            </p>
-                        )}
                     </div>
 
                     <div className="flex justify-end space-x-3 pt-4">
@@ -262,6 +288,183 @@ const EditModal = ({ faq, isOpen, onClose, onSave }) => {
                             <span>
                                 {processing ? "Menyimpan..." : "Simpan"}
                             </span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+};
+
+const AddModal = ({ isOpen, onClose }) => {
+    const { auth } = usePage().props;
+
+    useEffect(() => {
+        console.log("auth", auth);
+    }, [auth]);
+
+    const { data, setData, post, processing, errors, reset } = useForm({
+        nama: "",
+        nipd: auth?.user.nipd,
+        pertanyaan: "",
+        jawaban: "",
+        kategori: "",
+        status: "answered", // admin langsung “answered”
+    });
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        post(route("admin.faq.store"), {
+            onSuccess: () => {
+                onClose();
+                reset();
+            },
+        });
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 pt-0">
+            <div className="bg-white rounded-lg p-6 w-full md:w-1/3 max-h-[600px] overflow-y-auto">
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold">Tambah FAQ</h2>
+                    <button
+                        onClick={onClose}
+                        className="text-gray-500 hover:text-gray-700"
+                    >
+                        <X className="w-6 h-6" />
+                    </button>
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium mb-1">
+                            Nama Pengirim
+                        </label>
+                        <input
+                            type="text"
+                            value={data.nama}
+                            onChange={(e) => setData("nama", e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            required
+                        />
+                        {errors.nama && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.nama}
+                            </p>
+                        )}
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-1">
+                            NIPD
+                        </label>
+                        <input
+                            type="text"
+                            value={data.nipd}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            required
+                            readOnly
+                        />
+                        {errors.nipd && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.nipd}
+                            </p>
+                        )}
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-1">
+                            Pertanyaan
+                        </label>
+                        <textarea
+                            value={data.pertanyaan}
+                            onChange={(e) =>
+                                setData("pertanyaan", e.target.value)
+                            }
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            rows="3"
+                            required
+                        />
+                        {errors.pertanyaan && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.pertanyaan}
+                            </p>
+                        )}
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-1">
+                            Jawaban
+                        </label>
+                        <textarea
+                            value={data.jawaban}
+                            onChange={(e) => setData("jawaban", e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            rows="4"
+                            placeholder="Masukkan jawaban..."
+                        />
+                        {errors.jawaban && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.jawaban}
+                            </p>
+                        )}
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-1">
+                            Status
+                        </label>
+                        <select
+                            value={data.status}
+                            onChange={(e) => setData("status", e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        >
+                            <option value="pending">Pending</option>
+                            <option value="answered">Answered</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                        {errors.status && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.status}
+                            </p>
+                        )}
+                    </div>
+
+                    <div>
+                        <label className="block font-medium mb-1">
+                            Kategori
+                        </label>
+                        <SelectInput
+                            value={data.kategori}
+                            onChange={(e) =>
+                                setData("kategori", e.target.value)
+                            }
+                        />
+                    </div>
+
+                    <input
+                        type="hidden"
+                        value={data.status}
+                        onChange={() => {}}
+                    />
+
+                    <div className="flex justify-end gap-2 pt-4">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
+                        >
+                            Batal
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={processing}
+                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 flex items-center gap-1"
+                        >
+                            <Save className="w-4 h-4" />{" "}
+                            {processing ? "Menyimpan…" : "Simpan"}
                         </button>
                     </div>
                 </form>
@@ -336,6 +539,7 @@ const DeleteModal = ({ faq, isOpen, onClose, onDelete }) => {
 
 export default function ManajemenFaq({ faqList = [] }) {
     const [state, dispatch] = useReducer(reducer, initialState);
+    const [addModal, setAddModal] = useState(false);
     const [editModal, setEditModal] = useState({ isOpen: false, faq: null });
     const [deleteModal, setDeleteModal] = useState({
         isOpen: false,
@@ -428,11 +632,19 @@ export default function ManajemenFaq({ faqList = [] }) {
         <section className="flex flex-col w-full mx-auto pt-8 px-4 sm:px-6 lg:px-8 gap-5 font-[poppins]">
             <Head title="Manajemen FAQ" />
 
-            <div className="">
-                <h2 className="text-2xl font-bold">Managemen FAQ</h2>
-                <p className="text-sm text-gray-500">
-                    Kelola pertanyaan yang sering diajukan oleh pengguna
-                </p>
+            <div className="flex flex-row justify-between items-center">
+                <div className="">
+                    <h2 className="text-2xl font-bold">Managemen FAQ</h2>
+                    <p className="text-sm text-gray-500">
+                        Kelola pertanyaan yang sering diajukan oleh pengguna
+                    </p>
+                </div>{" "}
+                <button
+                    onClick={() => setAddModal(true)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center text-sm"
+                >
+                    <Plus size={16} className="mr-1" /> Tambah FAQ
+                </button>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
@@ -582,6 +794,9 @@ export default function ManajemenFaq({ faqList = [] }) {
                 totalPages={totalPages}
                 onPageChange={(p) => dispatch({ type: "SET_PAGE", value: p })}
             />
+
+            {/* Add Modal */}
+            <AddModal isOpen={addModal} onClose={() => setAddModal(false)} />
 
             {/* Edit Modal */}
             <EditModal

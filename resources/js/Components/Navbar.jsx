@@ -100,10 +100,6 @@ const Navbar = () => {
         };
     }, []);
 
-    useEffect(() => {
-        console.log("navbarBooks", navbarBooks);
-    }, [navbarBooks]);
-
     return (
         <nav
             className={`${
