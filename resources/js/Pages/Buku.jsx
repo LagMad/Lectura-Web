@@ -172,7 +172,7 @@ const Buku = ({ books, kategori, filters = {} }) => {
             <div className="flex flex-col items-start w-full">
                 <div className="flex flex-col justify-end items-center gap-5 md:gap-10 bg-cust-light-blue px-10 lg:px-0 h-auto md:h-96 w-full pt-32 pb-12 md:py-12">
                     <div className="text-3xl md:text-5xl font-bold text-center">
-                        Buku Favorit Sepanjang Semester
+                        Koleksi Buku Perpustakaan
                     </div>
                     <div className="flex flex-col md:flex-row w-full md:w-3/5 bg-white px-10 md:px-12 py-5 rounded-lg gap-3">
                         {/* Option 1: Try with direct input */}

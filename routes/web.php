@@ -60,6 +60,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
 
 Route::post('/validate-nipd', [NIPDController::class, 'validateNipd']);
+Route::get('/api/navbar-books', [BookController::class, 'search']);
 
 Route::middleware('auth')->group(function () {
     Route::get('/', [HomeController::class, 'index'])->name('home');

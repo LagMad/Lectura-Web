@@ -18,7 +18,7 @@ const Navbar = () => {
     const [searchResults, setSearchResults] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
     const { url } = usePage();
-    const { auth, books } = usePage().props;
+    const { auth, books, navbarBooks } = usePage().props;
     const dropdownRef = useRef(null);
     const searchRef = useRef(null);
 
@@ -53,33 +53,28 @@ const Navbar = () => {
     };
 
     // Handle search input
-    const handleSearchChange = (e) => {
+    const handleSearchChange = async (e) => {
         const value = e.target.value;
         setSearchTerm(value);
-
+    
         if (value.trim() === "") {
             setSearchResults([]);
             setIsSearching(false);
             return;
         }
-
+    
         setIsSearching(true);
-
-        // Filter books based on search term
-        const filteredBooks = books
-            ? books.filter(
-                  (book) =>
-                      book.judul.toLowerCase().includes(value.toLowerCase()) ||
-                      (book.penulis &&
-                          book.penulis
-                              .toLowerCase()
-                              .includes(value.toLowerCase()))
-              )
-            : [];
-
-        // Limit results to 5 books
-        setSearchResults(filteredBooks.slice(0, 5));
+    
+        try {
+            const response = await fetch(`/api/navbar-books?q=${encodeURIComponent(value)}`);
+            const data = await response.json();
+            setSearchResults(data);
+        } catch (error) {
+            console.error("Error fetching search results:", error);
+            setSearchResults([]);
+        }
     };
+    
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -104,6 +99,10 @@ const Navbar = () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
+
+    useEffect(() => {
+        console.log("navbarBooks", navbarBooks);
+    }, [navbarBooks]);
 
     return (
         <nav

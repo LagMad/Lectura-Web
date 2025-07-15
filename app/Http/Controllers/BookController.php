@@ -526,4 +526,17 @@ class BookController extends Controller
                 ->with('error', 'Terjadi kesalahan saat menghapus buku: ' . $e->getMessage());
         }
     }
+
+    public function search(Request $request)
+    {
+        $query = $request->input('q');
+
+        $books = Book::where('judul', 'like', "%{$query}%")
+            ->orWhere('penulis', 'like', "%{$query}%")
+            ->select('id', 'judul', 'penulis', 'cover_path')
+            ->take(5)
+            ->get();
+
+        return response()->json($books);
+    }
 }
