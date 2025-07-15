@@ -4,7 +4,7 @@ import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import axios from "axios";
-import { Icon } from '@iconify/react';
+import { Icon } from "@iconify/react";
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -86,9 +86,9 @@ export default function Register() {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const togglePasswordVisibility = (field) => {
-        if (field === 'password') {
+        if (field === "password") {
             setShowPassword(!showPassword);
-        } else if (field === 'confirmation') {
+        } else if (field === "confirmation") {
             setShowConfirmPassword(!showConfirmPassword);
         }
     };
@@ -118,10 +118,11 @@ export default function Register() {
                 // Registration successful
                 setRegistrationStatus({
                     success: true,
-                    message: "Pendaftaran berhasil! Silahkan login dengan akun baru Anda.",
+                    message:
+                        "Pendaftaran berhasil! Silahkan login dengan akun baru Anda.",
                 });
                 reset("password", "password_confirmation");
-                
+
                 // Optionally, redirect after a short delay
                 setTimeout(() => {
                     window.location.href = route("login");
@@ -143,18 +144,21 @@ export default function Register() {
 
     return (
         <div className="min-h-screen md:h-screen flex flex-col md:flex-row justify-center justify-items-center bg-white w-full">
-            <div className="w-full md:w-1/2 h-fit my-auto pt-10 md:pt-0">
-                <div className="px-10 md:mx-auto w-full md:w-8/12 text-3xl font-bold text-center md:text-justify">
-                    Daftarkan Dirimu di E-Library!
-                </div>
-                <div className="px-10 md:mx-auto w-full md:w-8/12 text-lg mt-2 text-justify">
-                    Buka akses ke ribuan buku digital, artikel, dan referensi
-                    berkualitas. Buat akun sekarang dan mulai menjelajah dunia
-                    pengetahuan tanpa batas!
+            <div className="relative flex justify-center items-center w-full md:w-1/2 h-fit md:h-screen py-10 md:py-0 bg-[url(/auth-page.jpg)] bg-no-repeat bg-cover bg-center">
+                <div className="absolute inset-0 bg-black/50 z-0"/>
+                <div className="z-10 px-5 md:px-20 space-y-5">
+                    <div className="text-2xl md:text-4xl text-[#E9DFC3] font-bold text-center md:text-justify">
+                        Daftarkan Dirimu di E-Library!
+                    </div>
+                    <div className="text-base md:text-xl mt-2 text-center md:text-justify text-white">
+                        Buka akses ke ribuan buku digital, artikel, dan
+                        referensi berkualitas. Buat akun sekarang dan mulai
+                        menjelajah dunia pengetahuan tanpa batas!
+                    </div>
                 </div>
             </div>
             <div className="md:w-1/2 h-fit my-auto">
-                <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 md:py-12 py-4 px-4 sm:px-6 lg:px-8">
+                <div className="flex flex-col items-center justify-center md:min-h-screen bg-gray-50 md:py-12 py-10 px-4 sm:px-6 lg:px-8">
                     <div className="w-full max-w-md">
                         <div className="text-center mb-6">
                             <h1 className="text-2xl font-bold text-blue-600">
@@ -167,16 +171,22 @@ export default function Register() {
 
                         {/* Registration Status Message */}
                         {registrationStatus.message && (
-                            <div className={`mb-4 p-4 rounded-md ${
-                                registrationStatus.success 
-                                    ? "bg-green-50 text-green-700 border border-green-200" 
-                                    : "bg-red-50 text-red-700 border border-red-200"
-                            }`}>
+                            <div
+                                className={`mb-4 p-4 rounded-md ${
+                                    registrationStatus.success
+                                        ? "bg-green-50 text-green-700 border border-green-200"
+                                        : "bg-red-50 text-red-700 border border-red-200"
+                                }`}
+                            >
                                 <div className="flex">
                                     <div className="flex-shrink-0">
-                                        <Icon 
-                                            icon={registrationStatus.success ? "mdi:check-circle" : "mdi:alert-circle"} 
-                                            className="h-5 w-5" 
+                                        <Icon
+                                            icon={
+                                                registrationStatus.success
+                                                    ? "mdi:check-circle"
+                                                    : "mdi:alert-circle"
+                                            }
+                                            className="h-5 w-5"
                                         />
                                     </div>
                                     <div className="ml-3">
@@ -287,7 +297,9 @@ export default function Register() {
                                 <div className="relative">
                                     <input
                                         id="password"
-                                        type={showPassword ? "text" : "password"}
+                                        type={
+                                            showPassword ? "text" : "password"
+                                        }
                                         name="password"
                                         value={data.password}
                                         className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 pr-10"
@@ -298,13 +310,19 @@ export default function Register() {
                                     <button
                                         type="button"
                                         className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-600 focus:outline-none mt-1"
-                                        onClick={() => togglePasswordVisibility('password')}
+                                        onClick={() =>
+                                            togglePasswordVisibility("password")
+                                        }
                                         tabIndex="-1"
                                     >
-                                        <Icon 
-                                            icon={showPassword ? 'mdi:eye-off' : 'mdi:eye'} 
-                                            className="h-5 w-5" 
-                                            aria-hidden="true" 
+                                        <Icon
+                                            icon={
+                                                showPassword
+                                                    ? "mdi:eye-off"
+                                                    : "mdi:eye"
+                                            }
+                                            className="h-5 w-5"
+                                            aria-hidden="true"
                                         />
                                     </button>
                                 </div>
@@ -322,7 +340,11 @@ export default function Register() {
                                 <div className="relative">
                                     <input
                                         id="password_confirmation"
-                                        type={showConfirmPassword ? "text" : "password"}
+                                        type={
+                                            showConfirmPassword
+                                                ? "text"
+                                                : "password"
+                                        }
                                         name="password_confirmation"
                                         value={data.password_confirmation}
                                         className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 pr-10"
@@ -338,13 +360,21 @@ export default function Register() {
                                     <button
                                         type="button"
                                         className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-600 focus:outline-none mt-1"
-                                        onClick={() => togglePasswordVisibility('confirmation')}
+                                        onClick={() =>
+                                            togglePasswordVisibility(
+                                                "confirmation"
+                                            )
+                                        }
                                         tabIndex="-1"
                                     >
-                                        <Icon 
-                                            icon={showConfirmPassword ? 'mdi:eye-off' : 'mdi:eye'} 
-                                            className="h-5 w-5" 
-                                            aria-hidden="true" 
+                                        <Icon
+                                            icon={
+                                                showConfirmPassword
+                                                    ? "mdi:eye-off"
+                                                    : "mdi:eye"
+                                            }
+                                            className="h-5 w-5"
+                                            aria-hidden="true"
                                         />
                                     </button>
                                 </div>

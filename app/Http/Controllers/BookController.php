@@ -38,15 +38,26 @@ class BookController extends Controller
     }
 
 
-    public function index()
+    public function index(Request $request)
     {
         $kategori = Kategori::all();
+
+        // Get the category filter from request
+        $categoryFilter = $request->get('category');
 
         $books = Book::with([
             'favorites' => function ($query) {
                 $query->where('user_id', auth()->id());
             }
-        ])->latest()->paginate(10);
+        ])
+            ->when($categoryFilter, function ($query, $category) {
+                // Filter by category if provided and not "Semua Buku"
+                if ($category !== 'Semua Buku') {
+                    $query->where('kategori', $category);
+                }
+            })
+            ->latest()
+            ->paginate(10);
 
         foreach ($books as $book) {
             $book->isFavorited = $book->favorites->isNotEmpty();
@@ -54,7 +65,10 @@ class BookController extends Controller
 
         return Inertia::render('Buku', [
             'books' => $books,
-            'kategori' => $kategori
+            'kategori' => $kategori,
+            'filters' => [
+                'category' => $categoryFilter,
+            ],
         ]);
     }
 
@@ -338,6 +352,13 @@ class BookController extends Controller
         $averageRating = $book->reviews()->avg('rating');
         $isFavorited = false;
 
+        // Get other books in the same category, excluding the current one
+        $relatedBooks = Book::where('kategori', $book->kategori) // same category
+            ->whereKeyNot($book->id)                            // exclude the one being viewed
+            ->latest()                                          // order by created_at DESC
+            ->take(10)                                          // limit to 10
+            ->get();
+
         if (auth()->check()) {
             $isFavorited = $book->favorites()
                 ->where('user_id', auth()->id())
@@ -345,12 +366,14 @@ class BookController extends Controller
         }
 
         return Inertia::render('Buku/Detail', [
-            'book' => $book,
-            'reviews' => $reviews,
-            'avgRating' => $averageRating,
-            'isFavorited' => $isFavorited
+            'book'         => $book,
+            'reviews'      => $reviews,
+            'avgRating'    => $averageRating,
+            'isFavorited'  => $isFavorited,
+            'relatedBooks' => $relatedBooks,
         ]);
     }
+
 
     public function edit(Book $book)
     {
@@ -504,11 +527,16 @@ class BookController extends Controller
         }
     }
 
-    public function adminDashboard()
+    public function search(Request $request)
     {
-        return Inertia::render('Admin/Dashboard', [
-            // You can pass data here if needed
-            // 'users' => User::all(), for example
-        ]);
+        $query = $request->input('q');
+
+        $books = Book::where('judul', 'like', "%{$query}%")
+            ->orWhere('penulis', 'like', "%{$query}%")
+            ->select('id', 'judul', 'penulis', 'cover_path')
+            ->take(5)
+            ->get();
+
+        return response()->json($books);
     }
 }

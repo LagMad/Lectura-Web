@@ -68,3 +68,7 @@ body {
     --color-cust-tertiary-color: #eef2ff;
     --color-cust-background-color:#F9FAFB;
 }
+
+.swiper-button-next, .swiper-button-prev {
+    color: white !important;
+}

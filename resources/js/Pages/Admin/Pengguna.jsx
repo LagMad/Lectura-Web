@@ -4,7 +4,7 @@ import ManajemenPengguna from "@/Sections/AdminPengguna/ManajemenPengguna";
 import PengaturanSistem from "@/Sections/AdminPengguna/PengaturanSistem";
 import ManajemenFaq from "@/Sections/AdminPengguna/ManajemenFaq";
 
-export default function Pengguna({ users }) {
+export default function Pengguna({ users, faqList = [] }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const toggleSidebar = () => {
@@ -24,7 +24,7 @@ export default function Pengguna({ users }) {
         >
             <div className="flex flex-col w-full font-[poppins] py-10">
                 <ManajemenPengguna users={users} />
-                <ManajemenFaq />
+                <ManajemenFaq faqList={faqList} />
                 {/* <PengaturanSistem /> */}
             </div>
         </AdminLayout>

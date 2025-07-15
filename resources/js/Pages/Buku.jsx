@@ -10,8 +10,11 @@ import {
 } from "react-icons/md";
 import { router } from "@inertiajs/react";
 
-const Buku = ({ books, kategori }) => {
-    const [activeCategory, setActiveCategory] = useState("Semua Buku");
+const Buku = ({ books, kategori, filters = {} }) => {
+    // Get initial category from URL parameters or default to "Semua Buku"
+    const initialCategory = filters.category || "Semua Buku";
+
+    const [activeCategory, setActiveCategory] = useState(initialCategory);
     const [currentPage, setCurrentPage] = useState(1);
     const [isMobile, setIsMobile] = useState(false);
     const [processing, setProcessing] = useState({});
@@ -30,7 +33,12 @@ const Buku = ({ books, kategori }) => {
         setFilteredBooks(books.data);
     }, [books]);
 
-    useEffect(() => {}, [books.data, kategori]);
+    // Update active category when filters change
+    useEffect(() => {
+        if (filters.category) {
+            setActiveCategory(filters.category);
+        }
+    }, [filters.category]);
 
     useEffect(() => {
         let filtered = books.data;
@@ -104,6 +112,20 @@ const Buku = ({ books, kategori }) => {
         setSearchQuery(e.target.value);
     };
 
+    const handleCategoryChange = (newCategory) => {
+        setActiveCategory(newCategory);
+        setCurrentPage(1);
+
+        // Update URL with new category parameter
+        const categoryParam =
+            newCategory === "Semua Buku" ? {} : { category: newCategory };
+        router.visit(route("buku.index"), {
+            data: categoryParam,
+            preserveState: true,
+            preserveScroll: true,
+        });
+    };
+
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth < 1024);
         window.addEventListener("resize", handleResize);
@@ -134,10 +156,9 @@ const Buku = ({ books, kategori }) => {
                 <Menu.Item
                     key={item.id}
                     onClick={() => {
-                        setActiveCategory(
-                            item.id === "Semua Buku" ? item.id : item.nama
-                        );
-                        setCurrentPage(1);
+                        const categoryName =
+                            item.id === "Semua Buku" ? item.id : item.nama;
+                        handleCategoryChange(categoryName);
                     }}
                 >
                     {item.nama}
@@ -151,7 +172,7 @@ const Buku = ({ books, kategori }) => {
             <div className="flex flex-col items-start w-full">
                 <div className="flex flex-col justify-end items-center gap-5 md:gap-10 bg-cust-light-blue px-10 lg:px-0 h-auto md:h-96 w-full pt-32 pb-12 md:py-12">
                     <div className="text-3xl md:text-5xl font-bold text-center">
-                        Buku Favorit Sepanjang Semester
+                        Koleksi Buku Perpustakaan
                     </div>
                     <div className="flex flex-col md:flex-row w-full md:w-3/5 bg-white px-10 md:px-12 py-5 rounded-lg gap-3">
                         {/* Option 1: Try with direct input */}
@@ -200,12 +221,11 @@ const Buku = ({ books, kategori }) => {
                                                 : "bg-[#DEDEDE] text-black"
                                         } px-7 py-1.5 rounded-full font-semibold cursor-pointer hover:opacity-80 transition-opacity duration-300 ease-in-out`}
                                         onClick={() => {
-                                            setActiveCategory(
+                                            const categoryName =
                                                 item.id === "Semua Buku"
                                                     ? item.id
-                                                    : item.nama
-                                            );
-                                            setCurrentPage(1);
+                                                    : item.nama;
+                                            handleCategoryChange(categoryName);
                                         }}
                                     >
                                         {item.nama}
@@ -217,8 +237,16 @@ const Buku = ({ books, kategori }) => {
 
                     {filteredBooks.length === 0 ? (
                         <div className="flex justify-center items-center w-full py-10">
-                            <p className="text-xl text-gray-500">
-                                Tidak ada buku yang ditemukan
+                            <p className="flex flex-col text-center text-xl text-gray-500">
+                                Tidak ada buku yang ditemukan.
+                                <span className="text-base">
+                                    Minta staf perpustakaan atau gurumu untuk
+                                    menambahkan buku dengan kategori{" "}
+                                    <span className="font-bold">
+                                        {activeCategory}
+                                    </span>
+                                    !
+                                </span>
                             </p>
                         </div>
                     ) : (

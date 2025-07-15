@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\FaqQuestion;
 use Inertia\Inertia;
 use App\Models\User;
 use App\Models\ValidNIPD;
@@ -13,36 +14,54 @@ class PenggunaController extends Controller
 {
     public function index(Request $request)
     {
-    $query = User::query();
+        /* ---------- 1. QUERY USERS ---------- */
+        $userQuery = User::query();
 
-    // Filter pencarian (nama atau email)
-    if ($request->filled('search')) {
-        $searchTerm = $request->search;
-        $query->where(function ($q) use ($searchTerm) {
-            $q->where('name', 'like', "%{$searchTerm}%")
-              ->orWhere('email', 'like', "%{$searchTerm}%");
-        });
-    }
+        if ($request->filled('search')) {
+            $term = $request->search;
+            $userQuery->where(function ($q) use ($term) {
+                $q->where('name',  'like', "%{$term}%")
+                    ->orWhere('email', 'like', "%{$term}%");
+            });
+        }
 
-    // Filter berdasarkan role
-    if ($request->filled('role')) {
-        $query->where('role', $request->role);
-    }
+        if ($request->filled('role')) {
+            $userQuery->where('role', $request->role);
+        }
 
-    // Filter berdasarkan status
-    if ($request->filled('status')) {
-        $status = strtolower($request->status);
-        $query->whereRaw('LOWER(status) = ?', [$status]);
-    }
-    
+        if ($request->filled('status')) {
+            $userQuery->whereRaw('LOWER(status) = ?', [strtolower($request->status)]);
+        }
 
-    // Ambil user dengan pagination
-    $users = $query->latest()->paginate(10)->appends($request->all());
+        $users = $userQuery->latest()->paginate(10)->appends($request->all());
 
-    return Inertia::render('Admin/Pengguna', [
-        'users' => $users,
-    ]);
+        /* ---------- 2. QUERY FAQ ---------- */
+        $faqQuery = FaqQuestion::query();
 
+        if ($request->filled('faq_search')) {
+            $term = $request->faq_search;
+            $faqQuery->where(function ($q) use ($term) {
+                $q->where('pertanyaan', 'like', "%{$term}%")
+                    ->orWhere('jawaban',   'like', "%{$term}%");
+            });
+        }
+
+        if ($request->filled('faq_status')) {
+            $faqQuery->where('status', $request->faq_status);   // pending / answered / rejected
+        }
+
+        $faqList = $faqQuery
+            ->orderByDesc('updated_at')
+            ->get(['id', 'nama', 'nipd', 'pertanyaan', 'jawaban', 'status', 'kategori', 'created_at', 'updated_at']);
+
+        /* ---------- 3. RENDER ONE PAGE ---------- */
+        return Inertia::render('Admin/Pengguna', [
+            'users'      => $users,
+            'faqList'    => $faqList,
+            // opsional: kirim filter utk dipakai di front‑end
+            'userFilters' => $request->only(['search', 'role', 'status']),
+            'faqFilters' => $request->only(['faq_search', 'faq_status']),
+        ]);
     }
 
     public function create()

@@ -1,11 +1,22 @@
-import { useState, useReducer, useMemo, useEffect } from "react";
-import { Head, useForm } from "@inertiajs/react";
-import { Search, Edit, Trash2, X, Save } from "lucide-react";
+import React, { useState, useReducer, useMemo, useEffect } from "react";
+import { Head, useForm, router } from "@inertiajs/react";
+import {
+    Search,
+    Edit,
+    Trash2,
+    X,
+    Save,
+    Plus,
+    Eye,
+    EyeOff,
+    FileText,
+    Image,
+    ExternalLink,
+} from "lucide-react";
 
 const initialState = {
     search: "",
     status: "Semua Status",
-    date: "Semua Tanggal",
     page: 1,
 };
 
@@ -15,8 +26,6 @@ const reducer = (state, action) => {
             return { ...state, search: action.value, page: 1 };
         case "SET_STATUS":
             return { ...state, status: action.value, page: 1 };
-        case "SET_DATE":
-            return { ...state, date: action.value, page: 1 };
         case "SET_PAGE":
             return { ...state, page: action.value };
         default:
@@ -79,48 +88,109 @@ const Pagination = ({ page, totalPages, onPageChange }) => (
     </div>
 );
 
-// Edit Modal Component - Fixed Version
-const EditModal = ({ faq, isOpen, onClose, onSave }) => {
-    const { data, setData, put, processing, errors, reset } = useForm({
-        nama: "",
-        nipd: "",
-        pertanyaan: "",
-        jawaban: "",
-        status: "pending",
-        kategori: "",
+// Add/Edit Modal Component
+const PengumumanModal = ({ pengumuman, isOpen, onClose, isEdit = false }) => {
+    const { data, setData, post, put, processing, errors, reset } = useForm({
+        judul: "",
+        penulis: "",
+        image: null,
+        file: null,
+        is_active: false,
     });
 
-    // Reset form data when FAQ changes or modal opens
+    const [imagePreview, setImagePreview] = useState(null);
+    const [fileName, setFileName] = useState("");
+
+    // Reset form when modal opens/closes or pengumuman changes
     useEffect(() => {
-        if (faq && isOpen) {
-            setData({
-                nama: faq.nama || "",
-                nipd: faq.nipd || "",
-                pertanyaan: faq.pertanyaan || "",
-                jawaban: faq.jawaban || "",
-                status: faq.status || "pending",
-                kategori: faq.kategori || "",
-            });
+        if (isOpen) {
+            if (isEdit && pengumuman) {
+                setData({
+                    judul: pengumuman.judul || "",
+                    penulis: pengumuman.penulis || "",
+                    image: null,
+                    file: null,
+                    is_active: pengumuman.is_active || false,
+                });
+                setImagePreview(pengumuman.image_path || null);
+                setFileName(pengumuman.original_filename || "");
+            } else {
+                setData({
+                    judul: "",
+                    penulis: "",
+                    image: null,
+                    file: null,
+                    is_active: false,
+                });
+                setImagePreview(null);
+                setFileName("");
+            }
         }
-    }, [faq, isOpen, reset]);
+    }, [isOpen, isEdit, pengumuman]);
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setData("image", file);
+            const reader = new FileReader();
+            reader.onload = (e) => setImagePreview(e.target.result);
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setData("file", file);
+            setFileName(file.name);
+        }
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        put(route("admin.faq.update", faq.id), {
-            onSuccess: () => {
-                onClose();
-                reset();
-            },
-        });
+
+        if (isEdit && pengumuman) {
+            put(route("admin.pengumuman.update", pengumuman.id), {
+                forceFormData: true,
+                onSuccess: () => {
+                    onClose();
+                    reset();
+                },
+            });
+            const fd = new FormData();
+            fd.append("_method", "PUT"); // <‑‑ spoof
+            fd.append("judul", data.judul);
+            fd.append("penulis", data.penulis);
+            fd.append("is_active", data.is_active ? 1 : 0);
+            if (data.image) fd.append("image", data.image);
+            if (data.file) fd.append("file", data.file);
+
+            router.post(route("admin.pengumuman.update", pengumuman.id), fd, {
+                onSuccess: () => {
+                    onClose();
+                    reset();
+                },
+            });
+        } else {
+            post(route("admin.pengumuman.store"), {
+                forceFormData: true,
+                onSuccess: () => {
+                    onClose();
+                    reset();
+                },
+            });
+        }
     };
 
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 pt-0">
-            <div className="bg-white rounded-lg p-6 w-full md:w-1/3 max-h-[600px] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold">Edit FAQ</h2>
+                    <h2 className="text-xl font-bold">
+                        {isEdit ? "Edit Pengumuman" : "Tambah Pengumuman"}
+                    </h2>
                     <button
                         onClick={onClose}
                         className="text-gray-500 hover:text-gray-700"
@@ -132,117 +202,106 @@ const EditModal = ({ faq, isOpen, onClose, onSave }) => {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium mb-1">
-                            Nama Pengirim
+                            Judul *
                         </label>
                         <input
                             type="text"
-                            value={data.nama}
-                            onChange={(e) => setData("nama", e.target.value)}
+                            value={data.judul}
+                            onChange={(e) => setData("judul", e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                             required
                         />
-                        {errors.nama && (
+                        {errors.judul && (
                             <p className="text-red-500 text-sm mt-1">
-                                {errors.nama}
+                                {errors.judul}
                             </p>
                         )}
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium mb-1">
-                            NIPD
+                            Penulis *
                         </label>
                         <input
                             type="text"
-                            value={data.nipd}
-                            onChange={(e) => setData("nipd", e.target.value)}
+                            value={data.penulis}
+                            onChange={(e) => setData("penulis", e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                             required
-                            readOnly
                         />
-                        {errors.nipd && (
+                        {errors.penulis && (
                             <p className="text-red-500 text-sm mt-1">
-                                {errors.nipd}
+                                {errors.penulis}
                             </p>
                         )}
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium mb-1">
-                            Pertanyaan
+                            Gambar
                         </label>
-                        <textarea
-                            value={data.pertanyaan}
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        />
+                        {errors.image && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.image}
+                            </p>
+                        )}
+
+                        {imagePreview && (
+                            <div className="mt-2">
+                                <img
+                                    src={imagePreview}
+                                    alt="Preview"
+                                    className="w-32 h-32 object-cover rounded-lg border"
+                                />
+                            </div>
+                        )}
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-1">
+                            File Lampiran
+                        </label>
+                        <input
+                            type="file"
+                            onChange={handleFileChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        />
+                        {errors.file && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.file}
+                            </p>
+                        )}
+
+                        {fileName && (
+                            <div className="mt-2 flex items-center space-x-2 text-sm text-gray-600">
+                                <FileText className="w-4 h-4" />
+                                <span>{fileName}</span>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                        <input
+                            type="checkbox"
+                            id="is_active"
+                            checked={data.is_active}
                             onChange={(e) =>
-                                setData("pertanyaan", e.target.value)
+                                setData("is_active", e.target.checked)
                             }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                            rows="3"
-                            required
+                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                         />
-                        {errors.pertanyaan && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.pertanyaan}
-                            </p>
-                        )}
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium mb-1">
-                            Jawaban
-                        </label>
-                        <textarea
-                            value={data.jawaban}
-                            onChange={(e) => setData("jawaban", e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                            rows="4"
-                            placeholder="Masukkan jawaban..."
-                        />
-                        {errors.jawaban && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.jawaban}
-                            </p>
-                        )}
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium mb-1">
-                            Status
-                        </label>
-                        <select
-                            value={data.status}
-                            onChange={(e) => setData("status", e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        <label
+                            htmlFor="is_active"
+                            className="text-sm font-medium"
                         >
-                            <option value="pending">Pending</option>
-                            <option value="answered">Answered</option>
-                            <option value="rejected">Rejected</option>
-                        </select>
-                        {errors.status && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.status}
-                            </p>
-                        )}
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium mb-1">
-                            Kategori
+                            Aktif
                         </label>
-                        <input
-                            type="text"
-                            value={data.kategori}
-                            onChange={(e) =>
-                                setData("kategori", e.target.value)
-                            }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                            placeholder="Masukkan kategori..."
-                        />
-                        {errors.kategori && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.kategori}
-                            </p>
-                        )}
                     </div>
 
                     <div className="flex justify-end space-x-3 pt-4">
@@ -271,11 +330,11 @@ const EditModal = ({ faq, isOpen, onClose, onSave }) => {
 };
 
 // Delete Modal Component
-const DeleteModal = ({ faq, isOpen, onClose, onDelete }) => {
+const DeleteModal = ({ pengumuman, isOpen, onClose }) => {
     const { delete: destroy, processing } = useForm();
 
     const handleDelete = () => {
-        destroy(route("admin.faq.destroy", faq.id), {
+        destroy(route("admin.pengumuman.destroy", pengumuman.id), {
             onSuccess: () => {
                 onClose();
             },
@@ -285,11 +344,11 @@ const DeleteModal = ({ faq, isOpen, onClose, onDelete }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 w-full max-w-md">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-bold text-red-600">
-                        Hapus FAQ
+                        Hapus Pengumuman
                     </h2>
                     <button
                         onClick={onClose}
@@ -301,14 +360,14 @@ const DeleteModal = ({ faq, isOpen, onClose, onDelete }) => {
 
                 <div className="mb-6">
                     <p className="text-gray-600 mb-4">
-                        Apakah Anda yakin ingin menghapus FAQ ini?
+                        Apakah Anda yakin ingin menghapus pengumuman ini?
                     </p>
                     <div className="bg-gray-50 p-3 rounded-lg">
                         <p className="text-sm text-gray-700">
-                            <strong>Pertanyaan:</strong> {faq?.pertanyaan}
+                            <strong>Judul:</strong> {pengumuman?.judul}
                         </p>
-                        <p className="text-sm text-gray-700 mt-2">
-                            <strong>Pengirim:</strong> {faq?.nama}
+                        <p className="text-sm text-gray-700 mt-1">
+                            <strong>Penulis:</strong> {pengumuman?.penulis}
                         </p>
                     </div>
                 </div>
@@ -334,64 +393,37 @@ const DeleteModal = ({ faq, isOpen, onClose, onDelete }) => {
     );
 };
 
-export default function ManajemenFaq({ faqList = [] }) {
+export default function ManajemenPengumuman({ pengumuman = [] }) {
     const [state, dispatch] = useReducer(reducer, initialState);
-    const [editModal, setEditModal] = useState({ isOpen: false, faq: null });
+    const [addModal, setAddModal] = useState(false);
+    const [editModal, setEditModal] = useState({
+        isOpen: false,
+        pengumuman: null,
+    });
     const [deleteModal, setDeleteModal] = useState({
         isOpen: false,
-        faq: null,
+        pengumuman: null,
     });
-    const { search, status, page, date } = state;
+    const { search, status, page } = state;
 
     const filteredData = useMemo(() => {
-        const now = new Date(); // current time in local TZ
-        const startOfToday = new Date(
-            now.getFullYear(),
-            now.getMonth(),
-            now.getDate()
-        );
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-        // make Monday the first day of the week (ISO‑8601)
-        const mondayOffset = (startOfToday.getDay() + 6) % 7; // 0 = Mon, …, 6 = Sun
-        const startOfWeek = new Date(startOfToday);
-        startOfWeek.setDate(startOfToday.getDate() - mondayOffset);
-
-        return faqList.filter((faq) => {
+        return pengumuman.filter((item) => {
             const matchSearch =
-                faq.jawaban?.toLowerCase().includes(search.toLowerCase()) ||
-                faq.nama?.toLowerCase().includes(search.toLowerCase()) ||
-                faq.pertanyaan?.toLowerCase().includes(search.toLowerCase());
+                item.judul?.toLowerCase().includes(search.toLowerCase()) ||
+                item.penulis?.toLowerCase().includes(search.toLowerCase());
             const matchStatus =
-                status === "Semua Status" || faq.status === status;
-            // created_at is what we filter on – change to updated_at if you want
-            const created = new Date(faq.created_at);
-            const matchDate =
-                date === "Semua Tanggal"
-                    ? true
-                    : date === "Hari Ini"
-                    ? created >= startOfToday
-                    : date === "Minggu Ini"
-                    ? created >= startOfWeek
-                    : date === "Bulan Ini"
-                    ? created >= startOfMonth
-                    : true; // fallback (should never hit)
-
-            return matchSearch && matchStatus && matchDate;
+                status === "Semua Status" ||
+                (status === "Aktif" && item.is_active) ||
+                (status === "Tidak Aktif" && !item.is_active);
+            return matchSearch && matchStatus;
         });
-    }, [faqList, search, status, date]);
+    }, [pengumuman, search, status]);
 
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
     const currentData = useMemo(() => {
         const start = (page - 1) * itemsPerPage;
         return filteredData.slice(start, start + itemsPerPage);
     }, [filteredData, page]);
-
-    const getStatusColor = (status) =>
-        status === "answered"
-            ? "text-green-600 bg-green-50"
-            : status === "rejected"
-            ? "text-red-600 bg-red-50"
-            : "text-yellow-600 bg-yellow-50";
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -408,31 +440,41 @@ export default function ManajemenFaq({ faqList = [] }) {
         );
     };
 
-    const handleEdit = (faq) => {
-        setEditModal({ isOpen: true, faq });
+    const handleEdit = (pengumuman) => {
+        setEditModal({ isOpen: true, pengumuman });
     };
 
-    const handleDelete = (faq) => {
-        setDeleteModal({ isOpen: true, faq });
+    const handleDelete = (pengumuman) => {
+        setDeleteModal({ isOpen: true, pengumuman });
     };
+
+    const closeAddModal = () => setAddModal(false);
 
     const closeEditModal = () => {
-        setEditModal({ isOpen: false, faq: null });
+        setEditModal({ isOpen: false, pengumuman: null });
     };
 
-    const closeDeleteModal = () => {
-        setDeleteModal({ isOpen: false, faq: null });
-    };
+    const closeDeleteModal = () =>
+        setDeleteModal({ isOpen: false, pengumuman: null });
 
     return (
         <section className="flex flex-col w-full mx-auto pt-8 px-4 sm:px-6 lg:px-8 gap-5 font-[poppins]">
-            <Head title="Manajemen FAQ" />
+            <Head title="Manajemen Pengumuman" />
 
-            <div className="">
-                <h2 className="text-2xl font-bold">Managemen FAQ</h2>
-                <p className="text-sm text-gray-500">
-                    Kelola pertanyaan yang sering diajukan oleh pengguna
-                </p>
+            <div className="flex justify-between items-center">
+                <div>
+                    <h2 className="text-2xl font-bold">Manajemen Pengumuman</h2>
+                    <p className="text-sm text-gray-500">
+                        Kelola pengumuman yang akan ditampilkan kepada pengguna
+                    </p>
+                </div>
+                <button
+                    onClick={() => setAddModal(true)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2"
+                >
+                    <Plus className="w-4 h-4" />
+                    <span>Tambah Pengumuman</span>
+                </button>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
@@ -440,7 +482,7 @@ export default function ManajemenFaq({ faqList = [] }) {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                     <input
                         type="text"
-                        placeholder="Cari Pertanyaan, Jawaban, atau Pengirim..."
+                        placeholder="Cari berdasarkan judul atau penulis..."
                         className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                         value={search}
                         onChange={(e) =>
@@ -454,28 +496,11 @@ export default function ManajemenFaq({ faqList = [] }) {
 
                 <div className="flex gap-3">
                     <Dropdown
-                        value={state.date}
-                        onChange={(v) =>
-                            dispatch({ type: "SET_DATE", value: v })
-                        }
-                        options={[
-                            "Semua Tanggal",
-                            "Hari Ini",
-                            "Minggu Ini",
-                            "Bulan Ini",
-                        ]}
-                    />
-                    <Dropdown
                         value={status}
                         onChange={(v) =>
                             dispatch({ type: "SET_STATUS", value: v })
                         }
-                        options={[
-                            "Semua Status",
-                            "answered",
-                            "pending",
-                            "rejected",
-                        ]}
+                        options={["Semua Status", "Aktif", "Tidak Aktif"]}
                     />
                 </div>
             </div>
@@ -486,13 +511,13 @@ export default function ManajemenFaq({ faqList = [] }) {
                         <tr>
                             {[
                                 "ID",
-                                "Kategori",
-                                "Pertanyaan",
-                                "Jawaban",
-                                "Pengirim",
-                                "Tanggal Masuk",
-                                "Terakhir Edit",
+                                "Judul",
+                                "Penulis",
+                                "Gambar",
+                                "File",
                                 "Status",
+                                "Dibuat",
+                                "Diperbarui",
                                 "Aksi",
                             ].map((h, i) => (
                                 <th
@@ -505,61 +530,88 @@ export default function ManajemenFaq({ faqList = [] }) {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {currentData.map((faq, i) => (
-                            <tr key={faq.id} className="hover:bg-gray-50">
+                        {currentData.map((item) => (
+                            <tr key={item.id} className="hover:bg-gray-50">
                                 <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                                    {faq.id}
-                                </td>
-                                <td className="px-6 py-4 text-sm text-gray-900">
-                                    {faq.kategori || "-"}
+                                    {item.id}
                                 </td>
                                 <td className="px-6 py-4 text-sm text-gray-900 max-w-xs">
                                     <div
                                         className="truncate"
-                                        title={faq.pertanyaan}
+                                        title={item.judul}
                                     >
-                                        {faq.pertanyaan}
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4 text-sm text-gray-900 max-w-xs">
-                                    <div
-                                        className="truncate"
-                                        title={faq.jawaban}
-                                    >
-                                        {faq.jawaban || "-"}
+                                        {item.judul}
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 text-sm text-gray-900">
-                                    {faq.nama}
+                                    {item.penulis}
                                 </td>
                                 <td className="px-6 py-4 text-sm text-gray-900">
-                                    {formatDate(faq.created_at)}
+                                    {item.image_path ? (
+                                        <div className="flex items-center space-x-2">
+                                            <Image className="w-4 h-4 text-green-600" />
+                                            <span className="text-green-600">
+                                                Ada
+                                            </span>
+                                        </div>
+                                    ) : (
+                                        <span className="text-gray-400">-</span>
+                                    )}
                                 </td>
                                 <td className="px-6 py-4 text-sm text-gray-900">
-                                    {formatDate(faq.updated_at)}
+                                    {item.link ? (
+                                        <a
+                                            href={item.link}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center space-x-1 text-blue-600 hover:text-blue-800"
+                                        >
+                                            <FileText className="w-4 h-4" />
+                                            <ExternalLink className="w-3 h-3" />
+                                        </a>
+                                    ) : (
+                                        <span className="text-gray-400">-</span>
+                                    )}
                                 </td>
                                 <td className="px-6 py-4">
-                                    <span
-                                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
-                                            faq.status
-                                        )}`}
-                                    >
-                                        {faq.status}
-                                    </span>
+                                    <div className="flex items-center space-x-2">
+                                        {item.is_active ? (
+                                            <Eye className="w-4 h-4 text-green-600" />
+                                        ) : (
+                                            <EyeOff className="w-4 h-4 text-gray-400" />
+                                        )}
+                                        <span
+                                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                                item.is_active
+                                                    ? "text-green-600 bg-green-50"
+                                                    : "text-gray-600 bg-gray-50"
+                                            }`}
+                                        >
+                                            {item.is_active
+                                                ? "Aktif"
+                                                : "Tidak Aktif"}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td className="px-6 py-4 text-sm text-gray-900">
+                                    {formatDate(item.created_at)}
+                                </td>
+                                <td className="px-6 py-4 text-sm text-gray-900">
+                                    {formatDate(item.updated_at)}
                                 </td>
                                 <td className="px-6 py-4 text-sm">
                                     <div className="flex space-x-2">
                                         <button
-                                            onClick={() => handleEdit(faq)}
+                                            onClick={() => handleEdit(item)}
                                             className="text-blue-600 hover:text-blue-800"
-                                            title="Edit FAQ"
+                                            title="Edit Pengumuman"
                                         >
                                             <Edit className="w-4 h-4" />
                                         </button>
                                         <button
-                                            onClick={() => handleDelete(faq)}
+                                            onClick={() => handleDelete(item)}
                                             className="text-red-600 hover:text-red-800"
-                                            title="Delete FAQ"
+                                            title="Hapus Pengumuman"
                                         >
                                             <Trash2 className="w-4 h-4" />
                                         </button>
@@ -572,7 +624,7 @@ export default function ManajemenFaq({ faqList = [] }) {
 
                 {currentData.length === 0 && (
                     <div className="text-center py-8 text-gray-500">
-                        Tidak ada data FAQ yang ditemukan.
+                        Tidak ada data pengumuman yang ditemukan.
                     </div>
                 )}
             </div>
@@ -583,16 +635,24 @@ export default function ManajemenFaq({ faqList = [] }) {
                 onPageChange={(p) => dispatch({ type: "SET_PAGE", value: p })}
             />
 
+            {/* Add Modal */}
+            <PengumumanModal
+                isOpen={addModal}
+                onClose={closeAddModal}
+                isEdit={false}
+            />
+
             {/* Edit Modal */}
-            <EditModal
-                faq={editModal.faq}
+            <PengumumanModal
+                pengumuman={editModal.pengumuman}
                 isOpen={editModal.isOpen}
                 onClose={closeEditModal}
+                isEdit={true}
             />
 
             {/* Delete Modal */}
             <DeleteModal
-                faq={deleteModal.faq}
+                pengumuman={deleteModal.pengumuman}
                 isOpen={deleteModal.isOpen}
                 onClose={closeDeleteModal}
             />

@@ -50,7 +50,7 @@ const BookShowcase = ({
             if (containerRef.current) {
                 const containerWidth = containerRef.current.offsetWidth;
                 setContainerWidth(containerWidth);
-                console.log("Container width:", containerWidth + "px");
+                // console.log("Container width:", containerWidth + "px");
             }
 
             // Reset active index when slides per view changes to avoid out of bounds
