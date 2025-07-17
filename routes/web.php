@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\FaqController;
@@ -73,10 +74,14 @@ Route::post('/validate-nipd', [NIPDController::class, 'validateNipd']);
 Route::get('/api/navbar-books', [BookController::class, 'search']);
 
 Route::middleware('auth')->group(function () {
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
+    Route::put('/password', [PasswordController::class, 'update'])->name('password.update');
+
     Route::get('/', [HomeController::class, 'index'])->name('home');
     Route::get('/buku', [BookController::class, 'index'])->name('books.index');
     Route::get('/detail-buku/{book}', [BookController::class, 'show'])->name('books.show');
-    Route::put('/{id}', [JurnalingController::class, 'update'])->name('jurnal.update');
+    Route::put('/jurnal/update/{id}', [JurnalingController::class, 'update'])->name('jurnal.update');
     // Review routes
     Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
     Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');

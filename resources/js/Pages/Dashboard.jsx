@@ -85,7 +85,7 @@ const Dashboard = ({
                         {sections.map((section, index) => (
                             <button
                                 key={index}
-                                className={`cursor-pointer text-lg text-center md:text-center w-full md:w-auto ${
+                                className={`cursor-pointer text-lg text-center md:text-left w-full md:w-auto ${
                                     activeTitle === section.title
                                         ? "font-bold text-cust-blue"
                                         : "font-normal text-cust-gray"
@@ -99,7 +99,7 @@ const Dashboard = ({
                         ))}
                     </div>
                 </div>
-                <div className="lg:w-4/5">{activeSection.component}</div>
+                <div className="w-full md:w-4/5">{activeSection.component}</div>
             </div>
         </Layout>
     );
