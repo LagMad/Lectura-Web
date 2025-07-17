@@ -4,8 +4,16 @@ import MediaSosial from "../Sections/Dashboard/MediaSosial";
 import KataSandi from "../Sections/Dashboard/KataSandi";
 import Layout from "@/Layouts/Layout";
 import Journaling from "@/Sections/Dashboard/Journaling";
+import BukuFavorit from "@/Sections/Dashboard/BukuFavorit";
 
-const Dashboard = ({ auth, books, jurnaling }) => {
+const Dashboard = ({
+    auth,
+    books,
+    jurnaling,
+    favoriteBooks,
+    kategori,
+    filters = {},
+}) => {
     const [activeTitle, setActiveTitle] = useState("Umum");
 
     const sections = [
@@ -28,6 +36,16 @@ const Dashboard = ({ auth, books, jurnaling }) => {
                     auth={auth}
                     books={books.data}
                     jurnaling={jurnaling.data}
+                />
+            ),
+        },
+        {
+            title: "Buku Favorit",
+            component: (
+                <BukuFavorit
+                    favoriteBooks={favoriteBooks}
+                    kategori={kategori}
+                    filters={filters}
                 />
             ),
         },

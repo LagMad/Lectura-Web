@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Inertia\Inertia;
 use App\Models\Book;
+use App\Models\Favorite;
 use App\Models\Kategori;
 use App\Models\Jurnaling;
 use Illuminate\Http\Request;
@@ -72,8 +73,25 @@ class BookController extends Controller
         ]);
     }
 
-    public function dashboard()
+    public function dashboard(Request $request)
     {
+
+        // Get the category filter from request
+
+        $favoriteBooks = Favorite::with('book')
+            ->where('user_id', auth()->id())
+            ->orderByDesc('updated_at')
+            ->get()
+            ->pluck('book'); // Ambil hanya bagian 'book'-nya
+
+        $kategori = Favorite::with('book')
+            ->where('user_id', auth()->id())
+            ->get()
+            ->pluck('book.kategori')
+            ->unique()
+            ->values(); // reset index agar arraynya rapi
+
+        $categoryFilter = $request->get('category');
 
         // Ambil semua books
         $books = Book::latest()->paginate(10);
@@ -85,8 +103,13 @@ class BookController extends Controller
             ->paginate(10);
 
         return Inertia::render('Dashboard', [
+            'favoriteBooks' => $favoriteBooks,
             'books' => $books,        // Semua buku
             'jurnaling' => $jurnaling, // Jurnaling user yang login
+            'kategori' => $kategori,
+            'filters' => [
+                'category' => $categoryFilter,
+            ],
         ]);
     }
 

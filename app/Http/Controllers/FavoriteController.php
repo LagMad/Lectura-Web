@@ -9,6 +9,21 @@ use Inertia\Inertia;
 
 class FavoriteController extends Controller
 {
+
+    public function index(Request $request)
+    {
+        $search = $request->string('search');
+
+        $favoriteBooks = Favorite::book()
+            ->orderByDesc('updated_at')
+            ->get();
+
+        return Inertia::render('Dashboard', [
+            'favoriteBooks'     => $favoriteBooks,
+            'searchQuery' => $search,
+        ]);
+    }
+
     /**
      * Add a book to user's favorites
      */

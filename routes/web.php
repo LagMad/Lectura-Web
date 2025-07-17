@@ -91,6 +91,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/tentang', [TentangController::class, 'index'])
         ->name('tentang');
 
+    Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
     Route::post('/favorites', [FavoriteController::class, 'create'])->name('favorites.create');
     Route::delete('/favorites', [FavoriteController::class, 'destroy'])->name('favorites.destroy');
 
