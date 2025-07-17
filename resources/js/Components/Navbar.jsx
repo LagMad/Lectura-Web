@@ -100,10 +100,6 @@ const Navbar = () => {
         };
     }, []);
 
-    useEffect(() => {
-        console.log("auth", auth.user.role)
-    }, [auth])
-
     return (
         <nav
             className={`${

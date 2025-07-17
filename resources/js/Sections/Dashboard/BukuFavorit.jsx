@@ -140,10 +140,6 @@ const BukuFavorit = ({ favoriteBooks, kategori, filters = {} }) => {
         })),
     ];
 
-    useEffect(() => {
-        console.log("kategori", kategori)
-    }, [kategori])
-
     const totalPages = Math.ceil(filteredBooks.length / booksPerPage);
 
     const currentBooks = filteredBooks.slice(
@@ -167,10 +163,6 @@ const BukuFavorit = ({ favoriteBooks, kategori, filters = {} }) => {
             ))}
         </Menu>
     );
-
-    useEffect(() => {
-        console.log("favoriteBooks", favoriteBooks);
-    }, [favoriteBooks]);
 
     return (
         <div className="flex flex-col gap-5 w-full bg-white p-10 rounded-2xl">
