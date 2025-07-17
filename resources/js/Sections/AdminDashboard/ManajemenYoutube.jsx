@@ -3,7 +3,7 @@
 ------------------------------------------------------------------ */
 import { useState, useEffect, useMemo } from "react";
 import { useForm, router } from "@inertiajs/react";
-import { Plus, Edit, Trash2, X, Eye, EyeOff, Save } from "lucide-react";
+import { Plus, Edit, Trash2, X, Eye, EyeOff, Save, Search } from "lucide-react";
 
 /* ------------ Modal Wrapper (re‑use dari komponen Anda) ------------ */
 const Modal = ({ show, onClose, children }) => {
@@ -26,7 +26,6 @@ const Modal = ({ show, onClose, children }) => {
 /* ------------ Pagination helper (optional client‑side) ------------- */
 const ITEMS_PER_PAGE = 10;
 function Pagination({ page, totalPages, onChange }) {
-
     return (
         <div className="flex sticky left-0 items-center justify-between px-6 py-3">
             <div className="text-sm text-gray-700">
@@ -69,13 +68,34 @@ function Pagination({ page, totalPages, onChange }) {
    MAIN SECTION
 ------------------------------------------------------------------ */
 export default function ManajemenYoutube({ videos = [] }) {
+    const [searchTerm, setSearchTerm] = useState("");
+
     /* ---------- pagination ---------- */
     const [page, setPage] = useState(1);
-    const totalPages = Math.ceil(videos.length / ITEMS_PER_PAGE);
+    const filteredVideos = useMemo(() => {
+        return videos.filter(
+            (video) =>
+                video.judul.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                video.pengunggah
+                    .toLowerCase()
+                    .includes(searchTerm.toLowerCase()) ||
+                video.created_by
+                    .toLowerCase()
+                    .includes(searchTerm.toLowerCase())
+        );
+    }, [videos, searchTerm]);
+
+    const totalPages = Math.ceil(filteredVideos.length / ITEMS_PER_PAGE);
+
     const currentData = useMemo(
-        () => videos.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE),
-        [page, videos]
+        () =>
+            filteredVideos.slice(
+                (page - 1) * ITEMS_PER_PAGE,
+                page * ITEMS_PER_PAGE
+            ),
+        [page, filteredVideos]
     );
+
     useEffect(() => setPage(1), [videos]);
 
     /* ---------- modal state ---------- */
@@ -162,6 +182,17 @@ export default function ManajemenYoutube({ videos = [] }) {
                 >
                     <Plus className="w-4 h-4" /> Tambah Video
                 </button>
+            </div>
+
+            <div className="relative w-full mb-4">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <input
+                    type="text"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    placeholder="Cari video berdasarkan judul, pengunggah, atau akun pengunggah..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
             </div>
 
             {/* Table */}
