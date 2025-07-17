@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useForm, router } from "@inertiajs/react";
-import { Plus, Edit, Trash2, X, FileText, Eye } from "lucide-react";
+import { Plus, Edit, Trash2, X, FileText, Eye, Search } from "lucide-react";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -22,7 +22,6 @@ const Modal = ({ show, onClose, children }) => {
 };
 
 function Pagination({ page, totalPages, onChange }) {
-
     return (
         <div className="flex sticky left-0 items-center justify-between px-6 py-3">
             <div className="text-sm text-gray-700">
@@ -61,18 +60,26 @@ function Pagination({ page, totalPages, onChange }) {
     );
 }
 
-/* ------------------------------------------------------------------
-   MAIN SECTION
------------------------------------------------------------------- */
 export default function StaffPerpustakaan({ staff = [] }) {
     const [modal, setModal] = useState({ type: null, item: null });
     const [page, setPage] = useState(1);
+    const [search, setSearch] = useState("");
 
     /* ---------- PAGINATION ---------- */
-    const totalPages = Math.ceil(staff.length / ITEMS_PER_PAGE);
+    const filteredStaff = useMemo(() => {
+        return staff.filter((s) =>
+            (s.nama + s.jabatan).toLowerCase().includes(search.toLowerCase())
+        );
+    }, [search, staff]);
+
+    const totalPages = Math.ceil(filteredStaff.length / ITEMS_PER_PAGE);
     const currentStaff = useMemo(
-        () => staff.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE),
-        [staff, page]
+        () =>
+            filteredStaff.slice(
+                (page - 1) * ITEMS_PER_PAGE,
+                page * ITEMS_PER_PAGE
+            ),
+        [filteredStaff, page]
     );
 
     // reset ke halaman 1 kalau data berubah (mis. habis tambah / hapus)
@@ -179,6 +186,17 @@ export default function StaffPerpustakaan({ staff = [] }) {
                 >
                     <Plus className="w-4 h-4" /> Tambah Staff
                 </button>
+            </div>
+
+            <div className="relative w-full mb-4">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <input
+                    type="text"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    placeholder="Cari nama atau jabatan staf..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                />
             </div>
 
             <div className="relative overflow-x-scroll bg-white shadow rounded-lg">
