@@ -101,6 +101,10 @@ class BookController extends Controller
             ->where('id_siswa', auth()->id())
             ->latest()
             ->paginate(10);
+        
+            foreach ($favoriteBooks as $favoriteBook) {
+                $favoriteBook->isFavorited = $favoriteBook->favorites->isNotEmpty();
+            }
 
         return Inertia::render('Dashboard', [
             'favoriteBooks' => $favoriteBooks,
