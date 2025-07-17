@@ -22,10 +22,9 @@ const Modal = ({ show, onClose, children }) => {
 };
 
 function Pagination({ page, totalPages, onChange }) {
-    if (totalPages <= 1) return null;
 
     return (
-        <div className="flex items-center justify-between px-6 py-3">
+        <div className="flex sticky left-0 items-center justify-between px-6 py-3">
             <div className="text-sm text-gray-700">
                 Halaman {page} dari {totalPages}
             </div>
@@ -166,8 +165,14 @@ export default function StaffPerpustakaan({ staff = [] }) {
     /* ------------------ JSX ------------------ */
     return (
         <section className="p-6">
-            <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold">Staf Perpustakaan</h2>
+            <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-5">
+                <div>
+                    <h2 className="text-2xl font-bold">Staf Perpustakaan</h2>
+                    <p className="text-sm text-gray-500">
+                        Kelola staf perpustakaan yang akan ditampilkan di
+                        halaman "tentang."
+                    </p>
+                </div>
                 <button
                     onClick={() => setModal({ type: "add", item: null })}
                     className="inline-flex items-center gap-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 cursor-pointer"
@@ -176,7 +181,7 @@ export default function StaffPerpustakaan({ staff = [] }) {
                 </button>
             </div>
 
-            <div className="overflow-x-auto bg-white shadow rounded-lg">
+            <div className="relative overflow-x-scroll bg-white shadow rounded-lg">
                 <table className="min-w-full text-sm">
                     <thead className="bg-gray-50">
                         <tr>

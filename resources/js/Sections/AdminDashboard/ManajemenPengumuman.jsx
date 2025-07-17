@@ -40,7 +40,7 @@ const Dropdown = ({ value, onChange, options }) => (
     <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
+        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white w-full md:w-auto text-center md:text-left"
     >
         {options.map((option) => (
             <option key={option} value={option}>
@@ -52,7 +52,7 @@ const Dropdown = ({ value, onChange, options }) => (
 
 // Pagination component
 const Pagination = ({ page, totalPages, onPageChange }) => (
-    <div className="flex items-center justify-between px-6 py-3">
+    <div className="flex sticky left-0 items-center justify-between px-6 py-3">
         <div className="text-sm text-gray-700">
             Halaman {page} dari {totalPages}
         </div>
@@ -461,7 +461,7 @@ export default function ManajemenPengumuman({ pengumuman = [] }) {
         <section className="flex flex-col w-full mx-auto pt-8 px-4 sm:px-6 lg:px-8 gap-5 font-[poppins]">
             <Head title="Manajemen Pengumuman" />
 
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-5">
                 <div>
                     <h2 className="text-2xl font-bold">Manajemen Pengumuman</h2>
                     <p className="text-sm text-gray-500">
@@ -477,7 +477,7 @@ export default function ManajemenPengumuman({ pengumuman = [] }) {
                 </button>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col md:flex-row gap-4">
                 <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                     <input
@@ -494,7 +494,7 @@ export default function ManajemenPengumuman({ pengumuman = [] }) {
                     />
                 </div>
 
-                <div className="flex gap-3">
+                <div className="flex gap-3 w-full">
                     <Dropdown
                         value={status}
                         onChange={(v) =>
@@ -505,8 +505,8 @@ export default function ManajemenPengumuman({ pengumuman = [] }) {
                 </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow overflow-hidden">
-                <table className="w-full">
+            <div className="relative bg-white rounded-lg shadow overflow-hidden overflow-x-scroll">
+                <table className="w-full overflow-hidden">
                     <thead className="bg-gray-50">
                         <tr>
                             {[

@@ -18,10 +18,6 @@ export default function ManajemenKategori({
         setSearchTerm(e.target.value);
     };
 
-    useEffect(() => {
-        console.log("initialBooks", initialBooks.data);
-    }, [initialBooks.data]);
-
     // Apply search filter
     const handleSearch = () => {
         router.get(

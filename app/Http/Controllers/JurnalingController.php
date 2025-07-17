@@ -64,10 +64,22 @@ class JurnalingController extends Controller
 
     public function detail(Request $request, $book_id)
     {
-        $book = Book::withCount('jurnaling as total_jurnal')
+        $book = Book::with(['jurnaling.siswa']) // eager-load jurnaling + siswa
+            ->withCount('jurnaling as total_jurnal')
             ->findOrFail($book_id);
 
-        $book->total_siswa = $book->jurnaling->unique('id_siswa')->count();
+        // Count unique siswa who did journaling for this book
+        $book->total_siswa = $book->jurnaling
+            ->filter(fn($item) => $item->siswa?->role === 'siswa')
+            ->unique('id_siswa')
+            ->count();
+
+        // Count total jurnal entries by siswa
+        $book->total_jurnal = $book->jurnaling
+            ->filter(fn($item) => $item->siswa?->role === 'siswa')
+            ->count();
+
+
 
         $search = $request->input('search', '');
         $page = $request->input('page', 1);
@@ -169,16 +181,16 @@ class JurnalingController extends Controller
     }
 
     public function destroy($id)
-{
-    $jurnal = Jurnaling::findOrFail($id);
+    {
+        $jurnal = Jurnaling::findOrFail($id);
 
-    // Cek apakah user adalah pemilik jurnal ATAU admin/guru
-    if (auth()->id() !== $jurnal->id_siswa && !in_array(auth()->user()->role, ['admin', 'guru'])) {
-        abort(403, 'Unauthorized action.');
+        // Cek apakah user adalah pemilik jurnal ATAU admin/guru
+        if (auth()->id() !== $jurnal->id_siswa && !in_array(auth()->user()->role, ['admin', 'guru'])) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $jurnal->delete();
+
+        return redirect()->back()->with('success', 'Jurnal berhasil dihapus');
     }
-
-    $jurnal->delete();
-
-    return redirect()->back()->with('success', 'Jurnal berhasil dihapus');
-}
 }

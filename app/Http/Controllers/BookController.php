@@ -127,10 +127,15 @@ class BookController extends Controller
 
         // Format data
         $formattedBooks = $booksJurnaling->map(function ($book) {
-            $totalJurnal = Jurnaling::where('id_buku', $book->id)->count();
+            $totalJurnal = Jurnaling::where('id_buku', $book->id)
+                ->whereHas('siswa', fn($q) => $q->where('role', 'siswa'))
+                ->count();
+
             $totalSiswa = Jurnaling::where('id_buku', $book->id)
+                ->whereHas('siswa', fn($q) => $q->where('role', 'siswa'))
                 ->distinct('id_siswa')
                 ->count('id_siswa');
+
 
             return [
                 'id' => $book->id,

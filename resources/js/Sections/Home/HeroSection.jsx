@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
@@ -6,10 +6,6 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 
 const HeroSection = ({ pengumuman }) => {
-    useEffect(() => {
-        console.log("pengumuman", pengumuman);
-    }, [pengumuman]);
-
     return (
         <div className="flex w-full h-full">
             <Swiper

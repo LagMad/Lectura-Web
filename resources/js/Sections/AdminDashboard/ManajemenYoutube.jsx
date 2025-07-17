@@ -24,44 +24,46 @@ const Modal = ({ show, onClose, children }) => {
 };
 
 /* ------------ Pagination helper (optional client‑side) ------------- */
-const PAGE_SIZE = 10;
-const Pagination = ({ page, total, onChange }) => {
-    const totalPages = Math.ceil(total / PAGE_SIZE);
-    if (totalPages <= 1) return null;
+const ITEMS_PER_PAGE = 10;
+function Pagination({ page, totalPages, onChange }) {
+
     return (
-        <div className="flex items-center justify-between mt-4 text-sm">
-            <button
-                onClick={() => onChange(page - 1)}
-                disabled={page === 1}
-                className="px-3 py-2 text-gray-500 disabled:text-gray-300"
-            >
-                ‹
-            </button>
-            <div className="space-x-1">
+        <div className="flex sticky left-0 items-center justify-between px-6 py-3">
+            <div className="text-sm text-gray-700">
+                Halaman {page} dari {totalPages}
+            </div>
+            <div className="flex space-x-1">
+                <button
+                    onClick={() => onChange(page - 1)}
+                    disabled={page === 1}
+                    className="px-3 py-2 text-sm text-gray-500 disabled:text-gray-300"
+                >
+                    ‹
+                </button>
                 {Array.from({ length: totalPages }, (_, i) => (
                     <button
                         key={i + 1}
                         onClick={() => onChange(i + 1)}
-                        className={`px-3 py-2 rounded ${
+                        className={`px-3 py-2 text-sm rounded ${
                             page === i + 1
-                                ? "bg-blue-600 text-white"
-                                : "text-gray-600 hover:bg-gray-100"
+                                ? "bg-blue-500 text-white"
+                                : "text-gray-500 hover:bg-gray-100"
                         }`}
                     >
                         {i + 1}
                     </button>
                 ))}
+                <button
+                    onClick={() => onChange(page + 1)}
+                    disabled={page === totalPages}
+                    className="px-3 py-2 text-sm text-gray-500 disabled:text-gray-300"
+                >
+                    ›
+                </button>
             </div>
-            <button
-                onClick={() => onChange(page + 1)}
-                disabled={page === totalPages}
-                className="px-3 py-2 text-gray-500 disabled:text-gray-300"
-            >
-                ›
-            </button>
         </div>
     );
-};
+}
 
 /* ------------------------------------------------------------------
    MAIN SECTION
@@ -69,8 +71,9 @@ const Pagination = ({ page, total, onChange }) => {
 export default function ManajemenYoutube({ videos = [] }) {
     /* ---------- pagination ---------- */
     const [page, setPage] = useState(1);
+    const totalPages = Math.ceil(videos.length / ITEMS_PER_PAGE);
     const currentData = useMemo(
-        () => videos.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+        () => videos.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE),
         [page, videos]
     );
     useEffect(() => setPage(1), [videos]);
@@ -108,7 +111,7 @@ export default function ManajemenYoutube({ videos = [] }) {
                 pengunggah: "",
             });
         }
-    }, [modal])
+    }, [modal]);
 
     const closeModal = () => {
         setModal({ type: null, item: null });
@@ -140,12 +143,17 @@ export default function ManajemenYoutube({ videos = [] }) {
         });
     };
 
-    /* ---------------------------- RENDER ---------------------------- */
     return (
         <section className="p-6">
             {/* Header */}
-            <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold">Video YouTube</h2>
+            <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-5">
+                <div>
+                    <h2 className="text-2xl font-bold">Video Youtube</h2>
+                    <p className="text-sm text-gray-500">
+                        Kelola video youtube untuk ditampilkan di halaman
+                        tentang.
+                    </p>
+                </div>
                 <button
                     onClick={() => {
                         setModal({ type: "add", item: null });
@@ -244,10 +252,13 @@ export default function ManajemenYoutube({ videos = [] }) {
                         )}
                     </tbody>
                 </table>
+                {/* Pagination */}
+                <Pagination
+                    page={page}
+                    totalPages={totalPages}
+                    onChange={setPage}
+                />
             </div>
-
-            {/* Pagination */}
-            <Pagination page={page} total={videos.length} onChange={setPage} />
 
             {/* ------------------ ADD / EDIT MODAL ------------------ */}
             <Modal
@@ -282,7 +293,9 @@ export default function ManajemenYoutube({ videos = [] }) {
                             URL YouTube
                         </label>
                         <div className="text-gray-500 text-xs mb-1">
-                            Pastikan video tersebut sudah dicentang perizinan untuk dapat dipasang (embed) atau akan tampil "Video Unavailable".
+                            Pastikan video tersebut sudah dicentang perizinan
+                            untuk dapat dipasang (embed) atau akan tampil "Video
+                            Unavailable".
                         </div>
                         <input
                             type="url"
