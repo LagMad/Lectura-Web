@@ -252,6 +252,7 @@ class BookController extends Controller
             'penerbit' => 'nullable|string|max:255',
             'tahun_terbit' => 'nullable|string|max:4',
             'bahasa' => 'nullable|string|max:255',
+            'karya_oleh' => 'required|in:Siswa,Guru,Koleksi Perpustakaan',
             'deskripsi' => 'nullable|string',
             'cover' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'file_buku' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:10240', // 10MB max

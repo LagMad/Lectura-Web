@@ -167,6 +167,10 @@ const Buku = ({ books, kategori, filters = {} }) => {
         </Menu>
     );
 
+    useEffect(() => {
+        console.log("books", books)
+    }, [books])
+
     return (
         <Layout>
             <div className="flex flex-col items-start w-full">
