@@ -264,9 +264,12 @@ const PengumumanModal = ({ pengumuman, isOpen, onClose, isEdit = false }) => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium mb-1">
+                        <label className="block text-sm font-medium">
                             File Lampiran
                         </label>
+                        <div className="text-left text-xs text-gray-500 mb-1">
+                            Dapat berupa file pdf pengumuman. Jika dicantumkan lampiran, pengumuman akan menunjukkan tombol "Selengkapnya" untuk melihat dokumen.
+                        </div>
                         <input
                             type="file"
                             onChange={handleFileChange}
