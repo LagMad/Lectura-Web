@@ -271,10 +271,24 @@ const Detail = () => {
                         </div>
 
                         <div className="bg-white p-8 rounded-lg w-full md:w-1/2">
-                            <h2 className="text-2xl font-bold text-cust-primary-color mb-1">
+                            <h2 className="flex flex-col-reverse md:flex-row justify-start items-center gap-2 md:gap-5 text-2xl font-bold text-cust-primary-color mb-1">
                                 {book.judul}
+                                <span
+                                    className={`flex px-3 py-1 rounded-full text-xs ${
+                                        book.karya_oleh ===
+                                        "Koleksi Perpustakaan"
+                                            ? "bg-purple-100 text-purple-500"
+                                            : book.karya_oleh === "Guru"
+                                            ? "bg-yellow-100 text-yellow-500"
+                                            : book.karya_oleh === "Siswa"
+                                            ? "bg-blue-100 text-blue-500"
+                                            : "bg-gray-100 text-gray-600"
+                                    }`}
+                                >
+                                    {book.karya_oleh}
+                                </span>
                             </h2>
-                            <p className="text-gray-600 mb-4">
+                            <p className="text-gray-600 mb-4 text-center md:text-left">
                                 Oleh {book.penulis}
                             </p>
 
