@@ -15,7 +15,6 @@ const Umum = ({ auth }) => {
         errors,
         reset,
         recentlySuccessful,
-        setRe,
     } = useForm({
         name: auth.user.name || "",
         email: auth.user.email || "",
@@ -64,7 +63,7 @@ const Umum = ({ auth }) => {
                     <TextInput
                         id="password"
                         type="password"
-                        label="Masukkan kata sandi untuk konfirmasi"
+                        label="Masukkan kata sandi untuk konfirmasi perubahan"
                         placeholder={"Kata sandi saat ini..."}
                         value={data.password}
                         onChange={(e) => setData("password", e.target.value)}

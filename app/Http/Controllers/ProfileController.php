@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Http\Requests\SocialUpdateRequest;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -36,6 +37,18 @@ class ProfileController extends Controller
 
         return redirect()->route('dashboard')->with('success', 'Profile updated successfully.');
     }
+
+    public function updateSocials(SocialUpdateRequest $request)
+{
+    $request->user()->update([
+        'instagram' => $request->instagram,
+        'x'         => $request->x,
+        'linkedin'  => $request->linkedin,
+        'tiktok'    => $request->tiktok,
+    ]);
+
+    return redirect()->route('dashboard')->with('success', 'Sosial media berhasil diperbarui.');
+}
 
 
     /**

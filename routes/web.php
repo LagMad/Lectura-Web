@@ -75,6 +75,7 @@ Route::get('/api/navbar-books', [BookController::class, 'search']);
 
 Route::middleware('auth')->group(function () {
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/socials', [ProfileController::class, 'updateSocials'])->name('profile.update.socials');
 
     Route::put('/password', [PasswordController::class, 'update'])->name('password.update');
 
