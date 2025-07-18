@@ -6,6 +6,7 @@ import { usePage, router, useForm } from "@inertiajs/react";
 const Detail = () => {
     const { book, avgRating, auth, isFavorited, reviews, relatedBooks } =
         usePage().props;
+
     const [isProcessing, setIsProcessing] = useState(false);
     const [favorited, setFavorited] = useState(isFavorited);
     const [reviewModal, setReviewModal] = useState(false);

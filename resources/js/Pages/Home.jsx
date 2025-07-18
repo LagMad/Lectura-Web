@@ -1,14 +1,15 @@
 import React, { useEffect } from "react";
 import Layout from "../Layouts/Layout";
-import BukuMinggu from "../Sections/Home/BukuMinggu";
-import BukuPekan from "../Sections/Home/BukuPekan";
-import BukuSemester from "../Sections/Home/BukuSemester";
 import HeroSection from "../Sections/Home/HeroSection";
 import SloganSection from "../Sections/Home/SloganSection";
 import BookShowcase from "@/Sections/Home/BookShowcase";
 import KategoriBuku from "@/Sections/Home/KategoriBuku";
 
-const Home = ({ books, pengumuman }) => {
+const Home = ({ books, pengumuman, karyaSiswa, karyaGuru, karyaKoleksiPerpustakaan }) => {
+
+    useEffect(() => {
+        console.log("karyaKoleksiPerpustakaan", karyaKoleksiPerpustakaan)
+    }, [karyaKoleksiPerpustakaan])
 
     return (
         <Layout>
@@ -17,13 +18,12 @@ const Home = ({ books, pengumuman }) => {
                 <KategoriBuku books={books}/>
                 <SloganSection />
                 <BookShowcase
-                    books={books}
-                    judul={"Buku dengan Rating Tertinggi"}
+                    books={karyaKoleksiPerpustakaan}
+                    judul={"Koleksi Perpustakaan"}
                     subjudul={
                         <>
-                            SEPANJANG{" "}
-                            <span className="text-[#F0F1C5]">TERLARIS</span>{" "}
-                            MINGGU INI
+                            KOLEKSI{" "}
+                            <span className="text-[#F0F1C5]">PERPUSTAKAAN</span>{" "}
                         </>
                     }
                     deskripsi={
@@ -32,37 +32,33 @@ const Home = ({ books, pengumuman }) => {
                     image={"/girl-reading-on-sofa.svg"}
                 />
                 <BookShowcase
-                    books={books}
+                    books={karyaSiswa}
                     judul={"Karya Siswa"}
                     subjudul={
                         <>
-                            BACAAN{" "}
-                            <span className="text-[#F0F1C5]">FAVORIT</span>{" "}
-                            MINGGU INI
+                            KARYA{" "}
+                            <span className="text-[#F0F1C5]">SISWA</span>{" "}
                         </>
                     }
                     deskripsi={
-                        "Buku-buku yang paling banyak dibaca dan disukai minggu ini. Buktikan sendiri kenapa mereka jadi pilihan favorit para pembaca!"
+                        "Buku karya teman-teman siswa dengan review tertinggi! Buktikan sendiri kenapa mereka jadi pilihan favorit!"
                     }
                     image={"/boy-reading.svg"}
                 />
                 <BookShowcase
-                    books={books}
+                    books={karyaGuru}
                     judul={"Karya Guru"}
                     subjudul={
                         <>
-                            SEPANJANG{" "}
-                            <span className="text-[#F0F1C5]">SEMESTER</span>{" "}
+                            KARYA{" "}
+                            <span className="text-[#F0F1C5]">GURU</span>{" "}
                         </>
                     }
                     deskripsi={
-                        "Deretan buku terbaik pilihan pembaca selama satu semester penuh. Bacaan yang terus relevan, memikat, dan tak terlupakan."
+                        "Deretan karya terbaik para pahlawan tanpa tanda jasa SMAN 1 Kota Batu. Bacaan yang terus relevan, memikat, dan tak terlupakan."
                     }
                     image={"/girl-reading.svg"}
                 />
-                {/* <BukuMinggu books={books} />
-                <BukuPekan books={books} />
-                <BukuSemester books={books} /> */}
             </div>
         </Layout>
     );
