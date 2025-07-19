@@ -9,7 +9,7 @@ import StaffPerpustakaan from "@/Sections/AdminDashboard/StaffPerpustakaan";
 import ManajemenPengumuman from "@/Sections/AdminDashboard/ManajemenPengumuman";
 import ManajemenYoutube from "@/Sections/AdminDashboard/ManajemenYoutube";
 
-export default function Dashboard({ users, staff, pengumuman, videos }) {
+export default function Dashboard({ users, staff, pengumuman, videos, books, booksTabelKonten }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const toggleSidebar = () => {
@@ -33,7 +33,7 @@ export default function Dashboard({ users, staff, pengumuman, videos }) {
                 <ManajemenPengumuman pengumuman={pengumuman}/>
                 <StaffPerpustakaan staff={staff} />
                 <ManajemenYoutube videos={videos}/>
-                <TabelKonten />
+                <TabelKonten books={booksTabelKonten}/>
             </div>
         </AdminLayout>
     );
