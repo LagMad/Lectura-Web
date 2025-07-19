@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Inertia\Inertia;
 use App\Models\Book;
+use App\Models\Favorite;
 use App\Models\Kategori;
 use App\Models\Jurnaling;
 use Illuminate\Http\Request;
@@ -72,8 +73,25 @@ class BookController extends Controller
         ]);
     }
 
-    public function dashboard()
+    public function dashboard(Request $request)
     {
+
+        // Get the category filter from request
+
+        $favoriteBooks = Favorite::with('book')
+            ->where('user_id', auth()->id())
+            ->orderByDesc('updated_at')
+            ->get()
+            ->pluck('book'); // Ambil hanya bagian 'book'-nya
+
+        $kategori = Favorite::with('book')
+            ->where('user_id', auth()->id())
+            ->get()
+            ->pluck('book.kategori')
+            ->unique()
+            ->values(); // reset index agar arraynya rapi
+
+        $categoryFilter = $request->get('category');
 
         // Ambil semua books
         $books = Book::latest()->paginate(10);
@@ -83,10 +101,19 @@ class BookController extends Controller
             ->where('id_siswa', auth()->id())
             ->latest()
             ->paginate(10);
+        
+            foreach ($favoriteBooks as $favoriteBook) {
+                $favoriteBook->isFavorited = $favoriteBook->favorites->isNotEmpty();
+            }
 
         return Inertia::render('Dashboard', [
+            'favoriteBooks' => $favoriteBooks,
             'books' => $books,        // Semua buku
             'jurnaling' => $jurnaling, // Jurnaling user yang login
+            'kategori' => $kategori,
+            'filters' => [
+                'category' => $categoryFilter,
+            ],
         ]);
     }
 
@@ -127,10 +154,15 @@ class BookController extends Controller
 
         // Format data
         $formattedBooks = $booksJurnaling->map(function ($book) {
-            $totalJurnal = Jurnaling::where('id_buku', $book->id)->count();
+            $totalJurnal = Jurnaling::where('id_buku', $book->id)
+                ->whereHas('siswa', fn($q) => $q->where('role', 'siswa'))
+                ->count();
+
             $totalSiswa = Jurnaling::where('id_buku', $book->id)
+                ->whereHas('siswa', fn($q) => $q->where('role', 'siswa'))
                 ->distinct('id_siswa')
                 ->count('id_siswa');
+
 
             return [
                 'id' => $book->id,
@@ -220,6 +252,7 @@ class BookController extends Controller
             'penerbit' => 'nullable|string|max:255',
             'tahun_terbit' => 'nullable|string|max:4',
             'bahasa' => 'nullable|string|max:255',
+            'karya_oleh' => 'required|in:Siswa,Guru,Koleksi Perpustakaan',
             'deskripsi' => 'nullable|string',
             'cover' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'file_buku' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:10240', // 10MB max

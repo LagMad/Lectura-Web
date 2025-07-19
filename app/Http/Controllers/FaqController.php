@@ -107,6 +107,24 @@ class FaqController extends Controller
         return Inertia::render('Faq/Edit', ['faq' => $faq]);
     }
 
+    public function adminStore(Request $request)
+    {
+        $this->validateInput($request);          // gunakan validator yang sudah ada
+
+        FaqQuestion::create([
+            'nama'       => $request->nama,
+            'nipd'       => $request->nipd,
+            'pertanyaan' => $request->pertanyaan,
+            'jawaban'    => $request->jawaban,
+            'status'     => 'answered',          // langsung answered
+            'kategori'   => $request->kategori,
+            'admin_id'   => auth()->id(),
+        ]);
+
+        return back()->with('success', 'FAQ berhasil ditambahkan!');
+    }
+
+
     public function adminUpdate(Request $request, FaqQuestion $faq)
     {
         $this->validateInput($request, true);

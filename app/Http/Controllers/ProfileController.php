@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Http\Requests\SocialUpdateRequest;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -27,18 +28,28 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(ProfileUpdateRequest $request)
     {
-        $request->user()->fill($request->validated());
+        $request->user()->update([
+            'name' => $request->name,
+            'email' => $request->email,
+        ]);
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
-        }
-
-        $request->user()->save();
-
-        return Redirect::route('profile.edit');
+        return redirect()->route('dashboard')->with('success', 'Profile updated successfully.');
     }
+
+    public function updateSocials(SocialUpdateRequest $request)
+{
+    $request->user()->update([
+        'instagram' => $request->instagram,
+        'x'         => $request->x,
+        'linkedin'  => $request->linkedin,
+        'tiktok'    => $request->tiktok,
+    ]);
+
+    return redirect()->route('dashboard')->with('success', 'Sosial media berhasil diperbarui.');
+}
+
 
     /**
      * Delete the user's account.

@@ -28,6 +28,7 @@ export default function TambahBuku({ kategori }) {
         penerbit: "",
         tahun_terbit: "",
         bahasa: "",
+        karya_oleh: "Koleksi Perpustakaan",
         deskripsi: "",
     });
 
@@ -160,6 +161,7 @@ export default function TambahBuku({ kategori }) {
         formData.append("penerbit", formValues.penerbit);
         formData.append("tahun_terbit", formValues.tahun_terbit);
         formData.append("bahasa", formValues.bahasa);
+        formData.append("karya_oleh", formValues.karya_oleh);
         formData.append("deskripsi", formValues.deskripsi);
 
         // Check if file is uploaded and set status accordingly
@@ -216,6 +218,7 @@ export default function TambahBuku({ kategori }) {
                     penerbit: "",
                     tahun_terbit: "",
                     bahasa: "",
+                    karya_oleh: "",
                     deskripsi: "",
                 });
             }
@@ -252,11 +255,7 @@ export default function TambahBuku({ kategori }) {
     // Handle cancel button
     const handleCancel = () => {
         window.location.href = "/admin-tambah-buku";
-    }; 
-
-    useEffect(() => {
-        console.log("kategori", kategori)
-    }, [kategori])
+    };
 
     return (
         <div className="w-full lg:ml-8 lg:mr-0 ml-4 mr-4 my-6">
@@ -600,6 +599,38 @@ export default function TambahBuku({ kategori }) {
                                 </p>
                             )}
                         </div>
+                    </div>
+
+                    {/* Karya Oleh */}
+                    <div className="mt-6">
+                        <label
+                            htmlFor="karya_oleh"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                            Karya Oleh
+                        </label>
+                        <select
+                            id="karya_oleh"
+                            name="karya_oleh"
+                            value={formValues.karya_oleh}
+                            onChange={handleInputChange}
+                            className={`w-full p-2 border ${
+                                errors.karya_oleh
+                                    ? "border-red-500"
+                                    : "border-gray-300"
+                            } rounded`}
+                        >
+                            <option value="Koleksi Perpustakaan">
+                                Koleksi Perpustakaan
+                            </option>
+                            <option value="Siswa">Siswa</option>
+                            <option value="Guru">Guru</option>
+                        </select>
+                        {errors.karya_oleh && (
+                            <p className="text-red-500 text-xs mt-1">
+                                {errors.karya_oleh}
+                            </p>
+                        )}
                     </div>
 
                     {/* Deskripsi */}

@@ -288,6 +288,9 @@ export default function ManajemenBuku({ books: initialBooks }) {
                             </th>
                             <th className="py-3 px-4 font-medium">Penulis</th>
                             <th className="py-3 px-4 font-medium">Kategori</th>
+                            <th className="py-3 px-4 font-medium">
+                                Karya Oleh
+                            </th>
                             <th className="py-3 px-4 font-medium">Status</th>
                             <th className="py-3 px-4 font-medium">Aksi</th>
                         </tr>
@@ -308,6 +311,23 @@ export default function ManajemenBuku({ books: initialBooks }) {
                                     <td className="py-3 px-4">
                                         <span className="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-xs">
                                             {book.kategori}
+                                        </span>
+                                    </td>
+                                    <td className="py-3 px-4">
+                                        <span
+                                            className={`px-3 py-1 rounded-full text-xs ${
+                                                book.karya_oleh ===
+                                                "Koleksi Perpustakaan"
+                                                    ? "bg-purple-100 text-purple-500"
+                                                    : book.karya_oleh === "Guru"
+                                                    ? "bg-yellow-100 text-yellow-500"
+                                                    : book.karya_oleh ===
+                                                      "Siswa"
+                                                    ? "bg-blue-100 text-blue-500"
+                                                    : "bg-gray-100 text-gray-600"
+                                            }`}
+                                        >
+                                            {book.karya_oleh}
                                         </span>
                                     </td>
                                     <td className="py-3 px-4">

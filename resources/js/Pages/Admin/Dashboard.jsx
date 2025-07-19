@@ -7,8 +7,9 @@ import TabelKonten from "@/Sections/AdminDashboard/TabelKonten";
 import Title from "@/Sections/AdminDashboard/Title";
 import StaffPerpustakaan from "@/Sections/AdminDashboard/StaffPerpustakaan";
 import ManajemenPengumuman from "@/Sections/AdminDashboard/ManajemenPengumuman";
+import ManajemenYoutube from "@/Sections/AdminDashboard/ManajemenYoutube";
 
-export default function Dashboard({ users, staff, pengumuman }) {
+export default function Dashboard({ users, staff, pengumuman, videos, books, booksTabelKonten }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const toggleSidebar = () => {
@@ -21,10 +22,6 @@ export default function Dashboard({ users, staff, pengumuman }) {
         }
     };
 
-    useEffect(() => {
-        console.log("pengumuman", pengumuman);
-    }, [pengumuman]);
-
     return (
         <AdminLayout
             isSidebarOpen={isSidebarOpen}
@@ -35,7 +32,8 @@ export default function Dashboard({ users, staff, pengumuman }) {
                 <Statistik />
                 <ManajemenPengumuman pengumuman={pengumuman}/>
                 <StaffPerpustakaan staff={staff} />
-                <TabelKonten />
+                <ManajemenYoutube videos={videos}/>
+                <TabelKonten books={booksTabelKonten}/>
             </div>
         </AdminLayout>
     );

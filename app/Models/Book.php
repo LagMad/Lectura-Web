@@ -19,6 +19,7 @@ class Book extends Model
         'bahasa',
         'deskripsi',
         'status',
+        'karya_oleh',
         'cover_path',
         'cloudinary_public_id',
         'link',

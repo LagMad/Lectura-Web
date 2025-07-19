@@ -28,6 +28,7 @@ export default function EditBuku({ book, kategori }) {
         penerbit: book.penerbit || "",
         tahun_terbit: book.tahun_terbit?.toString() || "",
         bahasa: book.bahasa || "",
+        karya_oleh: book.karya_oleh || "",
         deskripsi: book.deskripsi || "",
         link: book.link || "",
         status: book.status || "Tersedia", // Use existing status or default to "Tersedia"
@@ -165,6 +166,7 @@ export default function EditBuku({ book, kategori }) {
         formData.append("penerbit", formValues.penerbit);
         formData.append("tahun_terbit", formValues.tahun_terbit);
         formData.append("bahasa", formValues.bahasa);
+        formData.append("karya_oleh", formValues.karya_oleh);
         formData.append("deskripsi", formValues.deskripsi);
         formData.append("link", formValues.link);
         formData.append("status", formValues.status);
@@ -599,6 +601,38 @@ export default function EditBuku({ book, kategori }) {
                                 </p>
                             )}
                         </div>
+                    </div>
+
+                    {/* Karya Oleh */}
+                    <div className="mt-6">
+                        <label
+                            htmlFor="karya_oleh"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                            Karya Oleh
+                        </label>
+                        <select
+                            id="karya_oleh"
+                            name="karya_oleh"
+                            value={formValues.karya_oleh}
+                            onChange={handleInputChange}
+                            className={`w-full p-2 border ${
+                                errors.karya_oleh
+                                    ? "border-red-500"
+                                    : "border-gray-300"
+                            } rounded`}
+                        >
+                            <option value="Koleksi Perpustakaan">
+                                Koleksi Perpustakaan
+                            </option>
+                            <option value="Siswa">Siswa</option>
+                            <option value="Guru">Guru</option>
+                        </select>
+                        {errors.karya_oleh && (
+                            <p className="text-red-500 text-xs mt-1">
+                                {errors.karya_oleh}
+                            </p>
+                        )}
                     </div>
 
                     {/* Deskripsi */}

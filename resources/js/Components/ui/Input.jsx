@@ -11,6 +11,7 @@ const Input = ({
     isSocialMedia = false,
     required = false,
     icon,
+    ...props
 }) => {
     const [showPassword, setShowPassword] = useState(false);
 
@@ -34,6 +35,7 @@ const Input = ({
                         value={value}
                         type={showPassword ? "text" : "password"}
                         required={required}
+                        {...props}
                     />
                     <button
                         className="absolute -translate-x-full right-0 top-1/2 -translate-y-1/2 cursor-pointer"
@@ -51,6 +53,7 @@ const Input = ({
                         value={value}
                         type={"text"}
                         required={required}
+                        {...props}
                     />
                 </div>
             ) : (
@@ -60,6 +63,7 @@ const Input = ({
                     value={value}
                     type={type}
                     required={required}
+                    {...props}
                 />
             )}
             {description && (

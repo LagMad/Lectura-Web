@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
@@ -6,10 +6,6 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 
 const HeroSection = ({ pengumuman }) => {
-    useEffect(() => {
-        console.log("pengumuman", pengumuman);
-    }, [pengumuman]);
-
     return (
         <div className="flex w-full h-full">
             <Swiper
@@ -39,9 +35,19 @@ const HeroSection = ({ pengumuman }) => {
                                     <div className="text-6xl font-bold text-white">
                                         {slide?.judul}
                                     </div>
-                                    <div className="text-2xl font-normal text-gray-400">
+                                    <div className="text-2xl font-normal text-gray-400 mb-10">
                                         {slide?.penulis}
                                     </div>
+                                    {slide?.link && (
+                                        <a
+                                            href={slide.link}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="bg-transparent hover:bg-cust-primary-color text-white px-8 py-1 rounded-full text-lg cursor-pointer transition-all duration-300 ease-in-out border-2 border-white hover:border-cust-primary-color"
+                                        >
+                                            Selengkapnya
+                                        </a>
+                                    )}
                                 </div>
                             </div>
                         </SwiperSlide>

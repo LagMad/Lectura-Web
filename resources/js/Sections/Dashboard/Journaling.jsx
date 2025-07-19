@@ -78,10 +78,10 @@ const Journaling = ({ books, jurnaling }) => {
     }, [jurnaling]);
 
     return (
-        <section>
+        <section className="flex flex-col gap-16 w-full bg-white p-10 rounded-2xl">
             <div className="space-y-8">
                 <div className="flex justify-between items-center">
-                    <h1 className="text-cust-primary-color font-bold text-xl">
+                    <h1 className="text-black font-bold text-3xl">
                         Jurnal Membaca Saya
                     </h1>
                     <Button variant="filled" onClick={handleOpenModal}>
@@ -89,8 +89,8 @@ const Journaling = ({ books, jurnaling }) => {
                     </Button>
                 </div>
 
-                <div className="bg-white px-10 py-5 rounded-2xl space-y-8">
-                    <div className="bg-white py-4 font-medium flex items-center gap-5">
+                <div className=" py-5 rounded-2xl space-y-8">
+                    <div className="bg-gray-100 rounded-lg px-8 py-4 font-medium flex items-center gap-5">
                         <Icon
                             icon="mynaui:search"
                             className="text-xl text-cust-gray"

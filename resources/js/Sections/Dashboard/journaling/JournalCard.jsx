@@ -83,7 +83,7 @@ const JournalCard = ({
 
     return (
         <>
-            <div className="bg-white px-10 py-5 rounded-2xl">
+            <div className="bg-white px-10 py-5 rounded-2xl shadow-xl">
                 <div
                     className="flex items-center justify-between cursor-pointer"
                     onClick={toggleExpand}

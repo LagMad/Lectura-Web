@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { router } from "@inertiajs/react";
 import JurnalSiswaDetail from "./JurnalSiswaDetail";

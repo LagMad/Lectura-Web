@@ -100,10 +100,6 @@ const Navbar = () => {
         };
     }, []);
 
-    useEffect(() => {
-        console.log("navbarBooks", navbarBooks);
-    }, [navbarBooks]);
-
     return (
         <nav
             className={`${
@@ -249,27 +245,17 @@ const Navbar = () => {
                                                 <span>Dashboard</span>
                                             </div>
                                         </a>
-                                        {auth?.user.role === "admin" ||
-                                            ("guru" && (
+                                        {auth?.user.role != "siswa" && (
                                                 <a
                                                     href="/admin-dashboard"
                                                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-cust-primary-color transition-colors"
                                                 >
                                                     <div className="flex items-center gap-2">
                                                         <Icon icon="mdi:view-dashboard" />
-                                                        <span>Dashboard</span>
+                                                        <span>Admin</span>
                                                     </div>
                                                 </a>
-                                            ))}
-                                        <a
-                                            href="/admin-dashboard"
-                                            className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-cust-primary-color transition-colors"
-                                        >
-                                            <div className="flex items-center gap-2">
-                                                <Icon icon="mdi:view-dashboard" />
-                                                <span>Admin</span>
-                                            </div>
-                                        </a>
+                                            )}
                                         <button
                                             onClick={handleLogout}
                                             className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-cust-primary-color transition-colors cursor-pointer"

@@ -22,7 +22,11 @@ class User extends Authenticatable
         'password',
         'role',
         'nipd',
-        'status'
+        'status',
+        'instagram',
+        'x',
+        'linkedin',
+        'tiktok'
     ];
 
     /**

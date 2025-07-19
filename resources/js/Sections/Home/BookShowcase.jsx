@@ -33,7 +33,7 @@ const BookShowcase = ({
             const width = window.innerWidth;
             if (width < 640) return 1; // Mobile
             if (width < 1024) return 2; // Small tablets
-            if (width < 1280) return 4; // Small laptops  
+            if (width < 1280) return 4; // Small laptops
             return 5; // Large screens
         }
         return 5; // Default for SSR
@@ -64,12 +64,9 @@ const BookShowcase = ({
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-    // Ensure we have books data before calculating
-    const booksData = books?.data || [];
-    
     // Calculate total pages based on complete groups
-    const totalPages = Math.ceil(booksData.length / slidesPerView);
-    
+    const totalPages = Math.ceil(books.length / slidesPerView);
+
     // Calculate the current page based on activeIndex
     const currentPage = Math.floor(activeIndex / slidesPerView);
 
@@ -139,13 +136,15 @@ const BookShowcase = ({
                     },
                 }}
             >
-                {booksData.map((book) => (
+                {books.map((book, index) => (
                     <SwiperSlide key={book.id} className="flex items-stretch">
                         <BukuHomeCard
+                            index={index}
                             image={book.cover_path || "/default-cover.png"}
                             penulis={book.penulis}
                             judul={book.judul}
                             bookId={book.id}
+                            rating={book.average_rating}
                         />
                     </SwiperSlide>
                 ))}
@@ -226,7 +225,7 @@ const BookShowcase = ({
                                 </button>
                             </div>
 
-                            {booksData.length > 0 ? (
+                            {books.length > 0 ? (
                                 renderSwiper()
                             ) : (
                                 <div className="flex justify-center items-center h-64 text-gray-500">
@@ -271,7 +270,7 @@ const BookShowcase = ({
                                     </button>
                                 </div>
 
-                                {booksData.length > 0 ? (
+                                {books.length > 0 ? (
                                     renderSwiper()
                                 ) : (
                                     <div className="flex justify-center items-center h-48 lg:h-64 text-gray-500 text-sm lg:text-base">

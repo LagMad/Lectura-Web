@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useForm, router } from "@inertiajs/react";
-import { Plus, Edit, Trash2, X, FileText, Eye } from "lucide-react";
+import { Plus, Edit, Trash2, X, FileText, Eye, Search } from "lucide-react";
 
-/* ------------------------------------------------------------------
-   REUSABLE MODAL WRAPPER
------------------------------------------------------------------- */
+const ITEMS_PER_PAGE = 10;
+
 const Modal = ({ show, onClose, children }) => {
     if (!show) return null;
     return (
@@ -22,11 +21,69 @@ const Modal = ({ show, onClose, children }) => {
     );
 };
 
-/* ------------------------------------------------------------------
-   MAIN SECTION
------------------------------------------------------------------- */
+function Pagination({ page, totalPages, onChange }) {
+    return (
+        <div className="flex sticky left-0 items-center justify-between px-6 py-3">
+            <div className="text-sm text-gray-700">
+                Halaman {page} dari {totalPages}
+            </div>
+            <div className="flex space-x-1">
+                <button
+                    onClick={() => onChange(page - 1)}
+                    disabled={page === 1}
+                    className="px-3 py-2 text-sm text-gray-500 disabled:text-gray-300"
+                >
+                    ‹
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => (
+                    <button
+                        key={i + 1}
+                        onClick={() => onChange(i + 1)}
+                        className={`px-3 py-2 text-sm rounded ${
+                            page === i + 1
+                                ? "bg-blue-500 text-white"
+                                : "text-gray-500 hover:bg-gray-100"
+                        }`}
+                    >
+                        {i + 1}
+                    </button>
+                ))}
+                <button
+                    onClick={() => onChange(page + 1)}
+                    disabled={page === totalPages}
+                    className="px-3 py-2 text-sm text-gray-500 disabled:text-gray-300"
+                >
+                    ›
+                </button>
+            </div>
+        </div>
+    );
+}
+
 export default function StaffPerpustakaan({ staff = [] }) {
     const [modal, setModal] = useState({ type: null, item: null });
+    const [page, setPage] = useState(1);
+    const [search, setSearch] = useState("");
+
+    /* ---------- PAGINATION ---------- */
+    const filteredStaff = useMemo(() => {
+        return staff.filter((s) =>
+            (s.nama + s.jabatan).toLowerCase().includes(search.toLowerCase())
+        );
+    }, [search, staff]);
+
+    const totalPages = Math.ceil(filteredStaff.length / ITEMS_PER_PAGE);
+    const currentStaff = useMemo(
+        () =>
+            filteredStaff.slice(
+                (page - 1) * ITEMS_PER_PAGE,
+                page * ITEMS_PER_PAGE
+            ),
+        [filteredStaff, page]
+    );
+
+    // reset ke halaman 1 kalau data berubah (mis. habis tambah / hapus)
+    useEffect(() => setPage(1), [staff]);
 
     /* ------------------ ADD / EDIT FORM ------------------ */
     const { data, setData, reset, errors, processing, post, put } = useForm({
@@ -115,17 +172,34 @@ export default function StaffPerpustakaan({ staff = [] }) {
     /* ------------------ JSX ------------------ */
     return (
         <section className="p-6">
-            <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold">Staf Perpustakaan</h2>
+            <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-5">
+                <div>
+                    <h2 className="text-2xl font-bold">Staf Perpustakaan</h2>
+                    <p className="text-sm text-gray-500">
+                        Kelola staf perpustakaan yang akan ditampilkan di
+                        halaman "tentang."
+                    </p>
+                </div>
                 <button
                     onClick={() => setModal({ type: "add", item: null })}
-                    className="inline-flex items-center gap-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                    className="inline-flex items-center gap-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 cursor-pointer"
                 >
-                    <Plus className="w-4 h-4" /> Tambah
+                    <Plus className="w-4 h-4" /> Tambah Staff
                 </button>
             </div>
 
-            <div className="overflow-x-auto bg-white shadow rounded-lg">
+            <div className="relative w-full mb-4">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <input
+                    type="text"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    placeholder="Cari nama atau jabatan staf..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                />
+            </div>
+
+            <div className="relative overflow-x-scroll bg-white shadow rounded-lg">
                 <table className="min-w-full text-sm">
                     <thead className="bg-gray-50">
                         <tr>
@@ -142,7 +216,7 @@ export default function StaffPerpustakaan({ staff = [] }) {
                         </tr>
                     </thead>
                     <tbody>
-                        {staff.map((s) => (
+                        {currentStaff.map((s) => (
                             <tr key={s.id} className="hover:bg-gray-50">
                                 <td className="px-6 py-4">{s.id}</td>
                                 <td className="px-6 py-4">
@@ -221,6 +295,11 @@ export default function StaffPerpustakaan({ staff = [] }) {
                         )}
                     </tbody>
                 </table>
+                <Pagination
+                    page={page}
+                    totalPages={totalPages}
+                    onChange={setPage}
+                />
             </div>
 
             {/* ---------------- ADD / EDIT MODAL ---------------- */}
@@ -268,7 +347,8 @@ export default function StaffPerpustakaan({ staff = [] }) {
                             </p>
                         )}
                         <div className="text-xs text-gray-500 mt-2">
-                            Masukkan "Kepala Perpustakaan" agar posisi di paling atas
+                            Masukkan "Kepala Perpustakaan" agar posisi di paling
+                            atas
                         </div>
                     </div>
 
