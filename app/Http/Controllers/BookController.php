@@ -51,6 +51,8 @@ class BookController extends Controller
                 $query->where('user_id', auth()->id());
             }
         ])
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating')
             ->when($categoryFilter, function ($query, $category) {
                 // Filter by category if provided and not "Semua Buku"
                 if ($category !== 'Semua Buku') {
@@ -62,10 +64,23 @@ class BookController extends Controller
 
         foreach ($books as $book) {
             $book->isFavorited = $book->favorites->isNotEmpty();
+            $book->average_rating = $book->reviews_avg_rating ?? 0;
         }
+
+        $topRatedBooks = Book::withCount('reviews')
+            ->withAvg('reviews', 'rating')
+            ->having('reviews_count', '>', 0)
+            ->orderByDesc('reviews_avg_rating')
+            ->take(10)
+            ->get()
+            ->map(function ($book) {
+                $book->average_rating = $book->reviews_avg_rating ?? 0;
+                return $book;
+            });
 
         return Inertia::render('Buku', [
             'books' => $books,
+            'topRatedBooks' => $topRatedBooks,
             'kategori' => $kategori,
             'filters' => [
                 'category' => $categoryFilter,
@@ -101,10 +116,10 @@ class BookController extends Controller
             ->where('id_siswa', auth()->id())
             ->latest()
             ->paginate(10);
-        
-            foreach ($favoriteBooks as $favoriteBook) {
-                $favoriteBook->isFavorited = $favoriteBook->favorites->isNotEmpty();
-            }
+
+        foreach ($favoriteBooks as $favoriteBook) {
+            $favoriteBook->isFavorited = $favoriteBook->favorites->isNotEmpty();
+        }
 
         return Inertia::render('Dashboard', [
             'favoriteBooks' => $favoriteBooks,
