@@ -6,6 +6,7 @@ use App\Models\Book;
 use App\Models\Pengumuman;
 use App\Models\StaffPerpustakaan;
 use App\Models\User;
+use App\Models\WebPortal;
 use App\Models\YoutubeVideo;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -25,7 +26,7 @@ class AdminController extends Controller
             'total_koleksi_perpus' => Book::where("karya_oleh", "Koleksi Perpustakaan")->count()
         ];
         $booksTabelKonten = Book::whereNotIn('karya_oleh', ['Koleksi Perpustakaan'])->get();
-
+        $web = WebPortal::all();
 
         return Inertia::render('Admin/Dashboard', [
             'users' => $latestUsers,
@@ -34,7 +35,8 @@ class AdminController extends Controller
             'videos' => $videos,
             'books' => $books,
             'booksTabelKonten' => $booksTabelKonten,
-            'statistik' => $statistik
+            'statistik' => $statistik,
+            'web' => $web
         ]);
     }
 }

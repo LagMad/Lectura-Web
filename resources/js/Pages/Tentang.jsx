@@ -4,13 +4,14 @@ import MediaLibrary from "@/Sections/Tentang/MediaLibrary";
 import Mitra from "@/Sections/Tentang/Mitra";
 import Pelayanan from "@/Sections/Tentang/Pelayanan";
 import Staff from "@/Sections/Tentang/Staff";
+import WebPortal from "@/Sections/Tentang/WebPortal";
 import React, { useEffect } from "react";
 
-const Tentang = ({ staff, books, user, videos }) => {
+const Tentang = ({ staff, books, user, videos, web }) => {
 
     useEffect(() => {
-        console.log("videos", videos)
-    }, [videos])
+        console.log("web", web)
+    }, [web])
 
     return (
         <Layout>
@@ -20,6 +21,7 @@ const Tentang = ({ staff, books, user, videos }) => {
                 <Staff staff={staff}/>
                 <MediaLibrary videos={videos}/>
                 <Mitra />
+                <WebPortal web={web}/>
             </div>
         </Layout>
     );

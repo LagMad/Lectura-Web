@@ -4,7 +4,7 @@ import ManajemenBuku from "@/Sections/AdminBuku/ManajemenBuku";
 import JurnalingSiswa from "@/Sections/AdminBuku/JurnalingSiswa";
 import ManajemenKategori from "@/Sections/AdminBuku/ManajemenKategori";
 import { usePage } from "@inertiajs/react";
-import TabelKonten from "@/Sections/AdminDashboard/TabelKonten";
+import TabelKonten from "@/Sections/AdminBuku/TabelKonten";
 
 export default function Buku({
     booksTabelKonten,

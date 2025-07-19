@@ -15,6 +15,7 @@ use App\Http\Controllers\PengumumanController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\StaffPerpustakaanController;
 use App\Http\Controllers\TentangController;
+use App\Http\Controllers\WebPortalController;
 use App\Http\Controllers\YoutubeVideoController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -67,6 +68,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/staff/{staff}',    [StaffPerpustakaanController::class, 'edit'])->name('staff.edit');
     Route::put('/staff/{staff}', [StaffPerpustakaanController::class, 'update'])->name('staff.update');
     Route::delete('/staff/{staff}',    [StaffPerpustakaanController::class, 'destroy'])->name('staff.destroy');
+
+    Route::post('/web-portal', [WebPortalController::class, 'store'])->name('web-portal.store');
+    Route::put('/web-portal/{id}', [WebPortalController::class, 'update'])->name('web-portal.update');
+    Route::delete('/web-portal/{id}', [WebPortalController::class, 'destroy'])->name('web-portal.destroy');
 });
 
 

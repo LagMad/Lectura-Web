@@ -3,13 +3,14 @@ import AdminLayout from "@/Layouts/AdminLayout";
 import ManajemenPengguna from "@/Sections/AdminPengguna/ManajemenPengguna";
 import PengaturanSistem from "@/Sections/AdminPengguna/PengaturanSistem";
 import Statistik from "@/Sections/AdminDashboard/Statistik";
-import TabelKonten from "@/Sections/AdminDashboard/TabelKonten";
+import TabelKonten from "@/Sections/AdminBuku/TabelKonten";
 import Title from "@/Sections/AdminDashboard/Title";
 import StaffPerpustakaan from "@/Sections/AdminDashboard/StaffPerpustakaan";
 import ManajemenPengumuman from "@/Sections/AdminDashboard/ManajemenPengumuman";
 import ManajemenYoutube from "@/Sections/AdminDashboard/ManajemenYoutube";
+import ManajemenWeb from "@/Sections/AdminDashboard/ManajemenWeb";
 
-export default function Dashboard({ users, staff, pengumuman, videos, books, booksTabelKonten, statistik }) {
+export default function Dashboard({ users, staff, pengumuman, videos, books, booksTabelKonten, statistik, web }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const toggleSidebar = () => {
@@ -33,7 +34,7 @@ export default function Dashboard({ users, staff, pengumuman, videos, books, boo
                 <ManajemenPengumuman pengumuman={pengumuman}/>
                 <StaffPerpustakaan staff={staff} />
                 <ManajemenYoutube videos={videos}/>
-                {/* <TabelKonten books={booksTabelKonten}/> */}
+                <ManajemenWeb web={web}/>
             </div>
         </AdminLayout>
     );
