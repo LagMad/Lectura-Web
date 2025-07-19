@@ -33,7 +33,7 @@ export default function Dashboard({ users, staff, pengumuman, videos, books, boo
                 <ManajemenPengumuman pengumuman={pengumuman}/>
                 <StaffPerpustakaan staff={staff} />
                 <ManajemenYoutube videos={videos}/>
-                <TabelKonten books={booksTabelKonten}/>
+                {/* <TabelKonten books={booksTabelKonten}/> */}
             </div>
         </AdminLayout>
     );

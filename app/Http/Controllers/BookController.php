@@ -227,7 +227,10 @@ class BookController extends Controller
 
         $categories = $queryKategori->orderBy('created_at', 'desc')->paginate($perPage);
 
+        $booksTabelKonten = Book::whereNotIn('karya_oleh', ['Koleksi Perpustakaan'])->get();
+
         return Inertia::render('Admin/Buku', [
+            'booksTabelKonten' => $booksTabelKonten,
             'books' => $books,
             'booksJurnaling' => $formattedBooks,
             'totalBooks' => $books->total(),
