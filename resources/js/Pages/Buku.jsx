@@ -9,8 +9,9 @@ import {
     MdOutlineKeyboardArrowRight,
 } from "react-icons/md";
 import { router } from "@inertiajs/react";
+import { Star } from "lucide-react";
 
-const Buku = ({ books, kategori, filters = {} }) => {
+const Buku = ({ books, kategori, filters = {}, topRatedBooks }) => {
     // Get initial category from URL parameters or default to "Semua Buku"
     const initialCategory = filters.category || "Semua Buku";
 
@@ -167,6 +168,10 @@ const Buku = ({ books, kategori, filters = {} }) => {
         </Menu>
     );
 
+    useEffect(() => {
+        console.log("books", books);
+    }, [books]);
+
     return (
         <Layout>
             <div className="flex flex-col items-start w-full">
@@ -259,43 +264,57 @@ const Buku = ({ books, kategori, filters = {} }) => {
                                             route("books.show", book.id)
                                         )
                                     }
-                                    className="flex cursor-pointer flex-col justify-between px-5 py-4 min-h-[350px] rounded-xl drop-shadow-xl hover:drop-shadow-2xl transition-[filter] gap-1 bg-white group"
+                                    className="relative flex cursor-pointer flex-col justify-between px-5 pb-4 min-h-[350px] rounded-xl drop-shadow-xl hover:drop-shadow-2xl transition-[filter] gap-1 bg-white group"
                                 >
-                                    <div className="flex flex-col gap-1">
-                                        <img
-                                            src={
-                                                book.cover_path ||
-                                                "/default-cover.png"
-                                            }
-                                            className="w-full h-52 object-contain mb-2"
-                                            alt={book.judul}
-                                        />
-                                        <div className="text-xs text-cust-gray line-clamp-1 group-hover:line-clamp-none">
-                                            {book.penulis}
+                                    <div className="flex flex-col justify-start gap-3">
+                                        <div className="flex flex-row justify-center items-center self-center text-sm gap-2 px-4 py-2 min-w-16 rounded-b-2xl bg-cust-primary-color text-white text-center">
+                                            {parseFloat(
+                                                book.average_rating
+                                            ).toFixed(1)}
+                                            <Star
+                                                size={20}
+                                                fill="#facc15"
+                                                stroke="#facc15"
+                                            />
                                         </div>
-                                        <div className="text-xs text-black font-semibold line-clamp-2 group-hover:line-clamp-none">
-                                            {book.judul}
+                                        <div className="flex flex-col gap-1">
+                                            <img
+                                                src={
+                                                    book.cover_path ||
+                                                    "/default-cover.png"
+                                                }
+                                                className="w-full h-52 object-contain mb-2"
+                                                alt={book.judul}
+                                            />
+                                            <div className="text-xs text-cust-gray line-clamp-1 group-hover:line-clamp-none">
+                                                {book.penulis}
+                                            </div>
+                                            <div className="text-xs text-black font-semibold line-clamp-2 group-hover:line-clamp-none">
+                                                {book.judul}
+                                            </div>
                                         </div>
                                     </div>
-                                    <button
-                                        className="self-end md:self-start cursor-pointer"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleBookmarkToggle(book.id);
-                                        }}
-                                    >
-                                        {bookmarks[book.id] ? (
-                                            <FaBookmark
-                                                size={24}
-                                                className="text-cust-blue"
-                                            />
-                                        ) : (
-                                            <FaRegBookmark
-                                                size={24}
-                                                className="text-cust-blue"
-                                            />
-                                        )}
-                                    </button>
+                                    <div className="flex flex-row justify-between items-center">
+                                        <button
+                                            className="self-end md:self-center cursor-pointer"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleBookmarkToggle(book.id);
+                                            }}
+                                        >
+                                            {bookmarks[book.id] ? (
+                                                <FaBookmark
+                                                    size={24}
+                                                    className="text-cust-blue"
+                                                />
+                                            ) : (
+                                                <FaRegBookmark
+                                                    size={24}
+                                                    className="text-cust-blue"
+                                                />
+                                            )}
+                                        </button>
+                                    </div>
                                 </div>
                             ))}
                         </div>

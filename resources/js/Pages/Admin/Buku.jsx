@@ -4,8 +4,10 @@ import ManajemenBuku from "@/Sections/AdminBuku/ManajemenBuku";
 import JurnalingSiswa from "@/Sections/AdminBuku/JurnalingSiswa";
 import ManajemenKategori from "@/Sections/AdminBuku/ManajemenKategori";
 import { usePage } from "@inertiajs/react";
+import TabelKonten from "@/Sections/AdminBuku/TabelKonten";
 
 export default function Buku({
+    booksTabelKonten,
     books,
     booksJurnaling,
     totalBooks,
@@ -43,6 +45,7 @@ export default function Buku({
                     filters={filters}
                     pagination={pagination}
                 />
+                <TabelKonten books={booksTabelKonten} />
             </div>
         </AdminLayout>
     );

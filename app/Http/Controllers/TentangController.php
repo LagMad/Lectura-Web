@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use App\Models\StaffPerpustakaan;
 use App\Models\User;
+use App\Models\WebPortal;
 use App\Models\YoutubeVideo;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -18,12 +19,14 @@ class TentangController extends Controller
         $books = Book::query()->get();
         $user = User::query()->get();
         $videos = YoutubeVideo::where('is_active', true)->get();
+        $web = WebPortal::all();
 
         return Inertia::render('Tentang', [
             'staff' => $staff,
             'books' => $books,
             'user' => $user,
-            'videos' => $videos
+            'videos' => $videos,
+            'web' => $web
         ]);
     }
 }

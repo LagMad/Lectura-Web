@@ -114,7 +114,7 @@ export default function AdminLayout({
                                                 : "text-gray-500"
                                         }`}
                                     />
-                                    <span>Manajemen Buku</span>
+                                    <span>Buku</span>
                                 </Link>
                             </li>
                             <li>
