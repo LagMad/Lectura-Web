@@ -283,6 +283,7 @@ export default function ManajemenBuku({ books: initialBooks }) {
                 <table className="min-w-full bg-white">
                     <thead>
                         <tr className="text-left text-gray-500 text-sm">
+                            <th className="py-3 px-4 font-medium">Cover</th>
                             <th className="py-3 px-4 font-medium">
                                 Judul Buku
                             </th>
@@ -297,76 +298,101 @@ export default function ManajemenBuku({ books: initialBooks }) {
                     </thead>
                     <tbody>
                         {initialBooks?.data && initialBooks.data.length > 0 ? (
-                            initialBooks.data.map((book) => (
-                                <tr
-                                    key={book.id}
-                                    className="border-t border-gray-100"
-                                >
-                                    <td className="py-3 px-4 md:text-md text-sm">
-                                        {book.judul}
-                                    </td>
-                                    <td className="py-3 px-4 text-sm text-gray-500">
-                                        {book.penulis}
-                                    </td>
-                                    <td className="py-3 px-4">
-                                        <span className="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-xs">
-                                            {book.kategori}
-                                        </span>
-                                    </td>
-                                    <td className="py-3 px-4">
-                                        <span
-                                            className={`px-3 py-1 rounded-full text-xs ${
-                                                book.karya_oleh ===
-                                                "Koleksi Perpustakaan"
-                                                    ? "bg-purple-100 text-purple-500"
-                                                    : book.karya_oleh === "Guru"
-                                                    ? "bg-yellow-100 text-yellow-500"
-                                                    : book.karya_oleh ===
-                                                      "Siswa"
-                                                    ? "bg-blue-100 text-blue-500"
-                                                    : "bg-gray-100 text-gray-600"
-                                            }`}
-                                        >
-                                            {book.karya_oleh}
-                                        </span>
-                                    </td>
-                                    <td className="py-3 px-4">
-                                        <span
-                                            className={`px-3 py-1 rounded-full text-xs ${
-                                                book.status === "Tersedia"
-                                                    ? "bg-green-100 text-green-500"
-                                                    : book.status ===
-                                                      "Tidak Tersedia"
-                                                    ? "bg-red-100 text-red-500"
-                                                    : "bg-yellow-100 text-yellow-500"
-                                            }`}
-                                        >
-                                            {book.status}
-                                        </span>
-                                    </td>
-                                    <td className="py-3 px-4">
-                                        <div className="flex gap-2">
-                                            <a
-                                                href={route(
-                                                    "books.edit",
-                                                    book.id
-                                                )}
-                                                className="text-blue-600 hover:text-blue-800"
+                            initialBooks.data.map((book) => {
+                                const isCloudinaryUrl = (url) => {
+                                    const pattern =
+                                        /^https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/v\d+\/[^/]+\/[^/]+\.(jpg|jpeg|png|gif)$/i;
+                                    return pattern.test(url);
+                                };
+                                const isValidImage =
+                                    book.cover_path &&
+                                    isCloudinaryUrl(book.cover_path);
+
+                                return (
+                                    <tr
+                                        key={book.id}
+                                        className="border-t border-gray-100"
+                                    >
+                                        <td className="py-3 px-4 md:text-md text-sm">
+                                            {isValidImage ? (
+                                                <img
+                                                    className="w-20 h-auto object-contain"
+                                                    src={book.cover_path}
+                                                    alt={book.judul}
+                                                />
+                                            ) : (
+                                                <div className="flex justify-center items-center w-20 h-28 text-center object-contain mb-2 bg-gray-300 text-gray-500">
+                                                    No Cover
+                                                </div>
+                                            )}
+                                        </td>
+                                        <td className="py-3 px-4 md:text-md text-sm">
+                                            {book.judul}
+                                        </td>
+                                        <td className="py-3 px-4 text-sm text-gray-500">
+                                            {book.penulis}
+                                        </td>
+                                        <td className="py-3 px-4">
+                                            <span className="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-xs">
+                                                {book.kategori}
+                                            </span>
+                                        </td>
+                                        <td className="py-3 px-4">
+                                            <span
+                                                className={`px-3 py-1 rounded-full text-xs ${
+                                                    book.karya_oleh ===
+                                                    "Koleksi Perpustakaan"
+                                                        ? "bg-purple-100 text-purple-500"
+                                                        : book.karya_oleh ===
+                                                          "Guru"
+                                                        ? "bg-yellow-100 text-yellow-500"
+                                                        : book.karya_oleh ===
+                                                          "Siswa"
+                                                        ? "bg-blue-100 text-blue-500"
+                                                        : "bg-gray-100 text-gray-600"
+                                                }`}
                                             >
-                                                <Edit size={16} />
-                                            </a>
-                                            <button
-                                                onClick={() =>
-                                                    confirmDelete(book)
-                                                }
-                                                className="text-red-500 hover:text-red-700"
+                                                {book.karya_oleh}
+                                            </span>
+                                        </td>
+                                        <td className="py-3 px-4">
+                                            <span
+                                                className={`px-3 py-1 rounded-full text-xs ${
+                                                    book.status === "Tersedia"
+                                                        ? "bg-green-100 text-green-500"
+                                                        : book.status ===
+                                                          "Tidak Tersedia"
+                                                        ? "bg-red-100 text-red-500"
+                                                        : "bg-yellow-100 text-yellow-500"
+                                                }`}
                                             >
-                                                <Trash2 size={16} />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))
+                                                {book.status}
+                                            </span>
+                                        </td>
+                                        <td className="py-3 px-4">
+                                            <div className="flex gap-2">
+                                                <a
+                                                    href={route(
+                                                        "books.edit",
+                                                        book.id
+                                                    )}
+                                                    className="text-blue-600 hover:text-blue-800"
+                                                >
+                                                    <Edit size={16} />
+                                                </a>
+                                                <button
+                                                    onClick={() =>
+                                                        confirmDelete(book)
+                                                    }
+                                                    className="text-red-500 hover:text-red-700"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                );
+                            })
                         ) : (
                             <tr>
                                 <td

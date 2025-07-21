@@ -261,7 +261,7 @@ const BukuFavorit = ({ favoriteBooks, kategori, filters = {} }) => {
                             const isValidImage =
                                 book.cover_path &&
                                 isCloudinaryUrl(book.cover_path);
-                                
+
                             return (
                                 <div
                                     key={book.id}
@@ -280,7 +280,7 @@ const BukuFavorit = ({ favoriteBooks, kategori, filters = {} }) => {
                                                 alt={book.judul}
                                             />
                                         ) : (
-                                            <div className="flex justify-center items-center w-full h-52 object-contain mb-2 bg-gray-300 text-gray-500">
+                                            <div className="flex justify-center items-center text-center w-full h-52 object-contain mb-2 bg-gray-300 text-gray-500">
                                                 No Cover
                                             </div>
                                         )}
