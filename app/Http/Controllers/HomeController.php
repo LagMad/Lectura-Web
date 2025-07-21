@@ -31,7 +31,7 @@ class HomeController extends Controller
         $karyaGuru = $this->getTopBooksByType('Guru');
         $karyaKoleksiPerpustakaan = $this->getTopBooksByType('Koleksi Perpustakaan');
 
-        $pengumuman = Pengumuman::all();
+        $pengumuman = Pengumuman::where("is_active", true)->get();
 
         return Inertia::render('Home', [
             'books' => $books,

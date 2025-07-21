@@ -108,7 +108,7 @@ const Navbar = () => {
         >
             <div className="px-5 sm:px-10 md:px-16 lg:px-20 xl:px-40 py-6 flex justify-between items-center">
                 <div className="flex items-center gap-5 xl:gap-10">
-                    <h1 className="font-bold text-cust-blue text-2xl xl:text-3xl">
+                    <h1 className={`font-bold text-2xl xl:text-3xl ${isScrolled ? "text-cust-primary-color" : "text-white"}`}>
                         E-Library
                     </h1>
                     <ul className="hidden lg:flex font-medium gap-3 xl:gap-6">
