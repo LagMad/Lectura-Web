@@ -168,6 +168,14 @@ const Buku = ({ books, kategori, filters = {}, topRatedBooks }) => {
         </Menu>
     );
 
+    const isCloudinaryUrl = (url) => {
+        const pattern =
+            /^https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/v\d+\/[^/]+\/[^/]+\.(jpg|jpeg|png|gif)$/i;
+        return pattern.test(url);
+    };
+
+    const isValidImage = books.cover_path && isCloudinaryUrl(books.cover_path);
+
     useEffect(() => {
         console.log("books", books);
     }, [books]);
@@ -278,14 +286,20 @@ const Buku = ({ books, kategori, filters = {}, topRatedBooks }) => {
                                             />
                                         </div>
                                         <div className="flex flex-col gap-1">
-                                            <img
-                                                src={
-                                                    book.cover_path ||
-                                                    "/default-cover.png"
-                                                }
-                                                className="w-full h-52 object-contain mb-2"
-                                                alt={book.judul}
-                                            />
+                                            {isValidImage ? (
+                                                <img
+                                                    src={
+                                                        book.cover_path ||
+                                                        "/default-cover.png"
+                                                    }
+                                                    className="w-full h-52 object-contain mb-2"
+                                                    alt={book.judul}
+                                                />
+                                            ) : (
+                                                <div className="flex justify-center items-center w-full h-52 object-contain mb-2 bg-gray-300 text-gray-500">
+                                                    No Cover
+                                                </div>
+                                            )}
                                             <div className="text-xs text-cust-gray line-clamp-1 group-hover:line-clamp-none">
                                                 {book.penulis}
                                             </div>

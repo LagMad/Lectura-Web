@@ -8,8 +8,8 @@ import KategoriBuku from "@/Sections/Home/KategoriBuku";
 const Home = ({ books, pengumuman, karyaSiswa, karyaGuru, karyaKoleksiPerpustakaan }) => {
 
     useEffect(() => {
-        console.log("pengumuman", pengumuman)
-    }, [pengumuman])
+        console.log("karyaKoleksiPerpustakaan", karyaKoleksiPerpustakaan)
+    }, [karyaKoleksiPerpustakaan])
 
     return (
         <Layout>

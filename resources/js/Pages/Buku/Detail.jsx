@@ -217,24 +217,41 @@ const Detail = () => {
         );
     };
 
+    const isCloudinaryUrl = (url) => {
+        const pattern =
+            /^https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/v\d+\/[^/]+\/[^/]+\.(jpg|jpeg|png|gif)$/i;
+        return pattern.test(url);
+    };
+
+    const isValidImage = book.cover_path && isCloudinaryUrl(book.cover_path);
+
     return (
         <>
             <Layout>
                 <section className="bg-cust-background-color pt-20">
-                    <div className="container py-20 flex flex-wrap justify-center gap-10">
+                    <div className="container py-20 flex flex-wrap justify-center gap-0 md:gap-10">
                         <div className="bg-white flex flex-col items-center p-8 rounded-lg w-full md:w-1/3 space-y-4">
-                            <img
-                                src={book.cover_path || "/placeholder-book.png"}
-                                alt={`Cover Buku ${book.judul}`}
-                                className="rounded-lg w-40 lg:w-64 object-cover"
-                            />
+                            {isValidImage ? (
+                                <img
+                                    src={
+                                        book.cover_path ||
+                                        "/placeholder-book.png"
+                                    }
+                                    alt={`Cover Buku ${book.judul}`}
+                                    className="rounded-lg w-40 lg:w-64 object-cover"
+                                />
+                            ) : (
+                                <div className="flex justify-center items-center rounded-lg w-full md:w-40 lg:w-64 h-96 md:h-80 object-contain mb-2 bg-gray-300 text-gray-500">
+                                    No Cover
+                                </div>
+                            )}
                             <a
                                 href={
                                     book.status === "Tersedia" ? book.link : "#"
                                 }
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className={`font-semibold text-sm rounded-lg transition-all py-2 w-40 lg:w-64 border-2 text-center ${
+                                className={`font-semibold text-sm rounded-lg transition-all py-2 w-full md:w-40 lg:w-64 border-2 text-center ${
                                     book.status === "Tersedia"
                                         ? "bg-cust-primary-color border-cust-primary-color text-white hover:scale-105"
                                         : " bg-gray-300 border-gray-300 text-gray-500 cursor-not-allowed pointer-events-none"
@@ -247,7 +264,7 @@ const Detail = () => {
 
                             {auth.user && (
                                 <button
-                                    className={`cursor-pointer border-2 border-cust-primary-color font-semibold text-sm rounded-lg hover:scale-105 transition-all py-2 w-40 lg:w-64 ${
+                                    className={`cursor-pointer border-2 border-cust-primary-color font-semibold text-sm rounded-lg hover:scale-105 transition-all py-2 w-full md:w-40 lg:w-64 ${
                                         isFavorited
                                             ? "bg-cust-primary-color text-white"
                                             : "text-cust-primary-color"
@@ -262,7 +279,7 @@ const Detail = () => {
                             )}
                             {auth.user && (
                                 <button
-                                    className={`cursor-pointer border-2 border-cust-primary-color text-cust-primary-color font-semibold text-sm rounded-lg hover:scale-105 transition-all py-2 w-40 lg:w-64`}
+                                    className={`cursor-pointer border-2 border-cust-primary-color text-cust-primary-color font-semibold text-sm rounded-lg hover:scale-105 transition-all py-2 w-full md:w-40 lg:w-64`}
                                     onClick={toggleReviewModal}
                                 >
                                     Tulis Review

@@ -1,7 +1,14 @@
 import React from "react";
 import { Star } from "lucide-react";
 
+const isCloudinaryUrl = (url) => {
+    const pattern = /^https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/v\d+\/[^/]+\/[^/]+\.(jpg|jpeg|png|gif)$/i;
+    return pattern.test(url);
+};
+
 const BukuHomeCard = ({ index, image, penulis, judul, bookId, rating }) => {
+    const isValidImage = image && isCloudinaryUrl(image);
+
     return (
         <div className="relative flex flex-col justify-between items-center min-h-[400px] gap-1 rounded-2xl drop-shadow-lg bg-white">
             <div className="flex flex-col justify-between items-center w-full">
@@ -12,11 +19,17 @@ const BukuHomeCard = ({ index, image, penulis, judul, bookId, rating }) => {
                     </div>
                 </div>
                 <div className="flex flex-col justify-center items-center p-3 gap-1 w-full">
-                    <img
-                        className="w-full h-52 object-contain"
-                        src={image}
-                        alt={judul}
-                    />
+                    {isValidImage ? (
+                        <img
+                            className="w-full h-52 object-contain"
+                            src={image}
+                            alt={judul}
+                        />
+                    ) : (
+                        <div className="flex justify-center items-center w-full h-52 object-contain mb-2 bg-gray-300 text-gray-500">
+                            No Cover
+                        </div>
+                    )}
                     <div className="text-cust-dark-gray font-light text-sm w-full">
                         {penulis}
                     </div>
