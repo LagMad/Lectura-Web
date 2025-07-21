@@ -43,8 +43,9 @@ class BookController extends Controller
     {
         $kategori = Kategori::all();
 
-        // Get the category filter from request
+        // Get filters from request
         $categoryFilter = $request->get('category');
+        $searchFilter = $request->get('search');
 
         $books = Book::with([
             'favorites' => function ($query) {
@@ -59,8 +60,16 @@ class BookController extends Controller
                     $query->where('kategori', $category);
                 }
             })
+            ->when($searchFilter, function ($query, $search) {
+                // Filter by search term in title or author
+                $query->where(function ($q) use ($search) {
+                    $q->where('judul', 'LIKE', '%' . $search . '%')
+                        ->orWhere('penulis', 'LIKE', '%' . $search . '%');
+                });
+            })
             ->latest()
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString(); // This preserves the query parameters in pagination links
 
         foreach ($books as $book) {
             $book->isFavorited = $book->favorites->isNotEmpty();
@@ -84,6 +93,7 @@ class BookController extends Controller
             'kategori' => $kategori,
             'filters' => [
                 'category' => $categoryFilter,
+                'search' => $searchFilter,
             ],
         ]);
     }
