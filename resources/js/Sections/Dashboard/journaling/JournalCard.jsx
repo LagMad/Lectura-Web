@@ -81,6 +81,13 @@ const JournalCard = ({
         setShowDetailModal(false);
     };
 
+    const isCloudinaryUrl = (url) => {
+        const pattern =
+            /^https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/v\d+\/[^/]+\/[^/]+\.(jpg|jpeg|png|gif)$/i;
+        return pattern.test(url);
+    };
+    const isValidImage = image && isCloudinaryUrl(image);
+
     return (
         <>
             <div className="bg-white px-10 py-5 rounded-2xl shadow-xl">
@@ -89,11 +96,17 @@ const JournalCard = ({
                     onClick={toggleExpand}
                 >
                     <div className="flex items-center gap-5">
-                        <img
-                            src={image}
-                            alt="book cover"
-                            className="w-20 rounded-xl"
-                        />
+                        {isValidImage ? (
+                            <img
+                                className="w-20 rounded-xl"
+                                src={image}
+                                alt={title}
+                            />
+                        ) : (
+                            <div className="flex justify-center items-center p-2 text-xs w-20 h-28 rounded-xl bg-gray-300 text-gray-500">
+                                No Cover
+                            </div>
+                        )}
                         <div>
                             <h2 className="font-medium">{title}</h2>
                             <p className="text-sm text-gray-500">{author}</p>

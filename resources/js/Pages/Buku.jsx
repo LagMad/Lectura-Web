@@ -447,7 +447,7 @@ const Buku = ({ books, kategori, filters = {}, topRatedBooks }) => {
                                                     style={{ display: 'none' }}
                                                 >
                                                     <div className="text-center">
-                                                        <div className="text-2xl mb-2">📚</div>
+                                                        {/* <div className="text-2xl mb-2">📚</div> */}
                                                         <div className="text-sm">Image Not Found</div>
                                                     </div>
                                                 </div>
