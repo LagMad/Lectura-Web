@@ -12,7 +12,7 @@ const Hero = ({ staff, books, user }) => {
 
     return (
         <section className="">
-            <div className="relative flex justify-start items-center bg-[url('/hero-profile.webp')] bg-center bg-cover bg-no-repeat h-screen px-5 sm:px-10 md:px-16 lg:px-20 xl:px-40 py-6">
+            <div className="relative flex justify-start items-center bg-[url('/fotbar.jpg')] bg-center bg-cover bg-no-repeat h-screen px-5 sm:px-10 md:px-16 lg:px-20 xl:px-40 py-6">
                 {/* Overlay */}
                 <div className="absolute inset-0 bg-white/80 z-0" />
 
@@ -37,14 +37,14 @@ const Hero = ({ staff, books, user }) => {
                 </div>
             </div>
 
-            <div className="flex justify-center items-center py-20 px-5 sm:px-10 md:px-16 lg:px-20 xl:px-40 w-full">
-                <div className="grid grid-cols-4 gap-24 w-full">
+            <div className="flex justify-center items-center pt-12 pb-0 md:py-20 px-5 sm:px-10 md:px-16 lg:px-20 xl:px-40 w-full">
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-5 sm:gap-10 md:gap-24 w-full">
                     {stats.map((item, index) => (
                         <div key={index} className="flex flex-col justify-center items-center w-auto">
                             <h1 className="text-cust-blue font-bold text-2xl lg:text-4xl">
                                 {item.value}
                             </h1>
-                            <p className="text-cust-dark-gray font-medium mt-2">
+                            <p className="text-cust-dark-gray font-medium text-center mt-2">
                                 {item.label}
                             </p>
                         </div>
