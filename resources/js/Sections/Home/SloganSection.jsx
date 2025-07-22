@@ -20,10 +20,10 @@ const SloganSection = () => {
                 modules={[Autoplay, Pagination, Navigation]}
                 className="w-full h-auto"
             >
-                <SwiperSlide className="flex justify-center items-center">
+                <SwiperSlide className="flex justify-center items-center ">
                     <img className="object-center" src="/slogan.webp" />
                 </SwiperSlide>
-                <SwiperSlide>
+                <SwiperSlide className="">
                     <div className="flex justify-center items-center py-16 text-white bg-cust-primary-color w-full rounded-2xl">
                         <div className="flex flex-col justify-center items-center text-center">
                             <div className="flex justify-center items-end h-auto w-96 mb-10 animate-pulse font-bold text-5xl text-white">

@@ -9,7 +9,7 @@
 }
 
 body {
-    font-family: 'Poppins', sans-serif;
+    font-family: "Poppins", sans-serif;
 }
 
 @layer components {
@@ -66,9 +66,84 @@ body {
     --color-cust-primary-color: #2563eb;
     --color-cust-secondary-color: #111827;
     --color-cust-tertiary-color: #eef2ff;
-    --color-cust-background-color:#F9FAFB;
+    --color-cust-background-color: #f9fafb;
 }
 
-.swiper-button-next, .swiper-button-prev {
+.swiper-button-next,
+.swiper-button-prev {
     color: white !important;
+}
+
+.book-showcase .swiper-wrapper {
+    overflow-y: visible !important;
+    min-height: 470px !important;
+}
+
+/* .book-showcase .swiper-slide {
+    height: fit-content !important;
+} */
+
+.book-showcase .swiper-button-prev {
+    color: gray !important;
+    width: 40px !important;
+    height: 40px !important;
+    top: auto;
+    bottom: 0px !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    z-index: 30 !important;
+    transform: translateY(-25%) !important;
+}
+
+.book-showcase .swiper-button-next {
+    color: gray !important;
+    width: 40px !important;
+    height: 40px !important;
+    top: auto;
+    bottom: 0px !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    z-index: 30 !important;
+    transform: translateY(-25%) !important;
+}
+
+.book-showcase .swiper-button-prev::after,
+.book-showcase .swiper-button-next::after {
+    font-size: 18px !important;
+    font-weight: bold !important;
+}
+
+.book-showcase .swiper-pagination {
+    bottom: 0px !important;
+    transform: translateY(-75%) !important;
+}
+
+.book-showcase .swiper-button-prev,
+.book-showcase .swiper-button-next {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important; /* Makes it a circle */
+    background-color: transparent !important; /* Or your preferred color */
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    z-index: 30 !important;
+    bottom: 0px !important;
+    top: auto !important;
+    border-color: gray;
+    border-width: 1.5px;
+}
+
+.book-showcase .swiper-button-prev:hover,
+.book-showcase .swiper-button-next:hover {
+    background-color: white !important; /* Tailwind's gray-200 */
+    filter: brightness(125%);
+}
+
+.book-showcase .swiper-button-prev,
+.book-showcase .swiper-button-next {
+    transition: background-color 0.2s ease-in-out;
 }
