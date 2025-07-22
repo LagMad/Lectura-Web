@@ -56,17 +56,19 @@ const Navbar = () => {
     const handleSearchChange = async (e) => {
         const value = e.target.value;
         setSearchTerm(value);
-    
+
         if (value.trim() === "") {
             setSearchResults([]);
             setIsSearching(false);
             return;
         }
-    
+
         setIsSearching(true);
-    
+
         try {
-            const response = await fetch(`/api/navbar-books?q=${encodeURIComponent(value)}`);
+            const response = await fetch(
+                `/api/navbar-books?q=${encodeURIComponent(value)}`
+            );
             const data = await response.json();
             setSearchResults(data);
         } catch (error) {
@@ -74,7 +76,6 @@ const Navbar = () => {
             setSearchResults([]);
         }
     };
-    
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -106,11 +107,23 @@ const Navbar = () => {
                 isScrolled ? "bg-white shadow-sm" : "bg-transparent"
             } fixed w-full z-50 transition-all duration-300 ease-in-out`}
         >
-            <div className="px-5 sm:px-10 md:px-16 lg:px-20 xl:px-40 py-6 flex justify-between items-center">
+            <div className="px-5 sm:px-10 md:px-16 lg:px-20 xl:px-40 py-0 flex justify-between items-center">
                 <div className="flex items-center gap-5 xl:gap-10">
-                    <h1 className={`font-bold text-2xl xl:text-3xl ${isScrolled ? "text-cust-primary-color" : "text-white"}`}>
+                    {/* <h1 className={`font-bold text-2xl xl:text-3xl ${isScrolled ? "text-cust-primary-color" : "text-white"}`}>
                         E-Library
-                    </h1>
+                    </h1> */}
+                    <a
+                        href="/"
+                    >
+                        <img
+                            src={
+                                isScrolled
+                                    ? "/Logo-lectura-full-transparent.svg"
+                                    : "/Logo-lectura-full-transparent-white.svg"
+                            }
+                            className="w-auto h-20"
+                        />
+                    </a>
                     <ul className="hidden lg:flex font-medium gap-3 xl:gap-6">
                         {navLinks.map((link, idx) => (
                             <li key={idx}>
@@ -135,7 +148,7 @@ const Navbar = () => {
 
                 <div className="items-center flex gap-4 w-1/2 justify-end">
                     <div
-                        className="relative w-full max-w-xs lg:w-1/3 xl:w-full xl:max-w-xs"
+                        className="relative group w-full max-w-xs lg:w-1/3 xl:w-full xl:max-w-xs"
                         ref={searchRef}
                     >
                         <input
@@ -147,13 +160,13 @@ const Navbar = () => {
                                 isScrolled
                                     ? "placeholder-gray-500 border-gray-400"
                                     : "placeholder-white border-white"
-                            } focus:bg-white transition-all duration-300 ease-in-out`}
+                            } focus:bg-white focus:placeholder-gray-500 transition-all duration-300 ease-in-out`}
                         />
                         <Icon
                             icon="mdi:magnify"
                             className={`absolute right-3 top-2.5 ${
                                 isScrolled ? "text-gray-500 " : " text-white"
-                            } text-lg transition-all duration-300 ease-in-out`}
+                            } text-lg group-focus:text-gray-500 transition-all duration-300 ease-in-out`}
                         />
 
                         {/* Search Results Dropdown */}
@@ -246,16 +259,16 @@ const Navbar = () => {
                                             </div>
                                         </a>
                                         {auth?.user.role != "siswa" && (
-                                                <a
-                                                    href="/admin-dashboard"
-                                                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-cust-primary-color transition-colors"
-                                                >
-                                                    <div className="flex items-center gap-2">
-                                                        <Icon icon="mdi:view-dashboard" />
-                                                        <span>Admin</span>
-                                                    </div>
-                                                </a>
-                                            )}
+                                            <a
+                                                href="/admin-dashboard"
+                                                className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-cust-primary-color transition-colors"
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    <Icon icon="mdi:view-dashboard" />
+                                                    <span>Admin</span>
+                                                </div>
+                                            </a>
+                                        )}
                                         <button
                                             onClick={handleLogout}
                                             className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-cust-primary-color transition-colors cursor-pointer"
