@@ -274,8 +274,8 @@ export default function ManajemenYoutube({ videos = [] }) {
                         {currentData.length === 0 && (
                             <tr>
                                 <td
-                                    colSpan={5}
-                                    className="text-center py-8 text-gray-500"
+                                    colSpan={7}
+                                    className="text-center py-8 text-gray-500 w-full"
                                 >
                                     Belum ada video.
                                 </td>

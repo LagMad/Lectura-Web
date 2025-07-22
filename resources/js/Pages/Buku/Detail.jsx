@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import Layout from "@/Layouts/Layout";
 import { Star, StarHalf, StarOff } from "lucide-react";
 import { usePage, router, useForm } from "@inertiajs/react";
+import BukuHomeCard from "@/Components/ui/BukuHomeCard";
 
 const Detail = () => {
     const { book, avgRating, auth, isFavorited, reviews, relatedBooks } =
@@ -225,12 +226,16 @@ const Detail = () => {
 
     const isValidImage = book.cover_path && isCloudinaryUrl(book.cover_path);
 
+    useEffect(() => {
+        console.log("relatedBooks", relatedBooks);
+    }, [relatedBooks]);
+
     return (
         <>
             <Layout>
-                <section className="bg-cust-background-color pt-20">
-                    <div className="container py-20 flex flex-wrap justify-center gap-0 md:gap-10">
-                        <div className="bg-white flex flex-col items-center p-8 rounded-lg w-full md:w-1/3 space-y-4">
+                <section className="bg-cust-background-color pt-20 px-5 sm:px-10 md:px-16 lg:px-20 xl:px-40">
+                    <div className="py-20 flex justify-center gap-0 md:gap-10">
+                        <div className="bg-white flex flex-col items-center p-8 rounded-lg w-full md:w-1/4 space-y-4">
                             {isValidImage ? (
                                 <img
                                     src={
@@ -287,11 +292,11 @@ const Detail = () => {
                             )}
                         </div>
 
-                        <div className="bg-white p-8 rounded-lg w-full md:w-1/2">
-                            <h2 className="flex flex-col-reverse md:flex-row justify-start items-center gap-2 md:gap-5 text-2xl font-bold text-cust-primary-color mb-1">
+                        <div className="bg-white p-8 rounded-lg w-full md:w-3/4">
+                            <div className="flex flex-col-reverse md:flex-row justify-start items-center gap-2 md:gap-5 text-2xl font-bold text-cust-primary-color mb-1">
                                 {book.judul}
                                 <span
-                                    className={`flex px-3 py-1 rounded-full text-xs ${
+                                    className={`flex px-3 py-1 rounded-full min-w-fit text-xs ${
                                         book.karya_oleh ===
                                         "Koleksi Perpustakaan"
                                             ? "bg-purple-100 text-purple-500"
@@ -304,16 +309,15 @@ const Detail = () => {
                                 >
                                     {book.karya_oleh}
                                 </span>
-                            </h2>
+                            </div>
                             <p className="text-gray-600 mb-4 text-center md:text-left">
                                 Oleh {book.penulis}
                             </p>
 
-                            <div className="flex items-center gap-2 mb-6">
+                            <div className="flex items-center gap-2 mb-6 text-sm text-gray-700">
                                 {renderStars(avgRating || 0)}
-                                <span className="ml-2 text-sm text-gray-700">
-                                    {formattedRating}
-                                </span>
+                                <span className="ml-2 ">{formattedRating}</span>
+                                / <span>{reviews.length} ulasan</span>
                             </div>
 
                             <div className="grid grid-cols-2 gap-y-3 w-2/3 text-sm mb-8">
@@ -353,7 +357,7 @@ const Detail = () => {
                             <div className="space-y-10">
                                 <div className="flex justify-between items-center mb-6">
                                     <h2 className="font-semibold text-xl">
-                                        Review Pembaca
+                                        Ulasan Pembaca
                                     </h2>
                                     <div className="flex items-center">
                                         <span className="mr-2 text-sm">
@@ -447,40 +451,29 @@ const Detail = () => {
                                                 <div className="flex gap-5 overflow-x-auto pb-2">
                                                     {relatedBooks.map(
                                                         (book, index) => (
-                                                            <div
-                                                                key={book.id}
-                                                                onClick={() =>
-                                                                    router.visit(
-                                                                        route(
-                                                                            "books.show",
-                                                                            book.id
-                                                                        )
-                                                                    )
-                                                                }
-                                                                className="min-w-[160px] bg-white rounded-lg shadow hover:shadow-md transition-all cursor-pointer"
-                                                            >
-                                                                <img
-                                                                    src={
-                                                                        book.cover_path
+                                                            <>
+                                                                <BukuHomeCard
+                                                                    index={
+                                                                        index
                                                                     }
-                                                                    alt={
+                                                                    image={
+                                                                        book.cover_path ||
+                                                                        "/default-cover.png"
+                                                                    }
+                                                                    penulis={
+                                                                        book.penulis
+                                                                    }
+                                                                    judul={
                                                                         book.judul
                                                                     }
-                                                                    className="rounded-t-lg w-full object-cover h-56 p-3"
+                                                                    bookId={
+                                                                        book.id
+                                                                    }
+                                                                    rating={
+                                                                        book.average_rating
+                                                                    }
                                                                 />
-                                                                <div className="p-3">
-                                                                    <p className="text-xs text-gray-600 mb-1">
-                                                                        {
-                                                                            book.penulis
-                                                                        }
-                                                                    </p>
-                                                                    <p className="text-sm font-medium line-clamp-2">
-                                                                        {
-                                                                            book.judul
-                                                                        }
-                                                                    </p>
-                                                                </div>
-                                                            </div>
+                                                            </>
                                                         )
                                                     )}
                                                 </div>

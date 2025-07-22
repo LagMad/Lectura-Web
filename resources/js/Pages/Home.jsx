@@ -12,14 +12,12 @@ const Home = ({
     karyaGuru,
     karyaKoleksiPerpustakaan,
 }) => {
-    useEffect(() => {
-        console.log("pengumuman", pengumuman);
-    }, [pengumuman]);
-
     return (
         <Layout>
             <HeroSection pengumuman={pengumuman} />
-            <div className={`flex flex-col gap-7 lg:gap-16 px-5 sm:px-10 md:px-16 lg:px-20 xl:px-40 pt-12 pb-28 bg-cust-background-color`}>
+            <div
+                className={`flex flex-col gap-7 lg:gap-16 px-5 sm:px-10 md:px-16 lg:px-20 xl:px-40 pt-12 pb-28 bg-cust-background-color`}
+            >
                 <KategoriBuku books={books} />
                 <SloganSection />
                 <BookShowcase

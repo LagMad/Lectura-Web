@@ -10,7 +10,7 @@ const BukuHomeCard = ({ index, image, penulis, judul, bookId, rating }) => {
     const isValidImage = image && isCloudinaryUrl(image);
 
     return (
-        <div className="relative flex flex-col justify-between items-center min-h-[400px] gap-1 rounded-2xl drop-shadow-lg bg-white">
+        <div className="relative flex flex-col justify-between items-center min-h-[400px] min-w-44 max-w-48 gap-1 rounded-2xl drop-shadow-lg bg-white group">
             <div className="flex flex-col justify-between items-center w-full">
                 <div className="flex flex-row justify-center items-center w-full">
                     <div className="flex flex-row justify-center items-center text-sm gap-2 px-4 py-2 min-w-16 rounded-b-2xl bg-cust-primary-color text-white text-center">
@@ -30,10 +30,10 @@ const BukuHomeCard = ({ index, image, penulis, judul, bookId, rating }) => {
                             No Cover
                         </div>
                     )}
-                    <div className="text-cust-dark-gray font-light text-sm w-full">
+                    <div className="text-cust-dark-gray font-light text-sm w-full line-clamp-2 group-hover:line-clamp-none">
                         {penulis}
                     </div>
-                    <div className="text-black font-normal text-sm w-full line-clamp-2">
+                    <div className="text-black font-normal text-sm w-full line-clamp-2 group-hover:line-clamp-none">
                         {judul}
                     </div>
                 </div>

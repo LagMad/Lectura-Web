@@ -414,11 +414,19 @@ class BookController extends Controller
         $isFavorited = false;
 
         // Get other books in the same category, excluding the current one
-        $relatedBooks = Book::where('kategori', $book->kategori) // same category
-            ->whereKeyNot($book->id)                            // exclude the one being viewed
-            ->latest()                                          // order by created_at DESC
-            ->take(10)                                          // limit to 10
-            ->get();
+        // Get other books in the same category, excluding the current one
+        $relatedBooks = Book::where('kategori', $book->kategori)       // same category
+            ->whereKeyNot($book->id)                                   // exclude the one being viewed
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating')                             // get average rating
+            ->latest()                                                 // order by created_at DESC
+            ->take(10)                                                 // limit to 10
+            ->get()
+            ->map(function ($bookItem) {
+                $bookItem->average_rating = $bookItem->reviews_avg_rating ?? 0;
+                return $bookItem;
+            });
+
 
         if (auth()->check()) {
             $isFavorited = $book->favorites()
