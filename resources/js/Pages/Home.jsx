@@ -11,6 +11,7 @@ const Home = ({
     karyaSiswa,
     karyaGuru,
     karyaKoleksiPerpustakaan,
+    posters
 }) => {
     return (
         <Layout>
@@ -19,7 +20,7 @@ const Home = ({
                 className={`flex flex-col gap-7 lg:gap-16 px-5 sm:px-10 md:px-16 lg:px-20 xl:px-40 pt-12 pb-28 bg-cust-background-color`}
             >
                 <KategoriBuku books={books} />
-                <SloganSection />
+                <SloganSection posters={posters}/>
                 <BookShowcase
                     books={karyaKoleksiPerpustakaan}
                     judul={"Koleksi Perpustakaan"}

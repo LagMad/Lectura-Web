@@ -12,6 +12,7 @@ use App\Http\Controllers\NIPDController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PengumumanController;
+use App\Http\Controllers\PosterController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\StaffPerpustakaanController;
 use App\Http\Controllers\TentangController;
@@ -27,7 +28,7 @@ Route::middleware(['auth', 'role:admin,guru'])->group(function () {
     Route::get('/admin-edit-buku/{book}', [BookController::class, 'edit'])->name('books.edit');
     Route::put('/update-buku/{book}', [BookController::class, 'update'])->name('books.update');
     Route::delete('/hapus-buku/{book}', [BookController::class, 'destroy'])->name('books.destroy');
-    Route::get('/admin-buku', [BookController::class, 'adminBuku'])->name('books.admin');
+    Route::get('/admin-buku', [AdminController::class, 'adminBuku'])->name('books.admin');
     Route::get('/admin-dashboard', [AdminController::class, 'adminDashboard'])->name('admin.dashboard');
 
     Route::get('/jurnal/book/{book_id}', [JurnalingController::class, 'detail'])->name('jurnal.book.detail');
@@ -51,6 +52,8 @@ Route::middleware(['auth', 'role:admin,guru'])->group(function () {
         Route::put('/{video}', [YoutubeVideoController::class, 'update'])->name('update'); // /video/{id}
         Route::delete('/{video}', [YoutubeVideoController::class, 'destroy'])->name('destroy');
     });
+
+    Route::resource('poster', PosterController::class);
 });
 
 Route::middleware(['auth', 'role:admin'])->group(function () {

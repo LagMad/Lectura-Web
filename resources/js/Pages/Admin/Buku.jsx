@@ -5,6 +5,7 @@ import JurnalingSiswa from "@/Sections/AdminBuku/JurnalingSiswa";
 import ManajemenKategori from "@/Sections/AdminBuku/ManajemenKategori";
 import { usePage } from "@inertiajs/react";
 import TabelKonten from "@/Sections/AdminBuku/TabelKonten";
+import ManajemenPoster from "@/Sections/AdminBuku/ManajemenPoster";
 
 export default function Buku({
     booksTabelKonten,
@@ -15,6 +16,7 @@ export default function Buku({
     filters,
     pagination,
     kategoriAll,
+    posters
 }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const { auth } = usePage().props;
@@ -38,6 +40,7 @@ export default function Buku({
                 {auth.user.role === "admin" && (
                     <ManajemenKategori categories={kategoriAll} books={books} />
                 )}
+                <ManajemenPoster posters={posters}/>
                 <JurnalingSiswa
                     booksJurnaling={booksJurnaling}
                     totalBooks={totalBooks}
