@@ -58,7 +58,12 @@ export default function AdminLayout({
                                     href="/"
                                     className="text-cust-blue text-2xl font-bold ml-2 sm:ml-0 no-underline hover:opacity-80 transition-opacity"
                                 >
-                                    E-Library
+                                    <img
+                                        src={
+                                            "/Logo-lectura-full-transparent.svg"
+                                        }
+                                        className="w-auto h-20"
+                                    />
                                 </a>
                             </div>
                         </div>
@@ -84,7 +89,7 @@ export default function AdminLayout({
                 {/* Overlay for mobile - only visible when sidebar is open */}
                 {isSidebarOpen && (
                     <div
-                        className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+                        className="fixed inset-0 bg-black/50 z-40 lg:hidden"
                         onClick={toggleSidebar}
                     ></div>
                 )}
