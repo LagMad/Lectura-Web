@@ -5,18 +5,22 @@ import SloganSection from "../Sections/Home/SloganSection";
 import BookShowcase from "@/Sections/Home/BookShowcase";
 import KategoriBuku from "@/Sections/Home/KategoriBuku";
 
-const Home = ({ books, pengumuman, karyaSiswa, karyaGuru, karyaKoleksiPerpustakaan }) => {
-
-    useEffect(() => {
-        console.log("pengumuman", pengumuman)
-    }, [pengumuman])
-
+const Home = ({
+    books,
+    pengumuman,
+    karyaSiswa,
+    karyaGuru,
+    karyaKoleksiPerpustakaan,
+    posters
+}) => {
     return (
         <Layout>
-            <HeroSection pengumuman={pengumuman}/>
-            <div className="flex flex-col gap-7 lg:gap-16 px-5 sm:px-10 md:px-16 lg:px-20 xl:px-40 pt-12 pb-28 bg-cust-background-color">
-                <KategoriBuku books={books}/>
-                <SloganSection />
+            <HeroSection pengumuman={pengumuman} />
+            <div
+                className={`flex flex-col gap-7 lg:gap-16 px-5 sm:px-10 md:px-16 lg:px-20 xl:px-40 pt-12 pb-28 bg-cust-background-color`}
+            >
+                <KategoriBuku books={books} />
+                <SloganSection posters={posters}/>
                 <BookShowcase
                     books={karyaKoleksiPerpustakaan}
                     judul={"Koleksi Perpustakaan"}
@@ -36,8 +40,7 @@ const Home = ({ books, pengumuman, karyaSiswa, karyaGuru, karyaKoleksiPerpustaka
                     judul={"Karya Siswa"}
                     subjudul={
                         <>
-                            KARYA{" "}
-                            <span className="text-[#F0F1C5]">SISWA</span>{" "}
+                            KARYA <span className="text-[#F0F1C5]">SISWA</span>{" "}
                         </>
                     }
                     deskripsi={
@@ -50,8 +53,7 @@ const Home = ({ books, pengumuman, karyaSiswa, karyaGuru, karyaKoleksiPerpustaka
                     judul={"Karya Guru"}
                     subjudul={
                         <>
-                            KARYA{" "}
-                            <span className="text-[#F0F1C5]">GURU</span>{" "}
+                            KARYA <span className="text-[#F0F1C5]">GURU</span>{" "}
                         </>
                     }
                     deskripsi={

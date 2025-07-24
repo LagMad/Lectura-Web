@@ -1,4 +1,14 @@
-import { Menu, LogOut, User, BookOpen, Settings, Bell, LayoutDashboardIcon, LayoutDashboard } from "lucide-react";
+import {
+    Menu,
+    LogOut,
+    User,
+    BookOpen,
+    Settings,
+    Bell,
+    LayoutDashboardIcon,
+    LayoutDashboard,
+    TrendingUp,
+} from "lucide-react";
 import { Link, usePage } from "@inertiajs/react";
 
 export default function AdminLayout({
@@ -12,6 +22,22 @@ export default function AdminLayout({
     // Function to check if a route is active
     const isActive = (path) => {
         return url.startsWith(path);
+    };
+
+    const handleLogout = async () => {
+        try {
+            await fetch("/logout", {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": document
+                        .querySelector('meta[name="csrf-token"]')
+                        .getAttribute("content"),
+                },
+            });
+            window.location.href = "/";
+        } catch (error) {
+            console.error("Logout failed:", error);
+        }
     };
 
     return (
@@ -32,7 +58,12 @@ export default function AdminLayout({
                                     href="/"
                                     className="text-cust-blue text-2xl font-bold ml-2 sm:ml-0 no-underline hover:opacity-80 transition-opacity"
                                 >
-                                    E-Library
+                                    <img
+                                        src={
+                                            "/Logo-lectura-full-transparent.svg"
+                                        }
+                                        className="w-auto h-20"
+                                    />
                                 </a>
                             </div>
                         </div>
@@ -58,7 +89,7 @@ export default function AdminLayout({
                 {/* Overlay for mobile - only visible when sidebar is open */}
                 {isSidebarOpen && (
                     <div
-                        className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+                        className="fixed inset-0 bg-black/50 z-40 lg:hidden"
                         onClick={toggleSidebar}
                     ></div>
                 )}
@@ -117,25 +148,58 @@ export default function AdminLayout({
                                     <span>Buku</span>
                                 </Link>
                             </li>
+                            {auth?.user.role === "admin" && (
+                                <li>
+                                    <Link
+                                        href="/admin-pengguna"
+                                        className={`flex items-center px-4 py-2 text-sm font-medium ${
+                                            isActive("/admin-pengguna")
+                                                ? "text-cust-blue bg-blue-50 hover:bg-blue-100"
+                                                : "text-gray-700 hover:bg-gray-100"
+                                        }`}
+                                    >
+                                        <User
+                                            size={18}
+                                            className={`mr-3 ${
+                                                isActive("/admin-pengguna")
+                                                    ? "text-cust-blue"
+                                                    : "text-gray-500"
+                                            }`}
+                                        />
+                                        <span>Pengguna</span>
+                                    </Link>
+                                </li>
+                            )}
                             <li>
                                 <Link
-                                    href="/admin-pengguna"
+                                    href="/admin-statistik"
                                     className={`flex items-center px-4 py-2 text-sm font-medium ${
-                                        isActive("/admin-pengguna")
+                                        isActive("/admin-statistik")
                                             ? "text-cust-blue bg-blue-50 hover:bg-blue-100"
                                             : "text-gray-700 hover:bg-gray-100"
                                     }`}
                                 >
-                                    <User
+                                    <TrendingUp
                                         size={18}
                                         className={`mr-3 ${
-                                            isActive("/admin-pengguna")
+                                            isActive("/admin-statistik")
                                                 ? "text-cust-blue"
                                                 : "text-gray-500"
                                         }`}
                                     />
-                                    <span>Pengguna</span>
+                                    <span>Statistik</span>
                                 </Link>
+                            </li>
+                            <li>
+                                <button
+                                    className="flex items-center px-4 py-2 w-full text-sm font-medium text-red-500 hover:text-red-700 hover:bg-gray-100 cursor-pointer"
+                                    onClick={handleLogout}
+                                >
+                                    <LogOut size={18} className="mr-3" />
+                                    <span className="text-sm font-medium">
+                                        Logout
+                                    </span>
+                                </button>
                             </li>
                             {/* <li>
                                 <Link
@@ -159,12 +223,12 @@ export default function AdminLayout({
                             </li> */}
                         </ul>
                     </div>
-                    <div className="absolute bottom-0 w-full border-t border-gray-200 p-4">
+                    {/* <div className="absolute bottom-0 w-full border-t border-gray-200 p-4">
                         <button className="flex items-center text-red-500 hover:text-red-700">
                             <LogOut size={18} className="mr-2" />
                             <span className="text-sm font-medium">Logout</span>
                         </button>
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Main Content */}

@@ -137,7 +137,7 @@ const MediaLibrary = ({ videos }) => {
                                     ))
                                 ) : (
                                     <div className="px-4 py-3 text-sm text-gray-500 text-center">
-                                        Tidak ada video ditemukan
+                                        Tidak ada video yang ditemukan
                                     </div>
                                 )}
                             </div>

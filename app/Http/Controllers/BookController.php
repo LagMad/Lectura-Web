@@ -43,8 +43,9 @@ class BookController extends Controller
     {
         $kategori = Kategori::all();
 
-        // Get the category filter from request
+        // Get filters from request
         $categoryFilter = $request->get('category');
+        $searchFilter = $request->get('search');
 
         $books = Book::with([
             'favorites' => function ($query) {
@@ -59,8 +60,16 @@ class BookController extends Controller
                     $query->where('kategori', $category);
                 }
             })
+            ->when($searchFilter, function ($query, $search) {
+                // Filter by search term in title or author
+                $query->where(function ($q) use ($search) {
+                    $q->where('judul', 'LIKE', '%' . $search . '%')
+                        ->orWhere('penulis', 'LIKE', '%' . $search . '%');
+                });
+            })
             ->latest()
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString(); // This preserves the query parameters in pagination links
 
         foreach ($books as $book) {
             $book->isFavorited = $book->favorites->isNotEmpty();
@@ -84,6 +93,7 @@ class BookController extends Controller
             'kategori' => $kategori,
             'filters' => [
                 'category' => $categoryFilter,
+                'search' => $searchFilter,
             ],
         ]);
     }
@@ -133,123 +143,7 @@ class BookController extends Controller
     }
 
 
-    public function adminBuku(Request $request)
-    {
-
-        // Jurnaling Siswa
-        $search = $request->input('search', '');
-        $kategori = $request->input('kategori', '');
-        $perPage = $request->input('perPage', 10);
-        $page = $request->input('page', 1);
-
-        $queryJurnaling = Book::select([
-            'id',
-            'judul',
-            'penulis',
-            'cover_path',
-            'updated_at'
-        ]);
-
-        // Pencarian
-        if (!empty($search)) {
-            $queryJurnaling->where(function ($q) use ($search) {
-                $q->where('judul', 'like', "%{$search}%")
-                    ->orWhere('penulis', 'like', "%{$search}%");
-            });
-        }
-
-        // Filter kategori
-        if ($kategori !== '' && $kategori !== 'Semua Kategori') {
-            $queryJurnaling->where('kategori', $kategori);
-        }
-
-        // Pagination
-        $booksJurnaling = $queryJurnaling->orderBy('updated_at', 'desc')
-            ->paginate($perPage);
-
-        // Format data
-        $formattedBooks = $booksJurnaling->map(function ($book) {
-            $totalJurnal = Jurnaling::where('id_buku', $book->id)
-                ->whereHas('siswa', fn($q) => $q->where('role', 'siswa'))
-                ->count();
-
-            $totalSiswa = Jurnaling::where('id_buku', $book->id)
-                ->whereHas('siswa', fn($q) => $q->where('role', 'siswa'))
-                ->distinct('id_siswa')
-                ->count('id_siswa');
-
-
-            return [
-                'id' => $book->id,
-                'judul' => $book->judul,
-                'penulis' => $book->penulis,
-                'cover_image' => $book->cover_path,
-                'total_jurnal' => $totalJurnal,
-                'total_siswa' => $totalSiswa,
-                'update_terakhir' => $book->updated_at->format('d M Y'),
-            ];
-        });
-
-
-        $kategoriBuku = Book::distinct()->pluck('kategori')->filter()->toArray();
-        array_unshift($kategoriBuku, 'Semua Kategori');
-
-
-        // ManajemenBuku
-        $query = Book::query();
-
-        // Apply search filter
-        if ($request->has('search') && $request->search !== null && $request->search !== '') {
-            $searchTerm = $request->search;
-            $query->where(function ($q) use ($searchTerm) {
-                $q->where('judul', 'like', "%{$searchTerm}%")
-                    ->orWhere('penulis', 'like', "%{$searchTerm}%");
-            });
-        }
-
-        // Apply category filter
-        if ($request->has('kategori') && $request->kategori !== null && $request->kategori !== '') {
-            $query->where('kategori', $request->kategori);
-        }
-
-        // Apply status filter
-        if ($request->has('status') && $request->status !== null && $request->status !== '') {
-            $query->where('status', $request->status);
-        }
-
-        $books = $query->latest()->paginate(10)->appends($request->all());
-
-        $queryKategori = Kategori::query();
-
-        if (!empty($search)) {
-            $queryKategori->where('kategori', 'like', "%{$search}%");
-        }
-
-        $categories = $queryKategori->orderBy('created_at', 'desc')->paginate($perPage);
-
-        $booksTabelKonten = Book::whereNotIn('karya_oleh', ['Koleksi Perpustakaan'])->get();
-
-        return Inertia::render('Admin/Buku', [
-            'booksTabelKonten' => $booksTabelKonten,
-            'books' => $books,
-            'booksJurnaling' => $formattedBooks,
-            'totalBooks' => $books->total(),
-            'kategoriBuku' => $kategoriBuku,
-            'filters' => [
-                'search' => $search,
-                'kategori' => $kategori,
-                'page' => $page,
-                'perPage' => $perPage,
-            ],
-            'pagination' => [
-                'current_page' => $books->currentPage(),
-                'last_page' => $books->lastPage(),
-                'per_page' => $books->perPage(),
-                'total' => $books->total(),
-            ],
-            'kategoriAll' => $categories
-        ]);
-    }
+    
 
     public function create()
     {
@@ -404,11 +298,19 @@ class BookController extends Controller
         $isFavorited = false;
 
         // Get other books in the same category, excluding the current one
-        $relatedBooks = Book::where('kategori', $book->kategori) // same category
-            ->whereKeyNot($book->id)                            // exclude the one being viewed
-            ->latest()                                          // order by created_at DESC
-            ->take(10)                                          // limit to 10
-            ->get();
+        // Get other books in the same category, excluding the current one
+        $relatedBooks = Book::where('kategori', $book->kategori)       // same category
+            ->whereKeyNot($book->id)                                   // exclude the one being viewed
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating')                             // get average rating
+            ->latest()                                                 // order by created_at DESC
+            ->take(10)                                                 // limit to 10
+            ->get()
+            ->map(function ($bookItem) {
+                $bookItem->average_rating = $bookItem->reviews_avg_rating ?? 0;
+                return $bookItem;
+            });
+
 
         if (auth()->check()) {
             $isFavorited = $book->favorites()

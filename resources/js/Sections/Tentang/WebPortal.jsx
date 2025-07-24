@@ -11,8 +11,9 @@ const WebPortal = ({ web }) => {
                         Kunjungi website SMAN 1 Batu yang lainnya!
                     </p>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5 md:gap-10 justify-center items-center">
-                    {web.map((web) => (
+                {web.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5 md:gap-10 justify-center items-center w-full">
+                        web.map((web) => (
                         <button
                             onClick={() => window.open(web.web_link, "_blank")}
                             className="flex flex-col justify-center items-center gap-5 p-5 shadow-lg hover:shadow-xl rounded-2xl cursor-pointer scale-100 hover:scale-105 transition-all duration-300 ease-in-out"
@@ -31,8 +32,13 @@ const WebPortal = ({ web }) => {
                                 </span>
                             </div>
                         </button>
-                    ))}
-                </div>
+                        ))
+                    </div>
+                ) : (
+                    <div className="px-4 py-3 text-sm text-gray-500 text-center w-full">
+                        Tidak ada website portal yang ditemukan
+                    </div>
+                )}
             </div>
         </section>
     );

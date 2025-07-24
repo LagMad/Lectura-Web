@@ -1,16 +1,24 @@
-/* ------------------------------------------------------------------
-   components/Admin/ManajemenYoutube.jsx
------------------------------------------------------------------- */
 import { useState, useEffect, useMemo } from "react";
 import { useForm, router } from "@inertiajs/react";
-import { Plus, Edit, Trash2, X, Eye, EyeOff, Save, Search } from "lucide-react";
+import {
+    Plus,
+    Edit,
+    Trash2,
+    X,
+    Eye,
+    EyeOff,
+    Save,
+    Search,
+    Upload,
+    User,
+} from "lucide-react";
 
-/* ------------ Modal Wrapper (re‑use dari komponen Anda) ------------ */
+/* ------------ Modal Wrapper ------------ */
 const Modal = ({ show, onClose, children }) => {
     if (!show) return null;
     return (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center overflow-auto py-16">
-            <div className="bg-white rounded-lg shadow-lg w-full max-w-xl relative">
+            <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl relative">
                 <button
                     onClick={onClose}
                     className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
@@ -23,7 +31,7 @@ const Modal = ({ show, onClose, children }) => {
     );
 };
 
-/* ------------ Pagination helper (optional client‑side) ------------- */
+/* ------------ Pagination helper ------------- */
 const ITEMS_PER_PAGE = 10;
 function Pagination({ page, totalPages, onChange }) {
     return (
@@ -65,59 +73,58 @@ function Pagination({ page, totalPages, onChange }) {
 }
 
 /* ------------------------------------------------------------------
-   MAIN SECTION
+   MAIN COMPONENT
 ------------------------------------------------------------------ */
-export default function ManajemenYoutube({ videos = [] }) {
+export default function ManajemenPoster({ posters = [] }) {
     const [searchTerm, setSearchTerm] = useState("");
+    const [imagePreview, setImagePreview] = useState(null);
 
     /* ---------- pagination ---------- */
     const [page, setPage] = useState(1);
-    const filteredVideos = useMemo(() => {
-        return videos.filter(
-            (video) =>
-                video.judul.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                video.pengunggah
-                    .toLowerCase()
-                    .includes(searchTerm.toLowerCase()) ||
-                video.created_by
+    const filteredPosters = useMemo(() => {
+        return posters.filter(
+            (item) =>
+                item.judul.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                item.karya_oleh
                     .toLowerCase()
                     .includes(searchTerm.toLowerCase())
         );
-    }, [videos, searchTerm]);
+    }, [posters, searchTerm]);
 
-    const totalPages = Math.ceil(filteredVideos.length / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(filteredPosters.length / ITEMS_PER_PAGE);
 
     const currentData = useMemo(
         () =>
-            filteredVideos.slice(
+            filteredPosters.slice(
                 (page - 1) * ITEMS_PER_PAGE,
                 page * ITEMS_PER_PAGE
             ),
-        [page, filteredVideos]
+        [page, filteredPosters]
     );
 
-    useEffect(() => setPage(1), [videos]);
+    useEffect(() => setPage(1), [posters]);
 
     /* ---------- modal state ---------- */
     const [modal, setModal] = useState({ type: null, item: null });
 
     /* ---------- form (add / edit) ---------- */
-    const { data, setData, reset, errors, processing, post, put } = useForm({
+    const { data, setData, reset, errors, processing, post } = useForm({
         judul: "",
-        link: "",
+        karya_oleh: "",
+        image: null,
         is_active: false,
-        pengunggah: "",
     });
 
-    /* Prefill ketika ‘edit’ */
+    /* Prefill ketika 'edit' */
     useEffect(() => {
         if (modal.type === "edit" && modal.item) {
             setData({
                 judul: modal.item.judul,
-                link: modal.item.link,
+                karya_oleh: modal.item.karya_oleh,
+                image: null,
                 is_active: modal.item.is_active,
-                pengunggah: modal.item.pengunggah ?? "",
             });
+            setImagePreview(modal.item.image_path || null);
         }
     }, [modal]);
 
@@ -126,38 +133,66 @@ export default function ManajemenYoutube({ videos = [] }) {
             reset();
             setData({
                 judul: "",
-                link: "",
+                karya_oleh: "",
+                image: null,
                 is_active: false,
-                pengunggah: "",
             });
+            setImagePreview(null);
         }
     }, [modal]);
 
     const closeModal = () => {
         setModal({ type: null, item: null });
         reset();
+        setImagePreview(null);
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setData("image", file);
+            // Create preview
+            const reader = new FileReader();
+            reader.onload = (e) => setImagePreview(e.target.result);
+            reader.readAsDataURL(file);
+        }
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const options = {
-            preserveScroll: true,
-            onSuccess: () => {
-                closeModal();
-                reset();
-            },
-        };
 
-        if (modal.type === "add") {
-            post(route("admin.video.store"), options);
-        } else if (modal.type === "edit") {
-            put(route("admin.video.update", modal.item.id), options);
+        if (modal.type === "edit") {
+            const fd = new FormData();
+            fd.append("_method", "PUT"); // <-- spoof
+            fd.append("judul", data.judul);
+            fd.append("karya_oleh", data.karya_oleh);
+            fd.append("is_active", data.is_active ? 1 : 0);
+            if (data.image) fd.append("image", data.image);
+
+            router.post(route("poster.update", modal.item.id), fd, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    closeModal();
+                    reset();
+                    setImagePreview(null);
+                },
+            });
+        } else {
+            post(route("poster.store"), {
+                forceFormData: true,
+                preserveScroll: true,
+                onSuccess: () => {
+                    closeModal();
+                    reset();
+                    setImagePreview(null);
+                },
+            });
         }
     };
 
     /* ---------- delete ---------- */
     const confirmDelete = (item) => {
-        router.delete(route("admin.video.destroy", item.id), {
+        router.delete(route("poster.destroy", item.id), {
             preserveScroll: true,
             onSuccess: () => closeModal(),
         });
@@ -168,10 +203,9 @@ export default function ManajemenYoutube({ videos = [] }) {
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-5">
                 <div>
-                    <h2 className="text-2xl font-bold">Video Youtube</h2>
+                    <h2 className="text-2xl font-bold">Manajemen Poster</h2>
                     <p className="text-sm text-gray-500">
-                        Kelola video youtube untuk ditampilkan di halaman
-                        tentang.
+                        Kelola poster untuk ditampilkan di beranda.
                     </p>
                 </div>
                 <button
@@ -180,7 +214,7 @@ export default function ManajemenYoutube({ videos = [] }) {
                     }}
                     className="inline-flex items-center gap-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
                 >
-                    <Plus className="w-4 h-4" /> Tambah Video
+                    <Plus className="w-4 h-4" /> Tambah Poster
                 </button>
             </div>
 
@@ -189,7 +223,7 @@ export default function ManajemenYoutube({ videos = [] }) {
                 <input
                     type="text"
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    placeholder="Cari video berdasarkan judul, pengunggah, atau akun pengunggah..."
+                    placeholder="Cari poster berdasarkan judul atau pembuat karya..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -201,10 +235,9 @@ export default function ManajemenYoutube({ videos = [] }) {
                     <thead className="bg-gray-50">
                         {[
                             "#",
+                            "Gambar",
                             "Judul",
-                            "Link",
-                            "Pengunggah",
-                            "Diunggah Menggunakan Akun",
+                            "Karya Oleh",
                             "Status",
                             "Aksi",
                         ].map((h) => (
@@ -217,31 +250,55 @@ export default function ManajemenYoutube({ videos = [] }) {
                         ))}
                     </thead>
                     <tbody>
-                        {currentData.map((v) => (
-                            <tr key={v.id} className="hover:bg-gray-50">
-                                <td className="px-6 py-4">{v.id}</td>
+                        {currentData.map((item) => (
+                            <tr key={item.id} className="hover:bg-gray-50">
+                                <td className="px-6 py-4">{item.id}</td>
+                                <td className="px-6 py-4">
+                                    {item.image_path ? (
+                                        <img
+                                            src={item.image_path}
+                                            alt={item.judul}
+                                            className="w-16 h-16 object-cover rounded"
+                                        />
+                                    ) : (
+                                        <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">
+                                            <span className="text-gray-400 text-xs">
+                                                No img
+                                            </span>
+                                        </div>
+                                    )}
+                                </td>
                                 <td className="px-6 py-4 max-w-xs">
-                                    <div className="truncate" title={v.judul}>
-                                        {v.judul}
+                                    <div className="truncate" title={item.judul}>
+                                        {item.judul}
                                     </div>
                                 </td>
-                                <td className="px-6 py-4 text-blue-600 underline">
-                                    <a
-                                        href={v.link}
-                                        target="_blank"
-                                        rel="noreferrer"
+                                <td className="px-6 py-4 max-w-xs">
+                                    <div
+                                        className="truncate inline-flex items-center gap-1"
+                                        title={item.karya_oleh}
                                     >
-                                        {v.link}
-                                    </a>
+                                        <User className="w-3 h-3 text-gray-400" />
+                                        {item.karya_oleh}
+                                    </div>
                                 </td>
-                                <td className="px-6 py-4">{v.pengunggah}</td>
-                                <td className="px-6 py-4">{v.created_by}</td>
                                 <td className="px-6 py-4">
-                                    {v.is_active ? (
+                                    {item.is_active ? (
                                         <Eye className="w-4 h-4 text-green-600 inline" />
                                     ) : (
                                         <EyeOff className="w-4 h-4 text-gray-400 inline" />
                                     )}
+                                    <span
+                                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                            item.is_active
+                                                ? "text-green-600 bg-green-50"
+                                                : "text-gray-600 bg-gray-50"
+                                        }`}
+                                    >
+                                        {item.is_active
+                                            ? "Aktif"
+                                            : "Tidak Aktif"}
+                                    </span>
                                 </td>
                                 <td className="px-6 py-4">
                                     <div className="flex gap-2">
@@ -249,7 +306,7 @@ export default function ManajemenYoutube({ videos = [] }) {
                                             onClick={() =>
                                                 setModal({
                                                     type: "edit",
-                                                    item: v,
+                                                    item: item,
                                                 })
                                             }
                                             className="text-green-600 hover:text-green-800"
@@ -260,7 +317,7 @@ export default function ManajemenYoutube({ videos = [] }) {
                                             onClick={() =>
                                                 setModal({
                                                     type: "delete",
-                                                    item: v,
+                                                    item: item,
                                                 })
                                             }
                                             className="text-red-600 hover:text-red-800"
@@ -274,10 +331,10 @@ export default function ManajemenYoutube({ videos = [] }) {
                         {currentData.length === 0 && (
                             <tr>
                                 <td
-                                    colSpan={7}
-                                    className="text-center py-8 text-gray-500 w-full"
+                                    colSpan={6}
+                                    className="text-center py-8 text-gray-500"
                                 >
-                                    Belum ada video.
+                                    Belum ada poster.
                                 </td>
                             </tr>
                         )}
@@ -296,20 +353,27 @@ export default function ManajemenYoutube({ videos = [] }) {
                 show={modal.type === "add" || modal.type === "edit"}
                 onClose={closeModal}
             >
-                <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                <form
+                    onSubmit={handleSubmit}
+                    className="p-6 space-y-4"
+                    encType="multipart/form-data"
+                >
                     <h3 className="text-lg font-semibold">
-                        {modal.type === "add" ? "Tambah Video" : "Edit Video"}
+                        {modal.type === "add"
+                            ? "Tambah Poster"
+                            : "Edit Poster"}
                     </h3>
 
                     <div>
                         <label className="block text-sm font-medium mb-1">
-                            Judul
+                            Judul Poster
                         </label>
                         <input
                             type="text"
                             value={data.judul}
                             onChange={(e) => setData("judul", e.target.value)}
                             className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Judul poster "
                             required
                         />
                         {errors.judul && (
@@ -320,46 +384,64 @@ export default function ManajemenYoutube({ videos = [] }) {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium">
-                            URL YouTube
+                        <label className="block text-sm font-medium mb-1">
+                            Karya Oleh
                         </label>
-                        <div className="text-gray-500 text-xs mb-1">
-                            Pastikan video tersebut sudah dicentang perizinan
-                            untuk dapat dipasang (embed) atau akan tampil "Video
-                            Unavailable".
-                        </div>
                         <input
-                            type="url"
-                            value={data.link}
-                            onChange={(e) => setData("link", e.target.value)}
-                            placeholder="https://www.youtube.com/watch?v=XXXX"
+                            type="text"
+                            value={data.karya_oleh}
+                            onChange={(e) =>
+                                setData("karya_oleh", e.target.value)
+                            }
+                            placeholder="Nama pembuat karya"
                             className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             required
                         />
-                        {errors.link && (
+                        {errors.karya_oleh && (
                             <p className="text-red-500 text-xs mt-1">
-                                {errors.link}
+                                {errors.karya_oleh}
                             </p>
                         )}
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium mb-1">
-                            Pengunggah
+                            Gambar Poster
                         </label>
-                        <input
-                            type="text"
-                            value={data.pengunggah}
-                            onChange={(e) =>
-                                setData("pengunggah", e.target.value)
-                            }
-                            placeholder="Nama pengunggah"
-                            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            required
-                        />
-                        {errors.pengunggah && (
+                        <div className="space-y-2">
+                        {modal.type === "add" && (
+                                <input
+                                    type="file"
+                                    accept="image/jpeg,image/jpg,image/png"
+                                    onChange={handleImageChange}
+                                    className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    required
+                                />
+                            )}
+                            {modal.type === "edit" && (
+                                <input
+                                    type="file"
+                                    accept="image/jpeg,image/jpg,image/png"
+                                    onChange={handleImageChange}
+                                    className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            )}
+                            <div className="text-xs text-gray-500">
+                                Format: JPEG, JPG, PNG. Maksimal 10MB.
+                            </div>
+                            {imagePreview && (
+                                <div className="mt-2">
+                                    <img
+                                        src={imagePreview}
+                                        alt="Preview"
+                                        className="w-48 h-48 object-cover rounded border"
+                                    />
+                                </div>
+                            )}
+                        </div>
+                        {errors.image && (
                             <p className="text-red-500 text-xs mt-1">
-                                {errors.pengunggah}
+                                {errors.image}
                             </p>
                         )}
                     </div>
@@ -403,10 +485,10 @@ export default function ManajemenYoutube({ videos = [] }) {
             <Modal show={modal.type === "delete"} onClose={closeModal}>
                 <div className="p-6 space-y-4">
                     <h3 className="text-lg font-semibold text-red-600">
-                        Hapus Video
+                        Hapus Poster 
                     </h3>
                     <p className="text-gray-600">
-                        Yakin ingin menghapus video&nbsp;
+                        Yakin ingin menghapus poster &nbsp;
                         <strong>{modal.item?.judul}</strong>?
                     </p>
                     <div className="flex justify-end gap-2 pt-4">

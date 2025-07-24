@@ -3,9 +3,10 @@ import BukuHomeCard from "../../Components/ui/BukuHomeCard";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
+import "swiper/css/navigation";
 import "swiper/css/pagination";
 
-import { Pagination } from "swiper/modules";
+import { Autoplay, Navigation, Pagination } from "swiper/modules";
 
 import {
     MdOutlineKeyboardArrowLeft,
@@ -103,16 +104,17 @@ const BookShowcase = ({
     };
 
     const renderSwiper = () => (
-        <>
+        <div className="book-showcase">
             <Swiper
-                modules={[Pagination]}
+                modules={[Autoplay, Pagination, Navigation]}
                 spaceBetween={10}
                 slidesPerView={slidesPerView}
                 slidesPerGroup={slidesPerView} // Back to slidesPerView for proper grouping
-                pagination={false}
+                pagination={{ clickable: true }}
+                navigation={true}
                 onSwiper={(swiper) => (swiperRef.current = swiper)}
                 onSlideChange={(swiper) => setActiveIndex(swiper.activeIndex)}
-                className="w-full"
+                className="w-full book-showcase"
                 breakpoints={{
                     320: {
                         slidesPerView: 1,
@@ -151,8 +153,8 @@ const BookShowcase = ({
             </Swiper>
 
             {/* Navigation Controls - Only show if there are multiple pages */}
-            {totalPages > 1 && (
-                <div className="flex justify-center items-center gap-2 mt-4">
+            {/* {totalPages > 1 && ( */}
+                {/* <div className="flex justify-center items-center gap-2 mt-4">
                     <button
                         className="cursor-pointer w-8 h-8 flex items-center justify-center text-xl font-bold rounded-full border border-gray-300 hover:bg-gray-200 disabled:opacity-50 transition-all duration-200"
                         onClick={goToPrevPage}
@@ -160,8 +162,6 @@ const BookShowcase = ({
                     >
                         <MdOutlineKeyboardArrowLeft />
                     </button>
-
-                    {/* Pagination Dots */}
                     {Array.from({ length: totalPages }).map((_, idx) => (
                         <div
                             key={idx}
@@ -173,7 +173,6 @@ const BookShowcase = ({
                             onClick={() => goToPage(idx)}
                         />
                     ))}
-
                     <button
                         className="cursor-pointer w-8 h-8 flex items-center justify-center text-xl font-bold rounded-full border border-gray-300 hover:bg-gray-200 disabled:opacity-50 transition-all duration-200"
                         onClick={goToNextPage}
@@ -181,15 +180,15 @@ const BookShowcase = ({
                     >
                         <MdOutlineKeyboardArrowRight />
                     </button>
-                </div>
-            )}
-        </>
+                </div> */}
+            {/* )} */}
+        </div>
     );
 
     return (
         <div
             ref={containerRef}
-            className="flex flex-col justify-center items-start gap-5 sm:gap-8 lg:gap-10 w-full p-5 sm:p-8 lg:p-10 pb-10 sm:pb-16 lg:pb-24 bg-[#EFF6FF] rounded-xl sm:rounded-2xl"
+            className="flex flex-col justify-center items-start gap-5 sm:gap-8 lg:gap-10 w-full p-5 sm:p-8 lg:p-10 pb-10 md:pb-16 bg-[#EFF6FF] rounded-xl sm:rounded-2xl"
         >
             {/* Header Section */}
             <div className="flex flex-col justify-center items-center gap-3 sm:gap-4 lg:gap-5 w-full">
@@ -204,19 +203,19 @@ const BookShowcase = ({
 
             {/* Main Content */}
             <div className="w-full">
-                {isMobile ? (
-                    /* Mobile Layout */
-                    <div className="w-full bg-[#54473F] p-4 sm:p-6 rounded-xl sm:rounded-2xl">
-                        <h3 className="text-xl sm:text-2xl font-extrabold text-white mb-6">
+                {/* {!isMobile ? ( */}
+                    {/* /* Mobile Layout */}
+                    <div className="w-full p-4 sm:p-6 rounded-xl sm:rounded-2xl">
+                        {/* <h3 className="text-xl sm:text-2xl font-extrabold text-white mb-6">
                             {subjudul}
-                        </h3>
+                        </h3> */}
                         {/* Image hidden on mobile */}
 
                         {/* Books Section */}
                         <div className="w-full">
                             <div className="flex justify-between items-center mb-4">
                                 <button
-                                    className="w-full text-right underline text-lg font-bold cursor-pointer text-white"
+                                    className="w-full text-right underline text-lg font-bold cursor-pointer"
                                     onClick={() =>
                                         (window.location.href = "/buku")
                                     }
@@ -234,23 +233,23 @@ const BookShowcase = ({
                             )}
                         </div>
                     </div>
-                ) : (
-                    /* Desktop Layout with Absolute Positioning */
-                    <div className="relative w-full">
-                        <div className="relative flex flex-col justify-start items-start w-[300px] xl:w-[340px] 2xl:w-[370px] h-[520px] sm:h-[560px] lg:h-[580px] bg-[#54473F] p-4 lg:p-6 rounded-xl lg:rounded-2xl gap-3 lg:gap-5">
+                {/* ) : ( */}
+                    {/* /* Desktop Layout with Absolute Positioning */}
+                    {/* <div className="relative w-full"> */}
+                        {/* <div className="relative flex flex-col justify-start items-start w-[300px] xl:w-[340px] 2xl:w-[370px] h-[520px] sm:h-[560px] lg:h-[580px] bg-[#54473F] p-4 lg:p-6 rounded-xl lg:rounded-2xl gap-3 lg:gap-5"> */}
                             {/* Sub Judul */}
-                            <h3 className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-extrabold w-full text-white">
+                            {/* <h3 className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-extrabold w-full text-white">
                                 {subjudul}
-                            </h3>
+                            </h3> */}
                             {/* Gambar Orang */}
-                            <img
+                            {/* <img
                                 className="h-[350px] sm:h-[380px] lg:h-[400px] w-auto object-contain"
                                 src={image}
                                 alt="subject image"
-                            />
+                            /> */}
 
                             {/* Absolute positioned books section */}
-                            <div
+                            {/* <div
                                 className="absolute flex flex-col left-[calc(100%-60px)] lg:left-[calc(100%-80px)] top-16 lg:top-20 xl:top-24 gap-2 lg:gap-3"
                                 style={{
                                     width:
@@ -280,7 +279,7 @@ const BookShowcase = ({
                             </div>
                         </div>
                     </div>
-                )}
+                )} */}
             </div>
         </div>
     );

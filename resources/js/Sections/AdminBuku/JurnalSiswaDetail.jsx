@@ -23,12 +23,12 @@ const JurnalSiswaDetail = ({ book, siswa, totalPages = 1 }) => {
     }, [siswa]);
 
     useEffect(() => {
-        console.log("book", book)
-    }, [book])
+        console.log("book", book);
+    }, [book]);
 
     useEffect(() => {
-        console.log("siswa", siswa)
-    }, [siswa])
+        console.log("siswa", siswa);
+    }, [siswa]);
 
     const fetchStudents = async (page = 1, query = "") => {
         setLoading(true);
@@ -130,6 +130,13 @@ const JurnalSiswaDetail = ({ book, siswa, totalPages = 1 }) => {
         return pages;
     };
 
+    const isCloudinaryUrl = (url) => {
+        const pattern =
+            /^https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/v\d+\/[^/]+\/[^/]+\.(jpg|jpeg|png|gif)$/i;
+        return pattern.test(url);
+    };
+    const isValidImage = book.cover_path && isCloudinaryUrl(book.cover_path);
+
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
@@ -149,11 +156,17 @@ const JurnalSiswaDetail = ({ book, siswa, totalPages = 1 }) => {
                 {/* Book Info */}
                 {book && (
                     <div className="p-4 flex items-start border-b">
-                        <img
-                            src={book.cover_path}
-                            alt={book.judul}
-                            className="w-20 h-28 object-cover mr-4"
-                        />
+                        {isValidImage ? (
+                            <img
+                                className="w-20 h-28 object-cover mr-4"
+                                src={book.cover_path}
+                                alt={book.judul}
+                            />
+                        ) : (
+                            <div className="flex justify-center items-center w-20 h-28 text-center object-contain mb-2 bg-gray-300 text-gray-500">
+                                No Cover
+                            </div>
+                        )}
                         <div>
                             <h3 className="font-bold text-lg">{book.judul}</h3>
                             <p className="text-gray-600">{book.penulis}</p>

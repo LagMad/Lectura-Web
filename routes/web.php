@@ -12,8 +12,10 @@ use App\Http\Controllers\NIPDController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PengumumanController;
+use App\Http\Controllers\PosterController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\StaffPerpustakaanController;
+use App\Http\Controllers\StatistikController;
 use App\Http\Controllers\TentangController;
 use App\Http\Controllers\WebPortalController;
 use App\Http\Controllers\YoutubeVideoController;
@@ -27,7 +29,7 @@ Route::middleware(['auth', 'role:admin,guru'])->group(function () {
     Route::get('/admin-edit-buku/{book}', [BookController::class, 'edit'])->name('books.edit');
     Route::put('/update-buku/{book}', [BookController::class, 'update'])->name('books.update');
     Route::delete('/hapus-buku/{book}', [BookController::class, 'destroy'])->name('books.destroy');
-    Route::get('/admin-buku', [BookController::class, 'adminBuku'])->name('books.admin');
+    Route::get('/admin-buku', [AdminController::class, 'adminBuku'])->name('books.admin');
     Route::get('/admin-dashboard', [AdminController::class, 'adminDashboard'])->name('admin.dashboard');
 
     Route::get('/jurnal/book/{book_id}', [JurnalingController::class, 'detail'])->name('jurnal.book.detail');
@@ -51,16 +53,29 @@ Route::middleware(['auth', 'role:admin,guru'])->group(function () {
         Route::put('/{video}', [YoutubeVideoController::class, 'update'])->name('update'); // /video/{id}
         Route::delete('/{video}', [YoutubeVideoController::class, 'destroy'])->name('destroy');
     });
+
+    Route::resource('poster', PosterController::class);
+
+    Route::prefix('admin-statistik')->name('admin.statistik.')->group(function () {
+        Route::get('/', [StatistikController::class, 'index'])->name('dashboard');
+        Route::get('/api/visitor-stats', [StatistikController::class, 'getVisitorStats'])->name('api.stats');
+    });
 });
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/admin-pengguna', [PenggunaController::class, 'index'])->name('users.admin');
+  Route::get('/admin-pengguna', [PenggunaController::class, 'index'])->name('users.admin');
+    Route::get('/admin/users/create', [PenggunaController::class, 'create'])->name('admin.users.create');
+    Route::post('/admin/users', [PenggunaController::class, 'store'])->name('users.store');
+    Route::get('/admin/users/{user}/edit', [PenggunaController::class, 'edit'])->name('admin.users.edit');
+    Route::put('/admin/users/{user}', [PenggunaController::class, 'update'])->name('users.update');
     Route::delete('/hapus-user/{user}', [PenggunaController::class, 'destroy'])->name('users.destroy');
     Route::get('/admin-pengaturan', function () {
         return Inertia::render('Admin/Pengaturan');
     });
+
     Route::post('/admin-pengguna', [PenggunaController::class, 'store'])->name('users.store');
     Route::get('/tambah-pengguna', [PenggunaController::class, 'create'])->name('admin.users.create');
+    Route::resource('nipd', NIPDController::class);
 
     Route::post('/kategori', [KategoriController::class, 'store'])->name('kategori.store');
     Route::delete('/kategori/{id}', [KategoriController::class, 'destroy'])->name('kategori.destroy');

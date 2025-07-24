@@ -158,7 +158,7 @@ export default function ManajemenPengguna({ users }) {
 
     return (
         <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 ">
-            <Head title="Manajemen Pengguna" />
+            <Head title="Manajemen Admin/Guru" />
 
             {flashMessage && (
                 <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
@@ -168,7 +168,7 @@ export default function ManajemenPengguna({ users }) {
 
             <div className="lg:flex justify-between items-center mb-2">
                 <h2 className="text-2xl lg:mb-0 mb-2 font-bold">
-                    Manajemen Pengguna
+                    Manajemen Admin/Guru
                 </h2>
                 <button
                     onClick={() => router.visit(route("admin.users.create"))}
@@ -410,7 +410,7 @@ export default function ManajemenPengguna({ users }) {
 
             {/* Delete confirmation modal */}
             {showDeleteConfirm && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
                     <div className="bg-white rounded-lg p-6 max-w-md w-full">
                         <h3 className="text-lg font-medium mb-4">
                             Konfirmasi Hapus

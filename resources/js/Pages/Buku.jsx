@@ -16,11 +16,11 @@ const Buku = ({ books, kategori, filters = {}, topRatedBooks }) => {
     const initialCategory = filters.category || "Semua Buku";
 
     const [activeCategory, setActiveCategory] = useState(initialCategory);
-    const [currentPage, setCurrentPage] = useState(1);
     const [isMobile, setIsMobile] = useState(false);
     const [processing, setProcessing] = useState({});
-    const [searchQuery, setSearchQuery] = useState("");
+    const [searchQuery, setSearchQuery] = useState(filters.search || "");
     const [filteredBooks, setFilteredBooks] = useState([]);
+    const [searchTimeoutId, setSearchTimeoutId] = useState(null);
 
     const [bookmarks, setBookmarks] = useState(() => {
         const initialBookmarks = {};
@@ -30,9 +30,51 @@ const Buku = ({ books, kategori, filters = {}, topRatedBooks }) => {
         return initialBookmarks;
     });
 
+    // Auto search with debounce
     useEffect(() => {
-        setFilteredBooks(books.data);
-    }, [books]);
+        // Clear existing timeout
+        if (searchTimeoutId) {
+            clearTimeout(searchTimeoutId);
+        }
+
+        // Don't trigger search on initial load if there's already a search filter
+        if (searchQuery === (filters.search || "")) {
+            return;
+        }
+
+        // Set new timeout for auto search
+        const timeoutId = setTimeout(() => {
+            performSearch(searchQuery);
+        }, 100);
+
+        setSearchTimeoutId(timeoutId);
+
+        // Cleanup function
+        return () => {
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+            }
+        };
+    }, [searchQuery, activeCategory]);
+
+    const performSearch = (query) => {
+        const params = {
+            ...(activeCategory !== "Semua Buku" && { category: activeCategory }),
+            ...(query.trim() && { search: query.trim() })
+        };
+
+        router.visit(route("books.index"), {
+            data: params,
+            preserveState: true,
+            preserveScroll: false,
+        });
+    };
+
+    useEffect(() => {
+        let filtered = books.data;
+        
+        setFilteredBooks(filtered);
+    }, [books.data]);
 
     // Update active category when filters change
     useEffect(() => {
@@ -40,37 +82,6 @@ const Buku = ({ books, kategori, filters = {}, topRatedBooks }) => {
             setActiveCategory(filters.category);
         }
     }, [filters.category]);
-
-    useEffect(() => {
-        let filtered = books.data;
-
-        // Filter by search query
-        if (searchQuery.trim() !== "") {
-            filtered = filtered.filter(
-                (book) =>
-                    (book.judul &&
-                        book.judul
-                            .toLowerCase()
-                            .includes(searchQuery.toLowerCase())) ||
-                    (book.penulis &&
-                        book.penulis
-                            .toLowerCase()
-                            .includes(searchQuery.toLowerCase()))
-            );
-        }
-
-        // Filter by category
-        if (activeCategory !== "Semua Buku") {
-            filtered = filtered.filter((book) => {
-                // Handle null or undefined kategori values
-                const bookCategory = book.kategori || "";
-                return bookCategory === activeCategory;
-            });
-        }
-
-        setFilteredBooks(filtered);
-        setCurrentPage(1);
-    }, [searchQuery, activeCategory, books.data, kategori]);
 
     const handleBookmarkToggle = (bookId) => {
         if (processing[bookId]) return;
@@ -106,6 +117,15 @@ const Buku = ({ books, kategori, filters = {}, topRatedBooks }) => {
     const handleSearch = (e) => {
         // Prevent form submission if button is clicked
         if (e) e.preventDefault();
+        
+        // Clear any pending auto-search timeout
+        if (searchTimeoutId) {
+            clearTimeout(searchTimeoutId);
+            setSearchTimeoutId(null);
+        }
+
+        // Perform immediate search
+        performSearch(searchQuery);
     };
 
     // Handler for search input changes
@@ -113,17 +133,47 @@ const Buku = ({ books, kategori, filters = {}, topRatedBooks }) => {
         setSearchQuery(e.target.value);
     };
 
+    // Handle Enter key in search input
+    const handleSearchKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            handleSearch(e);
+        }
+    };
+
     const handleCategoryChange = (newCategory) => {
         setActiveCategory(newCategory);
-        setCurrentPage(1);
 
-        // Update URL with new category parameter
-        const categoryParam =
-            newCategory === "Semua Buku" ? {} : { category: newCategory };
-        router.visit(route("buku.index"), {
-            data: categoryParam,
+        // Clear any pending search timeout
+        if (searchTimeoutId) {
+            clearTimeout(searchTimeoutId);
+            setSearchTimeoutId(null);
+        }
+
+        // Update URL with new category parameter and preserve search
+        const params = {
+            ...(newCategory !== "Semua Buku" && { category: newCategory }),
+            ...(searchQuery.trim() && { search: searchQuery.trim() })
+        };
+
+        router.visit(route("books.index"), {
+            data: params,
             preserveState: true,
             preserveScroll: true,
+        });
+    };
+
+    // Handle pagination
+    const handlePageChange = (page) => {
+        const params = {
+            page,
+            ...(activeCategory !== "Semua Buku" && { category: activeCategory }),
+            ...(searchQuery.trim() && { search: searchQuery.trim() })
+        };
+
+        router.visit(route("books.index"), {
+            data: params,
+            preserveState: true,
+            preserveScroll: false,
         });
     };
 
@@ -134,8 +184,6 @@ const Buku = ({ books, kategori, filters = {}, topRatedBooks }) => {
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-    const booksPerPage = 10;
-
     const allCategories = [
         { id: "Semua Buku", nama: "Semua Buku" },
         ...kategori.map((k) => ({
@@ -143,13 +191,6 @@ const Buku = ({ books, kategori, filters = {}, topRatedBooks }) => {
             nama: k.kategori,
         })),
     ];
-
-    const totalPages = Math.ceil(filteredBooks.length / booksPerPage);
-
-    const currentBooks = filteredBooks.slice(
-        (currentPage - 1) * booksPerPage,
-        currentPage * booksPerPage
-    );
 
     const categoryMenu = (
         <Menu>
@@ -168,9 +209,106 @@ const Buku = ({ books, kategori, filters = {}, topRatedBooks }) => {
         </Menu>
     );
 
+    const isCloudinaryUrl = (url) => {
+        if (!url) return false;
+        const pattern =
+            /^https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/v\d+\/[^/]+\/[^/]+\.(jpg|jpeg|png|gif|webp)$/i;
+        return pattern.test(url);
+    };
+
+    const isValidImageUrl = (url) => {
+        if (!url) return false;
+        // Check if it's a Cloudinary URL or any other valid image URL
+        return isCloudinaryUrl(url) || 
+               /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(url) ||
+               url.startsWith('/') || // Local image paths
+               url.startsWith('data:image/'); // Base64 images
+    };
+
     useEffect(() => {
         console.log("books", books);
     }, [books]);
+
+    // Generate pagination buttons
+    const renderPaginationButtons = () => {
+        const currentPage = books.current_page;
+        const lastPage = books.last_page;
+        const buttons = [];
+        
+        // Determine the range of page numbers to show
+        let startPage = Math.max(1, currentPage - 2);
+        let endPage = Math.min(lastPage, currentPage + 2);
+        
+        // Adjust the range to always show 5 buttons if possible
+        if (endPage - startPage < 4) {
+            if (startPage === 1) {
+                endPage = Math.min(lastPage, startPage + 4);
+            } else {
+                startPage = Math.max(1, endPage - 4);
+            }
+        }
+        
+        // Add first page and ellipsis if needed
+        if (startPage > 1) {
+            buttons.push(
+                <button
+                    key={1}
+                    onClick={() => handlePageChange(1)}
+                    className="cursor-pointer w-8 h-8 flex items-center justify-center text-base rounded-full bg-cust-light-gray hover:bg-cust-gray hover:text-white transition-all duration-300 ease-in-out"
+                >
+                    1
+                </button>
+            );
+            
+            if (startPage > 2) {
+                buttons.push(
+                    <span key="ellipsis1" className="w-8 h-8 flex items-center justify-center">
+                        ...
+                    </span>
+                );
+            }
+        }
+        
+        // Add page buttons
+        for (let i = startPage; i <= endPage; i++) {
+            buttons.push(
+                <button
+                    key={i}
+                    onClick={() => handlePageChange(i)}
+                    className={`cursor-pointer w-8 h-8 flex items-center justify-center text-base rounded-full ${
+                        currentPage === i
+                            ? "bg-cust-blue text-white font-bold"
+                            : "bg-cust-light-gray"
+                    } hover:bg-cust-gray hover:text-white transition-all duration-300 ease-in-out`}
+                >
+                    {i}
+                </button>
+            );
+        }
+        
+        // Add last page and ellipsis if needed
+        if (endPage < lastPage) {
+            if (endPage < lastPage - 1) {
+                buttons.push(
+                    <span key="ellipsis2" className="w-8 h-8 flex items-center justify-center">
+                        ...
+                    </span>
+                );
+            }
+            
+            buttons.push(
+                <button
+                    key={lastPage}
+                    onClick={() => handlePageChange(lastPage)}
+                    className="cursor-pointer w-8 h-8 flex items-center justify-center text-base rounded-full bg-cust-light-gray hover:bg-cust-gray hover:text-white transition-all duration-300 ease-in-out"
+                >
+                    {lastPage}
+                </button>
+            );
+        }
+        
+        return buttons;
+    };
 
     return (
         <Layout>
@@ -180,13 +318,13 @@ const Buku = ({ books, kategori, filters = {}, topRatedBooks }) => {
                         Koleksi Buku Perpustakaan
                     </div>
                     <div className="flex flex-col md:flex-row w-full md:w-3/5 bg-white px-10 md:px-12 py-5 rounded-lg gap-3">
-                        {/* Option 1: Try with direct input */}
                         <input
                             type="text"
                             className="w-full px-4 py-2 border rounded-lg"
                             placeholder="Cari berdasarkan judul atau penulis..."
                             value={searchQuery}
                             onChange={handleSearchChange}
+                            onKeyPress={handleSearchKeyPress}
                         />
 
                         <button
@@ -240,23 +378,28 @@ const Buku = ({ books, kategori, filters = {}, topRatedBooks }) => {
                         )}
                     </div>
 
+                    {/* Show pagination info */}
+                    <div className="flex justify-between items-center w-full">
+                        <div className="text-sm text-gray-600">
+                            Menampilkan {books.from || 0} - {books.to || 0} dari {books.total || 0} buku
+                        </div>
+                    </div>
+
                     {filteredBooks.length === 0 ? (
                         <div className="flex justify-center items-center w-full py-10">
                             <p className="flex flex-col text-center text-xl text-gray-500">
                                 Tidak ada buku yang ditemukan.
                                 <span className="text-base">
-                                    Minta staf perpustakaan atau gurumu untuk
-                                    menambahkan buku dengan kategori{" "}
-                                    <span className="font-bold">
-                                        {activeCategory}
-                                    </span>
-                                    !
+                                    {searchQuery ? 
+                                        `Coba kata kunci lain atau ubah kategori pencarian.` :
+                                        `Minta staf perpustakaan atau gurumu untuk menambahkan buku dengan kategori ${activeCategory}!`
+                                    }
                                 </span>
                             </p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-7 w-full ">
-                            {currentBooks.map((book) => (
+                            {filteredBooks.map((book) => (
                                 <div
                                     key={book.id}
                                     onClick={() =>
@@ -278,14 +421,38 @@ const Buku = ({ books, kategori, filters = {}, topRatedBooks }) => {
                                             />
                                         </div>
                                         <div className="flex flex-col gap-1">
-                                            <img
-                                                src={
-                                                    book.cover_path ||
-                                                    "/default-cover.png"
-                                                }
-                                                className="w-full h-52 object-contain mb-2"
-                                                alt={book.judul}
-                                            />
+                                            {isValidImageUrl(book.cover_path) ? (
+                                                <img
+                                                    src={book.cover_path}
+                                                    className="w-full h-52 object-cover mb-2 rounded-lg"
+                                                    alt={book.judul}
+                                                    onError={(e) => {
+                                                        // If image fails to load, show placeholder
+                                                        e.target.style.display = 'none';
+                                                        e.target.nextSibling.style.display = 'flex';
+                                                    }}
+                                                />
+                                            ) : null}
+                                            
+                                            {!isValidImageUrl(book.cover_path) ? (
+                                                <div className="flex justify-center items-center w-full h-52 mb-2 bg-gray-200 text-gray-500 rounded-lg">
+                                                    <div className="text-center">
+                                                        {/* <div className="text-2xl mb-2">📚</div> */}
+                                                        <div className="text-sm">No Cover</div>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div 
+                                                    className="justify-center items-center w-full h-52 mb-2 bg-gray-200 text-gray-500 rounded-lg"
+                                                    style={{ display: 'none' }}
+                                                >
+                                                    <div className="text-center">
+                                                        {/* <div className="text-2xl mb-2">📚</div> */}
+                                                        <div className="text-sm">Image Not Found</div>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            
                                             <div className="text-xs text-cust-gray line-clamp-1 group-hover:line-clamp-none">
                                                 {book.penulis}
                                             </div>
@@ -320,37 +487,23 @@ const Buku = ({ books, kategori, filters = {}, topRatedBooks }) => {
                         </div>
                     )}
 
-                    {/* Pagination Controls */}
-                    {filteredBooks.length > 0 && (
-                        <div className="flex justify-center gap-2">
+                    {/* Laravel Pagination Controls */}
+                    {books.last_page > 1 && (
+                        <div className="flex justify-center items-center gap-2">
                             <button
-                                disabled={currentPage === 1}
-                                onClick={() =>
-                                    setCurrentPage((prev) => prev - 1)
-                                }
-                                className="cursor-pointer w-8 h-8 flex items-center justify-center text-xl font-bold rounded-full border border-gray-300 hover:bg-gray-200 disabled:opacity-50 transition-all duration-300 ease-in-out"
+                                disabled={!books.prev_page_url}
+                                onClick={() => handlePageChange(books.current_page - 1)}
+                                className="cursor-pointer w-8 h-8 flex items-center justify-center text-xl font-bold rounded-full border border-gray-300 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 ease-in-out"
                             >
                                 <MdOutlineKeyboardArrowLeft />
                             </button>
-                            {Array.from({ length: totalPages }, (_, i) => (
-                                <button
-                                    key={i}
-                                    onClick={() => setCurrentPage(i + 1)}
-                                    className={`cursor-pointer w-8 h-8 flex items-center justify-center text-base rounded-full ${
-                                        currentPage === i + 1
-                                            ? "bg-cust-blue text-white font-bold"
-                                            : "bg-cust-light-gray"
-                                    } hover:bg-cust-gray hover:text-white transition-all duration-300 ease-in-out`}
-                                >
-                                    {i + 1}
-                                </button>
-                            ))}
+                            
+                            {renderPaginationButtons()}
+                            
                             <button
-                                disabled={currentPage === totalPages}
-                                onClick={() =>
-                                    setCurrentPage((prev) => prev + 1)
-                                }
-                                className="cursor-pointer w-8 h-8 flex items-center justify-center text-xl font-bold rounded-full border border-gray-300 hover:bg-gray-200 disabled:opacity-50 transition-all duration-300 ease-in-out"
+                                disabled={!books.next_page_url}
+                                onClick={() => handlePageChange(books.current_page + 1)}
+                                className="cursor-pointer w-8 h-8 flex items-center justify-center text-xl font-bold rounded-full border border-gray-300 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 ease-in-out"
                             >
                                 <MdOutlineKeyboardArrowRight />
                             </button>

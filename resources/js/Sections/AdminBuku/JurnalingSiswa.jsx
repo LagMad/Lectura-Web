@@ -250,7 +250,13 @@ const JurnalingSiswa = (props) => {
                             <thead>
                                 <tr className="bg-gray-50 border-b border-gray-200 text-left">
                                     <th className="px-6 py-3 text-black font-medium">
-                                        Buku
+                                        Cover
+                                    </th>
+                                    <th className="px-6 py-3 text-black font-medium">
+                                        Judul Buku
+                                    </th>
+                                    <th className="px-6 py-3 text-black font-medium">
+                                        Penulis
                                     </th>
                                     <th className="px-6 py-3 text-black font-medium">
                                         Total Siswa
@@ -267,50 +273,63 @@ const JurnalingSiswa = (props) => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {books.map((book) => (
-                                    <tr
-                                        key={book.id}
-                                        className="border-b border-gray-200"
-                                    >
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center">
-                                                <img
-                                                    src={book.cover_image}
-                                                    alt={book.judul}
-                                                    className="w-12 h-16 object-cover mr-4"
-                                                />
-                                                <div>
-                                                    <div className="font-medium text-gray-900">
-                                                        {book.judul}
+                                {books.map((book) => {
+                                    const isCloudinaryUrl = (url) => {
+                                        const pattern =
+                                            /^https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/v\d+\/[^/]+\/[^/]+\.(jpg|jpeg|png|gif)$/i;
+                                        return pattern.test(url);
+                                    };
+                                    const isValidImage =
+                                        book.cover_image &&
+                                        isCloudinaryUrl(book.cover_image);
+
+                                    return (
+                                        <tr
+                                            key={book.id}
+                                            className="border-b border-gray-200"
+                                        >
+                                            <td className="px-6 py-4">
+                                                {isValidImage ? (
+                                                    <img
+                                                        className="w-20 h-auto object-contain"
+                                                        src={book.cover_image}
+                                                        alt={book.judul}
+                                                    />
+                                                ) : (
+                                                    <div className="flex justify-center items-center w-20 h-28 text-center object-contain mb-2 bg-gray-300 text-gray-500">
+                                                        No Cover
                                                     </div>
-                                                    <div className="text-gray-500 text-sm">
-                                                        {book.penulis}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            {book.total_siswa} Siswa
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            {book.total_jurnal} Jurnal
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            {book.update_terakhir}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <a
-                                                href={route(
-                                                    "jurnal.book.detail",
-                                                    book.id
                                                 )}
-                                                className="text-blue-600 hover:text-blue-700 cursor-pointer"
-                                            >
-                                                Lihat Detail
-                                            </a>
-                                        </td>
-                                    </tr>
-                                ))}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {book.judul}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {book.penulis}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {book.total_siswa} Siswa
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {book.total_jurnal} Jurnal
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {book.update_terakhir}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <a
+                                                    href={route(
+                                                        "jurnal.book.detail",
+                                                        book.id
+                                                    )}
+                                                    className="text-blue-600 hover:text-blue-700 cursor-pointer"
+                                                >
+                                                    Lihat Detail
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>

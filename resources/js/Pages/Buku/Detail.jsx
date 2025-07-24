@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import Layout from "@/Layouts/Layout";
 import { Star, StarHalf, StarOff } from "lucide-react";
 import { usePage, router, useForm } from "@inertiajs/react";
+import BukuHomeCard from "@/Components/ui/BukuHomeCard";
 
 const Detail = () => {
     const { book, avgRating, auth, isFavorited, reviews, relatedBooks } =
@@ -11,6 +12,14 @@ const Detail = () => {
     const [favorited, setFavorited] = useState(isFavorited);
     const [reviewModal, setReviewModal] = useState(false);
     const [sortBy, setSortBy] = useState("latest");
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 1024);
+        window.addEventListener("resize", handleResize);
+        handleResize();
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
     const sortedReviews = useMemo(() => {
         if (!reviews) return [];
@@ -217,64 +226,101 @@ const Detail = () => {
         );
     };
 
+    const isCloudinaryUrl = (url) => {
+        const pattern =
+            /^https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/v\d+\/[^/]+\/[^/]+\.(jpg|jpeg|png|gif)$/i;
+        return pattern.test(url);
+    };
+
+    const isValidImage = book.cover_path && isCloudinaryUrl(book.cover_path);
+
+    useEffect(() => {
+        console.log("relatedBooks", relatedBooks);
+    }, [relatedBooks]);
+
     return (
         <>
             <Layout>
-                <section className="bg-cust-background-color pt-20">
-                    <div className="container py-20 flex flex-wrap justify-center gap-10">
-                        <div className="bg-white flex flex-col items-center p-8 rounded-lg w-full md:w-1/3 space-y-4">
-                            <img
-                                src={book.cover_path || "/placeholder-book.png"}
-                                alt={`Cover Buku ${book.judul}`}
-                                className="rounded-lg w-40 lg:w-64 object-cover"
-                            />
-                            <a
-                                href={
-                                    book.status === "Tersedia" ? book.link : "#"
-                                }
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className={`font-semibold text-sm rounded-lg transition-all py-2 w-40 lg:w-64 border-2 text-center ${
-                                    book.status === "Tersedia"
-                                        ? "bg-cust-primary-color border-cust-primary-color text-white hover:scale-105"
-                                        : " bg-gray-300 border-gray-300 text-gray-500 cursor-not-allowed pointer-events-none"
-                                }`}
-                            >
-                                {book.status === "Tersedia"
-                                    ? "Baca Sekarang"
-                                    : "Tidak Tersedia"}
-                            </a>
-
-                            {auth.user && (
-                                <button
-                                    className={`cursor-pointer border-2 border-cust-primary-color font-semibold text-sm rounded-lg hover:scale-105 transition-all py-2 w-40 lg:w-64 ${
-                                        isFavorited
-                                            ? "bg-cust-primary-color text-white"
-                                            : "text-cust-primary-color"
-                                    }`}
-                                    onClick={handleFavoriteToggle}
-                                    disabled={isProcessing}
-                                >
-                                    {isFavorited
-                                        ? "Hapus dari Favorite"
-                                        : "Tambah ke Favorite"}
-                                </button>
+                <section className="bg-cust-background-color pt-20 px-5 sm:px-10 md:px-16 lg:px-20 xl:px-40">
+                    <div className="py-10 md:py-20 flex flex-col md:flex-row justify-center gap-0 md:gap-10">
+                        <div className="bg-white flex flex-col items-center p-8 pb-0 md:p-8 rounded-lg w-full md:w-1/4 space-y-4">
+                            {isValidImage ? (
+                                <img
+                                    src={
+                                        book.cover_path ||
+                                        "/placeholder-book.png"
+                                    }
+                                    alt={`Cover Buku ${book.judul}`}
+                                    className="rounded-lg w-40 lg:w-64 object-cover"
+                                />
+                            ) : (
+                                <div className="flex justify-center items-center rounded-lg w-full md:w-40 lg:w-64 h-96 md:h-80 object-contain mb-2 bg-gray-300 text-gray-500">
+                                    No Cover
+                                </div>
                             )}
-                            {auth.user && (
-                                <button
-                                    className={`cursor-pointer border-2 border-cust-primary-color text-cust-primary-color font-semibold text-sm rounded-lg hover:scale-105 transition-all py-2 w-40 lg:w-64`}
-                                    onClick={toggleReviewModal}
-                                >
-                                    Tulis Review
-                                </button>
+
+                            {!isMobile && (
+                                <>
+                                    <a
+                                        href={
+                                            book.status === "Tersedia" &&
+                                            book.link
+                                                ? book.link
+                                                : "#"
+                                        }
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={`font-semibold text-sm rounded-lg transition-all py-2 w-full md:w-40 lg:w-64 border-2 text-center ${
+                                            book.status === "Tersedia" &&
+                                            book.link
+                                                ? "bg-cust-primary-color border-cust-primary-color text-white hover:scale-105"
+                                                : " bg-gray-300 border-gray-300 text-gray-500 cursor-not-allowed pointer-events-none"
+                                        }`}
+                                    >
+                                        {book.status === "Tersedia" && book.link
+                                            ? "Baca Sekarang"
+                                            : "Tidak Tersedia via Online"}
+                                    </a>
+                                    {book.status != "Tidak Tersedia" &&
+                                        !book.link && (
+                                            <p className="text-center text-xs text-gray-400 -mt-3 px-3">
+                                                Cari langsung di Perpustakaan
+                                                Puma Rymba ya!
+                                            </p>
+                                        )}
+
+                                    {auth.user && (
+                                        <button
+                                            className={`cursor-pointer border-2 border-cust-primary-color font-semibold text-sm rounded-lg hover:scale-105 transition-all py-2 w-full md:w-40 lg:w-64 ${
+                                                isFavorited
+                                                    ? "bg-cust-primary-color text-white"
+                                                    : "text-cust-primary-color"
+                                            }`}
+                                            onClick={handleFavoriteToggle}
+                                            disabled={isProcessing}
+                                        >
+                                            {isFavorited
+                                                ? "Hapus dari Favorite"
+                                                : "Tambah ke Favorite"}
+                                        </button>
+                                    )}
+                                    {auth.user && (
+                                        <button
+                                            className={`cursor-pointer border-2 border-cust-primary-color text-cust-primary-color font-semibold text-sm rounded-lg hover:scale-105 transition-all py-2 w-full md:w-40 lg:w-64`}
+                                            onClick={toggleReviewModal}
+                                        >
+                                            Tulis Review
+                                        </button>
+                                    )}
+                                </>
                             )}
                         </div>
 
-                        <div className="bg-white p-8 rounded-lg w-full md:w-1/2">
-                            <h2 className="flex flex-col-reverse md:flex-row justify-start items-center gap-2 md:gap-5 text-2xl font-bold text-cust-primary-color mb-1">
+                        <div className="flex flex-col bg-white p-8 rounded-lg w-full md:w-3/4">
+                            <div className="flex flex-col-reverse md:flex-row justify-center md:justify-start items-center gap-5 text-2xl text-center md:text-left font-bold text-cust-primary-color mb-1">
                                 {book.judul}
                                 <span
-                                    className={`flex px-3 py-1 rounded-full text-xs ${
+                                    className={`flex px-3 py-1 rounded-full text-center justify-center w-full md:w-fit text-xs ${
                                         book.karya_oleh ===
                                         "Koleksi Perpustakaan"
                                             ? "bg-purple-100 text-purple-500"
@@ -287,16 +333,15 @@ const Detail = () => {
                                 >
                                     {book.karya_oleh}
                                 </span>
-                            </h2>
+                            </div>
                             <p className="text-gray-600 mb-4 text-center md:text-left">
                                 Oleh {book.penulis}
                             </p>
 
-                            <div className="flex items-center gap-2 mb-6">
+                            <div className="flex items-center gap-2 mb-6 text-sm text-gray-700">
                                 {renderStars(avgRating || 0)}
-                                <span className="ml-2 text-sm text-gray-700">
-                                    {formattedRating}
-                                </span>
+                                <span className="ml-2 ">{formattedRating}</span>
+                                / <span>{reviews.length} ulasan</span>
                             </div>
 
                             <div className="grid grid-cols-2 gap-y-3 w-2/3 text-sm mb-8">
@@ -332,11 +377,67 @@ const Detail = () => {
                                 ))}
                             </div>
 
+                            {isMobile && (
+                                <div className="flex flex-col justify-center items-center gap-4 mt-10">
+                                    <a
+                                        href={
+                                            book.status === "Tersedia" &&
+                                            book.link
+                                                ? book.link
+                                                : "#"
+                                        }
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={`font-semibold text-sm rounded-lg transition-all py-2 w-full md:w-40 lg:w-64 border-2 text-center ${
+                                            book.status === "Tersedia" &&
+                                            book.link
+                                                ? "bg-cust-primary-color border-cust-primary-color text-white hover:scale-105"
+                                                : " bg-gray-300 border-gray-300 text-gray-500 cursor-not-allowed pointer-events-none"
+                                        }`}
+                                    >
+                                        {book.status === "Tersedia" && book.link
+                                            ? "Baca Sekarang"
+                                            : "Tidak Tersedia via Online"}
+                                    </a>
+                                    {book.status != "Tidak Tersedia" &&
+                                        !book.link && (
+                                            <p className="text-center text-xs text-gray-400 -mt-3 px-3">
+                                                Cari langsung di Perpustakaan
+                                                Puma Rymba ya!
+                                            </p>
+                                        )}
+
+                                    {auth.user && (
+                                        <button
+                                            className={`cursor-pointer border-2 border-cust-primary-color font-semibold text-sm rounded-lg hover:scale-105 transition-all py-2 w-full md:w-40 lg:w-64 ${
+                                                isFavorited
+                                                    ? "bg-cust-primary-color text-white"
+                                                    : "text-cust-primary-color"
+                                            }`}
+                                            onClick={handleFavoriteToggle}
+                                            disabled={isProcessing}
+                                        >
+                                            {isFavorited
+                                                ? "Hapus dari Favorite"
+                                                : "Tambah ke Favorite"}
+                                        </button>
+                                    )}
+                                    {auth.user && (
+                                        <button
+                                            className={`cursor-pointer border-2 border-cust-primary-color text-cust-primary-color font-semibold text-sm rounded-lg hover:scale-105 transition-all py-2 w-full md:w-40 lg:w-64`}
+                                            onClick={toggleReviewModal}
+                                        >
+                                            Tulis Review
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+
                             <hr className="my-8" />
                             <div className="space-y-10">
                                 <div className="flex justify-between items-center mb-6">
                                     <h2 className="font-semibold text-xl">
-                                        Review Pembaca
+                                        Ulasan Pembaca
                                     </h2>
                                     <div className="flex items-center">
                                         <span className="mr-2 text-sm">
@@ -345,15 +446,15 @@ const Detail = () => {
                                         <select
                                             value={sortBy}
                                             onChange={handleFilterChange}
-                                            className="border rounded py-1 px-3 text-sm"
+                                            className="border rounded py-1 px-3 text-sm cursor-pointer"
                                         >
-                                            <option value="latest">
+                                            <option value="latest" className="cursor-pointer">
                                                 Terbaru
                                             </option>
-                                            <option value="highest">
+                                            <option value="highest" className="cursor-pointer">
                                                 Tertinggi
                                             </option>
-                                            <option value="lowest">
+                                            <option value="lowest" className="cursor-pointer">
                                                 Terendah
                                             </option>
                                         </select>
@@ -430,40 +531,29 @@ const Detail = () => {
                                                 <div className="flex gap-5 overflow-x-auto pb-2">
                                                     {relatedBooks.map(
                                                         (book, index) => (
-                                                            <div
-                                                                key={book.id}
-                                                                onClick={() =>
-                                                                    router.visit(
-                                                                        route(
-                                                                            "books.show",
-                                                                            book.id
-                                                                        )
-                                                                    )
-                                                                }
-                                                                className="min-w-[160px] bg-white rounded-lg shadow hover:shadow-md transition-all cursor-pointer"
-                                                            >
-                                                                <img
-                                                                    src={
-                                                                        book.cover_path
+                                                            <>
+                                                                <BukuHomeCard
+                                                                    index={
+                                                                        index
                                                                     }
-                                                                    alt={
+                                                                    image={
+                                                                        book.cover_path ||
+                                                                        "/default-cover.png"
+                                                                    }
+                                                                    penulis={
+                                                                        book.penulis
+                                                                    }
+                                                                    judul={
                                                                         book.judul
                                                                     }
-                                                                    className="rounded-t-lg w-full object-cover h-56 p-3"
+                                                                    bookId={
+                                                                        book.id
+                                                                    }
+                                                                    rating={
+                                                                        book.average_rating
+                                                                    }
                                                                 />
-                                                                <div className="p-3">
-                                                                    <p className="text-xs text-gray-600 mb-1">
-                                                                        {
-                                                                            book.penulis
-                                                                        }
-                                                                    </p>
-                                                                    <p className="text-sm font-medium line-clamp-2">
-                                                                        {
-                                                                            book.judul
-                                                                        }
-                                                                    </p>
-                                                                </div>
-                                                            </div>
+                                                            </>
                                                         )
                                                     )}
                                                 </div>
@@ -563,7 +653,7 @@ const Detail = () => {
                                 <button
                                     type="submit"
                                     disabled={processing}
-                                    className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 font-medium disabled:opacity-50"
+                                    className="cursor-pointer w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 font-medium disabled:opacity-50"
                                 >
                                     {processing
                                         ? "Tunggu Sebentar..."

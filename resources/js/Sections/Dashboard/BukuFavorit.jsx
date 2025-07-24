@@ -252,51 +252,67 @@ const BukuFavorit = ({ favoriteBooks, kategori, filters = {} }) => {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-7 w-full ">
-                        {currentBooks.map((book) => (
-                            <div
-                                key={book.id}
-                                onClick={() =>
-                                    router.visit(route("books.show", book.id))
-                                }
-                                className="flex cursor-pointer flex-col justify-between px-5 py-4 min-h-[350px] rounded-xl drop-shadow-xl hover:drop-shadow-2xl transition-[filter] gap-1 bg-white group"
-                            >
-                                <div className="flex flex-col gap-1">
-                                    <img
-                                        src={
-                                            book.cover_path ||
-                                            "/default-cover.png"
-                                        }
-                                        className="w-full h-52 object-contain mb-2"
-                                        alt={book.judul}
-                                    />
-                                    <div className="text-xs text-cust-gray line-clamp-1 group-hover:line-clamp-none">
-                                        {book.penulis}
-                                    </div>
-                                    <div className="text-xs text-black font-semibold line-clamp-2 group-hover:line-clamp-none">
-                                        {book.judul}
-                                    </div>
-                                </div>
-                                <button
-                                    className="self-end md:self-start cursor-pointer"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleBookmarkToggle(book.id);
-                                    }}
+                        {currentBooks.map((book) => {
+                            const isCloudinaryUrl = (url) => {
+                                const pattern =
+                                    /^https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/v\d+\/[^/]+\/[^/]+\.(jpg|jpeg|png|gif)$/i;
+                                return pattern.test(url);
+                            };
+                            const isValidImage =
+                                book.cover_path &&
+                                isCloudinaryUrl(book.cover_path);
+
+                            return (
+                                <div
+                                    key={book.id}
+                                    onClick={() =>
+                                        router.visit(
+                                            route("books.show", book.id)
+                                        )
+                                    }
+                                    className="flex cursor-pointer flex-col justify-between px-5 py-4 min-h-[350px] rounded-xl drop-shadow-xl hover:drop-shadow-2xl transition-[filter] gap-1 bg-white group"
                                 >
-                                    {bookmarks[book.id] ? (
-                                        <FaBookmark
-                                            size={24}
-                                            className="text-cust-blue"
-                                        />
-                                    ) : (
-                                        <FaRegBookmark
-                                            size={24}
-                                            className="text-cust-blue"
-                                        />
-                                    )}
-                                </button>
-                            </div>
-                        ))}
+                                    <div className="flex flex-col gap-1">
+                                        {isValidImage ? (
+                                            <img
+                                                className="w-full h-52 object-contain"
+                                                src={book.cover_path}
+                                                alt={book.judul}
+                                            />
+                                        ) : (
+                                            <div className="flex justify-center items-center text-center w-full h-52 object-contain mb-2 bg-gray-300 text-gray-500">
+                                                No Cover
+                                            </div>
+                                        )}
+                                        <div className="text-xs text-cust-gray line-clamp-1 group-hover:line-clamp-none">
+                                            {book.penulis}
+                                        </div>
+                                        <div className="text-xs text-black font-semibold line-clamp-2 group-hover:line-clamp-none">
+                                            {book.judul}
+                                        </div>
+                                    </div>
+                                    <button
+                                        className="self-end md:self-start cursor-pointer"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleBookmarkToggle(book.id);
+                                        }}
+                                    >
+                                        {bookmarks[book.id] ? (
+                                            <FaBookmark
+                                                size={24}
+                                                className="text-cust-blue"
+                                            />
+                                        ) : (
+                                            <FaRegBookmark
+                                                size={24}
+                                                className="text-cust-blue"
+                                            />
+                                        )}
+                                    </button>
+                                </div>
+                            );
+                        })}
                     </div>
                 )}
 

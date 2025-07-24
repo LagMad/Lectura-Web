@@ -30,7 +30,7 @@ export default function Dashboard({ users, staff, pengumuman, videos, books, boo
         >
             <div className="flex flex-col w-full">
                 <Title />
-                <Statistik statistik={statistik}/>
+                <Statistik statistik={statistik} users={users} books={books}/>
                 <ManajemenPengumuman pengumuman={pengumuman}/>
                 <StaffPerpustakaan staff={staff} />
                 <ManajemenYoutube videos={videos}/>

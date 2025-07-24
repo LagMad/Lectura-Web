@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use App\Models\Book;
 use App\Models\Kategori;
 use App\Models\Pengumuman;
+use App\Models\Poster;
 
 class HomeController extends Controller
 {
@@ -31,7 +32,9 @@ class HomeController extends Controller
         $karyaGuru = $this->getTopBooksByType('Guru');
         $karyaKoleksiPerpustakaan = $this->getTopBooksByType('Koleksi Perpustakaan');
 
-        $pengumuman = Pengumuman::all();
+        $pengumuman = Pengumuman::where("is_active", true)->get();
+
+        $posters = Poster::where("is_active", true)->get();
 
         return Inertia::render('Home', [
             'books' => $books,
@@ -40,6 +43,7 @@ class HomeController extends Controller
             'karyaGuru' => $karyaGuru,
             'karyaKoleksiPerpustakaan' => $karyaKoleksiPerpustakaan,
             'pengumuman' => $pengumuman,
+            'posters' => $posters
         ]);
     }
 

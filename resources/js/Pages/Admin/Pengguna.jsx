@@ -3,8 +3,9 @@ import AdminLayout from "@/Layouts/AdminLayout";
 import ManajemenPengguna from "@/Sections/AdminPengguna/ManajemenPengguna";
 import PengaturanSistem from "@/Sections/AdminPengguna/PengaturanSistem";
 import ManajemenFaq from "@/Sections/AdminPengguna/ManajemenFaq";
+import ManajemenNipd from "@/Sections/AdminPengguna/ManajemenNipd";
 
-export default function Pengguna({ users, faqList = [] }) {
+export default function Pengguna({ users, faqList = [], nipdList = [] }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const toggleSidebar = () => {
@@ -17,6 +18,10 @@ export default function Pengguna({ users, faqList = [] }) {
         }
     };
 
+    useEffect(() => {
+        console.log("nipd", nipdList)
+    }, [nipdList])
+
     return (
         <AdminLayout
             isSidebarOpen={isSidebarOpen}
@@ -24,6 +29,7 @@ export default function Pengguna({ users, faqList = [] }) {
         >
             <div className="flex flex-col w-full font-[poppins] py-10">
                 <ManajemenPengguna users={users} />
+                <ManajemenNipd nipdList={nipdList} />
                 <ManajemenFaq faqList={faqList} />
                 {/* <PengaturanSistem /> */}
             </div>
