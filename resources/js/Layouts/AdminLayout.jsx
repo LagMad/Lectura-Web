@@ -24,6 +24,22 @@ export default function AdminLayout({
         return url.startsWith(path);
     };
 
+    const handleLogout = async () => {
+        try {
+            await fetch("/logout", {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": document
+                        .querySelector('meta[name="csrf-token"]')
+                        .getAttribute("content"),
+                },
+            });
+            window.location.href = "/";
+        } catch (error) {
+            console.error("Logout failed:", error);
+        }
+    };
+
     return (
         <div className="flex flex-col min-h-screen bg-gray-100 font-[poppins]">
             {/* Navbar */}
@@ -127,26 +143,28 @@ export default function AdminLayout({
                                     <span>Buku</span>
                                 </Link>
                             </li>
-                            <li>
-                                <Link
-                                    href="/admin-pengguna"
-                                    className={`flex items-center px-4 py-2 text-sm font-medium ${
-                                        isActive("/admin-pengguna")
-                                            ? "text-cust-blue bg-blue-50 hover:bg-blue-100"
-                                            : "text-gray-700 hover:bg-gray-100"
-                                    }`}
-                                >
-                                    <User
-                                        size={18}
-                                        className={`mr-3 ${
+                            {auth?.user.role === "admin" && (
+                                <li>
+                                    <Link
+                                        href="/admin-pengguna"
+                                        className={`flex items-center px-4 py-2 text-sm font-medium ${
                                             isActive("/admin-pengguna")
-                                                ? "text-cust-blue"
-                                                : "text-gray-500"
+                                                ? "text-cust-blue bg-blue-50 hover:bg-blue-100"
+                                                : "text-gray-700 hover:bg-gray-100"
                                         }`}
-                                    />
-                                    <span>Pengguna</span>
-                                </Link>
-                            </li>
+                                    >
+                                        <User
+                                            size={18}
+                                            className={`mr-3 ${
+                                                isActive("/admin-pengguna")
+                                                    ? "text-cust-blue"
+                                                    : "text-gray-500"
+                                            }`}
+                                        />
+                                        <span>Pengguna</span>
+                                    </Link>
+                                </li>
+                            )}
                             <li>
                                 <Link
                                     href="/admin-statistik"
@@ -166,6 +184,17 @@ export default function AdminLayout({
                                     />
                                     <span>Statistik</span>
                                 </Link>
+                            </li>
+                            <li>
+                                <button
+                                    className="flex items-center px-4 py-2 w-full text-sm font-medium text-red-500 hover:text-red-700 hover:bg-gray-100 cursor-pointer"
+                                    onClick={handleLogout}
+                                >
+                                    <LogOut size={18} className="mr-3" />
+                                    <span className="text-sm font-medium">
+                                        Logout
+                                    </span>
+                                </button>
                             </li>
                             {/* <li>
                                 <Link
@@ -189,12 +218,12 @@ export default function AdminLayout({
                             </li> */}
                         </ul>
                     </div>
-                    <div className="absolute bottom-0 w-full border-t border-gray-200 p-4">
+                    {/* <div className="absolute bottom-0 w-full border-t border-gray-200 p-4">
                         <button className="flex items-center text-red-500 hover:text-red-700">
                             <LogOut size={18} className="mr-2" />
                             <span className="text-sm font-medium">Logout</span>
                         </button>
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Main Content */}

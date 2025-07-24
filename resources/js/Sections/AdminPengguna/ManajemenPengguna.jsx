@@ -410,7 +410,7 @@ export default function ManajemenPengguna({ users }) {
 
             {/* Delete confirmation modal */}
             {showDeleteConfirm && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
                     <div className="bg-white rounded-lg p-6 max-w-md w-full">
                         <h3 className="text-lg font-medium mb-4">
                             Konfirmasi Hapus

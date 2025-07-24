@@ -63,7 +63,11 @@ Route::middleware(['auth', 'role:admin,guru'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/admin-pengguna', [PenggunaController::class, 'index'])->name('users.admin');
+  Route::get('/admin-pengguna', [PenggunaController::class, 'index'])->name('users.admin');
+    Route::get('/admin/users/create', [PenggunaController::class, 'create'])->name('admin.users.create');
+    Route::post('/admin/users', [PenggunaController::class, 'store'])->name('users.store');
+    Route::get('/admin/users/{user}/edit', [PenggunaController::class, 'edit'])->name('admin.users.edit');
+    Route::put('/admin/users/{user}', [PenggunaController::class, 'update'])->name('users.update');
     Route::delete('/hapus-user/{user}', [PenggunaController::class, 'destroy'])->name('users.destroy');
     Route::get('/admin-pengaturan', function () {
         return Inertia::render('Admin/Pengaturan');

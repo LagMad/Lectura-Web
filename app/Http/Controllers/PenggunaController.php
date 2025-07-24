@@ -122,12 +122,20 @@ class PenggunaController extends Controller
 
         $user->update($data);
 
-        return redirect()->route('users.index')->with('success', 'Pengguna berhasil diperbarui!');
+        return redirect()->route('users.admin')->with('success', 'Pengguna berhasil diperbarui!');
     }
 
     public function destroy(User $user)
     {
-        ValidNIPD::where('nipd', $user->nipd)->update(['is_registered' => 0]);
+        // Only update ValidNIPD if nipd exists and ValidNIPD table exists
+        if ($user->nipd) {
+            try {
+                ValidNIPD::where('nipd', $user->nipd)->update(['is_registered' => 0]);
+            } catch (\Exception $e) {
+                // Handle if ValidNIPD table doesn't exist or other errors
+                \Log::warning('Could not update ValidNIPD table: ' . $e->getMessage());
+            }
+        }
 
         $user->delete();
 
