@@ -59,6 +59,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin-pengaturan', function () {
         return Inertia::render('Admin/Pengaturan');
     });
+    Route::post('/admin-pengguna', [PenggunaController::class, 'store'])->name('users.store');
+    Route::get('/tambah-pengguna', [PenggunaController::class, 'create'])->name('admin.users.create');
+
     Route::post('/kategori', [KategoriController::class, 'store'])->name('kategori.store');
     Route::delete('/kategori/{id}', [KategoriController::class, 'destroy'])->name('kategori.destroy');
 
