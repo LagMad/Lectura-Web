@@ -7,6 +7,7 @@ import {
     Bell,
     LayoutDashboardIcon,
     LayoutDashboard,
+    TrendingUp,
 } from "lucide-react";
 import { Link, usePage } from "@inertiajs/react";
 
@@ -155,7 +156,7 @@ export default function AdminLayout({
                                             : "text-gray-700 hover:bg-gray-100"
                                     }`}
                                 >
-                                    <User
+                                    <TrendingUp
                                         size={18}
                                         className={`mr-3 ${
                                             isActive("/admin-statistik")
