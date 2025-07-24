@@ -12,7 +12,7 @@ const WebPortal = ({ web }) => {
                     </p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5 md:gap-10 justify-center items-center">
-                    {web ? (
+                    {web.length > 0 ? (
                         web.map((web) => (
                             <button
                                 onClick={() =>
