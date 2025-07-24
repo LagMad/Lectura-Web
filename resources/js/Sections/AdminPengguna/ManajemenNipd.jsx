@@ -501,7 +501,7 @@ export default function ManajemenNipd({ nipdList = [] }) {
                 <div className="">
                     <h2 className="text-2xl font-bold">Manajemen NIPD</h2>
                     <p className="text-sm text-gray-500">
-                        Kelola NIPD yang valid untuk registrasi pengguna
+                        Kelola NIPD yang valid untuk registrasi siswa
                     </p>
                 </div>
                 <button
