@@ -84,10 +84,11 @@ class PenggunaController extends Controller
             'email' => $validated['email'],
             'role' => $validated['role'],
             'status' => $validated['status'],
+            'nipd' => $this->generateNipd(),
             'password' => Hash::make($validated['password']),
         ]);
 
-        return redirect()->route('users.index')->with('success', 'Pengguna berhasil ditambahkan!');
+        return redirect()->route('users.admin')->with('success', 'Pengguna berhasil ditambahkan!');
     }
 
     public function edit(User $user)
@@ -131,5 +132,14 @@ class PenggunaController extends Controller
         $user->delete();
 
         return redirect()->route('users.admin')->with('success', 'Pengguna berhasil dihapus!');
+    }
+
+    private function generateNipd()
+    {
+        // Generate NIPD berdasarkan timestamp atau logika tertentu
+        $lastUser = User::orderBy('id', 'desc')->first();
+        $nextId = $lastUser ? $lastUser->id + 1 : 1;
+        
+        return str_pad($nextId, 6, '0', STR_PAD_LEFT);
     }
 }
