@@ -11,6 +11,7 @@ const Statistik = ({ statistik, users=[], books=[] }) => {
             title: "Jumlah Pengguna",
             value: users.length,
             change: "+12.5%",
+            satuan: "pengguna terdaftar",
             period: "vs Bulan Terakhir",
             icon: Users,
             iconColor: "text-blue-500",
@@ -21,6 +22,7 @@ const Statistik = ({ statistik, users=[], books=[] }) => {
             title: "Total Buku/Karya",
             value: books.length,
             change: "+8.1%",
+            satuan: "buku",
             period: "vs Bulan Terakhir",
             icon: BookOpen,
             iconColor: "text-green-500",
@@ -31,6 +33,7 @@ const Statistik = ({ statistik, users=[], books=[] }) => {
             title: "Karya Siswa",
             value: statistik.total_karya_siswa,
             change: "+5.7%",
+            satuan: "karya",
             period: "vs Bulan Terakhir",
             icon: FileText,
             iconColor: "text-orange-500",
@@ -41,6 +44,7 @@ const Statistik = ({ statistik, users=[], books=[] }) => {
             title: "Karya Guru",
             value: statistik.total_karya_guru,
             change: "-3.2%",
+            satuan: "karya",
             period: "vs Last Month",
             icon: GraduationCap,
             iconColor: "text-red-500",
@@ -71,9 +75,12 @@ const Statistik = ({ statistik, users=[], books=[] }) => {
                                 {stat.title}
                             </h3>
                             <p className="text-3xl font-bold text-gray-900">
-                                {stat.value}
+                                {stat.value} {" "}
+                                <span className="text-lg font-medium">
+                                    {stat.satuan}
+                                </span>
                             </p>
-                            <div className="flex items-center space-x-1">
+                            {/* <div className="flex items-center space-x-1">
                                 <span
                                     className={`text-sm font-medium ${stat.changeColor}`}
                                 >
@@ -82,7 +89,7 @@ const Statistik = ({ statistik, users=[], books=[] }) => {
                                 <span className="text-sm text-gray-500">
                                     {stat.period}
                                 </span>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 );
