@@ -269,9 +269,10 @@ const Navbar = () => {
                                                 </div>
                                             </a>
                                         )}
+                                        <hr className="w-full "/>
                                         <button
                                             onClick={handleLogout}
-                                            className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-cust-primary-color transition-colors cursor-pointer"
+                                            className="flex items-center px-4 py-2 w-full font-medium text-red-500 hover:text-red-700 hover:bg-gray-100 cursor-pointer"
                                         >
                                             <div className="flex items-center gap-2">
                                                 <Icon icon="mdi:logout" />

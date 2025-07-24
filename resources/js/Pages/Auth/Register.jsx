@@ -145,21 +145,38 @@ export default function Register() {
     return (
         <div className="min-h-screen md:h-screen flex flex-col md:flex-row justify-center justify-items-center bg-white w-full">
             <div className="relative flex justify-center items-center w-full md:w-1/2 h-fit md:h-screen py-10 md:py-0 bg-[url(/auth-page.jpg)] bg-no-repeat bg-cover bg-center">
-                <div className="absolute inset-0 bg-black/50 z-0"/>
-                <div className="z-10 px-5 md:px-20 space-y-5">
-                    <div className="text-2xl md:text-4xl text-[#E9DFC3] font-bold text-center md:text-justify">
-                        Daftarkan Dirimu di E-Library!
+                <div className="absolute inset-0 bg-black/50 z-0" />
+                <div className="flex flex-col justify-between items-center z-10 px-5 md:px-20 gap-3 h-full pb-0 md:pb-16">
+                    <div className="hidden md:block"/>
+                    <div className="space-y-5">
+                        <div className="text-2xl md:text-4xl text-[#E9DFC3] font-bold text-center md:text-justify">
+                            Daftarkan Dirimu di Lectura!
+                        </div>
+                        <div className="text-base md:text-xl mt-2 text-center md:text-justify text-white">
+                            Buka akses ke ribuan buku digital, artikel, dan
+                            referensi berkualitas. Buat akun sekarang dan mulai
+                            menjelajah dunia pengetahuan tanpa batas!
+                        </div>
                     </div>
-                    <div className="text-base md:text-xl mt-2 text-center md:text-justify text-white">
-                        Buka akses ke ribuan buku digital, artikel, dan
-                        referensi berkualitas. Buat akun sekarang dan mulai
-                        menjelajah dunia pengetahuan tanpa batas!
+                    <div className="flex flex-row justify-center items-center gap-3 w-full">
+                        <img
+                            className="w-1/3 ml-0 md:-ml-3"
+                            src="/logo_smansa_batu.png"
+                        />
+                        <img
+                            className="w-1/3 ml-0 md:-ml-3"
+                            src="/logo_puma_rymba.png"
+                        />
+                        <img
+                            className="w-1/3 ml-0 md:-ml-3"
+                            src="/Logo-lectura-full-transparent-white.svg"
+                        />
                     </div>
                 </div>
             </div>
             <div className="md:w-1/2 h-fit my-auto">
-                <div className="flex flex-col items-center justify-center md:min-h-screen bg-gray-50 md:py-12 py-10 px-4 sm:px-6 lg:px-8">
-                    <div className="w-full max-w-md">
+                <div className="flex flex-col items-center justify-center md:min-h-screen bg-gray-50 py-10 md:py-0 px-4 sm:px-6 lg:px-8">
+                    <div className="w-full md:w-2/3">
                         <div className="text-center mb-6">
                             <h1 className="text-2xl font-bold text-blue-600">
                                 Daftar E-Library
@@ -249,7 +266,7 @@ export default function Register() {
                                     htmlFor="nipd"
                                     value="NIPD (Nomor Induk Peserta Didik)"
                                 />
-                                <div className="flex">
+                                <div className="flex w-full">
                                     <TextInput
                                         id="nipd"
                                         name="nipd"
@@ -263,7 +280,7 @@ export default function Register() {
                                     />
                                     <button
                                         type="button"
-                                        className="cursor-pointer ml-2 mt-1 px-3 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                        className="cursor-pointer ml-2 px-3 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                         onClick={validateNipd}
                                         disabled={!data.nipd || processing}
                                     >
