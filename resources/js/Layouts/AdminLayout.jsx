@@ -1,4 +1,13 @@
-import { Menu, LogOut, User, BookOpen, Settings, Bell, LayoutDashboardIcon, LayoutDashboard } from "lucide-react";
+import {
+    Menu,
+    LogOut,
+    User,
+    BookOpen,
+    Settings,
+    Bell,
+    LayoutDashboardIcon,
+    LayoutDashboard,
+} from "lucide-react";
 import { Link, usePage } from "@inertiajs/react";
 
 export default function AdminLayout({
@@ -135,6 +144,26 @@ export default function AdminLayout({
                                         }`}
                                     />
                                     <span>Pengguna</span>
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    href="/admin-statistik"
+                                    className={`flex items-center px-4 py-2 text-sm font-medium ${
+                                        isActive("/admin-statistik")
+                                            ? "text-cust-blue bg-blue-50 hover:bg-blue-100"
+                                            : "text-gray-700 hover:bg-gray-100"
+                                    }`}
+                                >
+                                    <User
+                                        size={18}
+                                        className={`mr-3 ${
+                                            isActive("/admin-statistik")
+                                                ? "text-cust-blue"
+                                                : "text-gray-500"
+                                        }`}
+                                    />
+                                    <span>Statistik</span>
                                 </Link>
                             </li>
                             {/* <li>

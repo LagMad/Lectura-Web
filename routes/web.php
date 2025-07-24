@@ -15,6 +15,7 @@ use App\Http\Controllers\PengumumanController;
 use App\Http\Controllers\PosterController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\StaffPerpustakaanController;
+use App\Http\Controllers\StatistikController;
 use App\Http\Controllers\TentangController;
 use App\Http\Controllers\WebPortalController;
 use App\Http\Controllers\YoutubeVideoController;
@@ -54,6 +55,11 @@ Route::middleware(['auth', 'role:admin,guru'])->group(function () {
     });
 
     Route::resource('poster', PosterController::class);
+
+    Route::prefix('admin-statistik')->name('admin.statistik.')->group(function () {
+        Route::get('/', [StatistikController::class, 'index'])->name('dashboard');
+        Route::get('/api/visitor-stats', [StatistikController::class, 'getVisitorStats'])->name('api.stats');
+    });
 });
 
 Route::middleware(['auth', 'role:admin'])->group(function () {

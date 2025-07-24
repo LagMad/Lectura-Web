@@ -1,15 +1,15 @@
 import React, { useEffect } from "react";
 import { Users, BookOpen, FileText, GraduationCap } from "lucide-react";
 
-const Statistik = ({ statistik }) => {
+const Statistik = ({ statistik, users=[], books=[] }) => {
     useEffect(() => {
-      console.log("statistik", statistik)
-    }, [statistik])
+      console.log("users", users)
+    }, [users])
 
     const stats = [
         {
-            title: "Jumlah Pengunjung",
-            value: "2,847",
+            title: "Jumlah Pengguna",
+            value: users.length,
             change: "+12.5%",
             period: "vs Bulan Terakhir",
             icon: Users,
@@ -18,8 +18,8 @@ const Statistik = ({ statistik }) => {
             changeColor: "text-green-500",
         },
         {
-            title: "Buku Dipinjam",
-            value: "156",
+            title: "Total Buku/Karya",
+            value: books.length,
             change: "+8.1%",
             period: "vs Bulan Terakhir",
             icon: BookOpen,
@@ -50,7 +50,7 @@ const Statistik = ({ statistik }) => {
     ];
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
             {stats.map((stat, index) => {
                 const IconComponent = stat.icon;
                 return (
