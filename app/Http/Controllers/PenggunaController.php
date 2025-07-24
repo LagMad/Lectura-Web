@@ -54,10 +54,13 @@ class PenggunaController extends Controller
             ->orderByDesc('updated_at')
             ->get(['id', 'nama', 'nipd', 'pertanyaan', 'jawaban', 'status', 'kategori', 'created_at', 'updated_at']);
 
+        $nipdList = ValidNIPD::orderByDesc(("created_at"))->get();
+
         /* ---------- 3. RENDER ONE PAGE ---------- */
         return Inertia::render('Admin/Pengguna', [
             'users'      => $users,
             'faqList'    => $faqList,
+            'nipdList' => $nipdList,
             // opsional: kirim filter utk dipakai di front‑end
             'userFilters' => $request->only(['search', 'role', 'status']),
             'faqFilters' => $request->only(['faq_search', 'faq_status']),
