@@ -192,7 +192,7 @@ export default function EditBuku({ book, kategori }) {
                 headers["X-CSRF-TOKEN"] = csrfToken;
             }
 
-            console.log("Submitting update for book ID:", bookId);
+            // console.log("Submitting update for book ID:", bookId);
 
             // Use POST with method spoofing instead of PUT for form data
             const response = await axios.post(
@@ -201,7 +201,7 @@ export default function EditBuku({ book, kategori }) {
                 { headers }
             );
 
-            console.log("Update response:", response.data);
+            // console.log("Update response:", response.data);
 
             setSubmitSuccess(true);
 

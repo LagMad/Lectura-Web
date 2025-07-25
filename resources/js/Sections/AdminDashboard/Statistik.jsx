@@ -2,9 +2,6 @@ import React, { useEffect } from "react";
 import { Users, BookOpen, FileText, GraduationCap } from "lucide-react";
 
 const Statistik = ({ statistik, users=[], books=[] }) => {
-    useEffect(() => {
-      console.log("users", users)
-    }, [users])
 
     const stats = [
         {

@@ -234,10 +234,6 @@ const Detail = () => {
 
     const isValidImage = book.cover_path && isCloudinaryUrl(book.cover_path);
 
-    useEffect(() => {
-        console.log("relatedBooks", relatedBooks);
-    }, [relatedBooks]);
-
     return (
         <>
             <Layout>

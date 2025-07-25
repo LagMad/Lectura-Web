@@ -9,6 +9,95 @@ import {
 import { router } from "@inertiajs/react";
 import { Icon } from "@iconify/react";
 
+const Pagination = ({ page, totalPages, onPageChange }) => {
+    const generatePageNumbers = () => {
+        const delta = 2; // Number of pages to show around current page
+        const range = [];
+        const rangeWithDots = [];
+
+        // Always show first page
+        range.push(1);
+
+        // Calculate range around current page
+        for (let i = Math.max(2, page - delta); i <= Math.min(totalPages - 1, page + delta); i++) {
+            range.push(i);
+        }
+
+        // Always show last page (if totalPages > 1)
+        if (totalPages > 1) {
+            range.push(totalPages);
+        }
+
+        // Remove duplicates and sort
+        const uniqueRange = [...new Set(range)].sort((a, b) => a - b);
+
+        // Add ellipsis where there are gaps
+        let prev = 0;
+        for (const current of uniqueRange) {
+            if (current - prev === 2) {
+                rangeWithDots.push(prev + 1);
+            } else if (current - prev !== 1) {
+                rangeWithDots.push('...');
+            }
+            rangeWithDots.push(current);
+            prev = current;
+        }
+
+        return rangeWithDots;
+    };
+
+    const pageNumbers = generatePageNumbers();
+
+    if (totalPages <= 1) return null;
+
+    return (
+        <div className="flex items-center justify-center gap-2">
+            <button
+                disabled={page === 1}
+                onClick={() => onPageChange(page - 1)}
+                className="cursor-pointer w-8 h-8 flex items-center justify-center text-xl font-bold rounded-full border border-gray-300 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 ease-in-out"
+            >
+                <MdOutlineKeyboardArrowLeft />
+            </button>
+            
+            {pageNumbers.map((pageNum, index) => {
+                if (pageNum === '...') {
+                    return (
+                        <span
+                            key={`ellipsis-${index}`}
+                            className="w-8 h-8 flex items-center justify-center text-base text-gray-500"
+                        >
+                            ...
+                        </span>
+                    );
+                }
+
+                return (
+                    <button
+                        key={pageNum}
+                        onClick={() => onPageChange(pageNum)}
+                        className={`cursor-pointer w-8 h-8 flex items-center justify-center text-base rounded-full ${
+                            page === pageNum
+                                ? "bg-cust-blue text-white font-bold"
+                                : "bg-cust-light-gray hover:bg-cust-gray hover:text-white"
+                        } transition-all duration-300 ease-in-out`}
+                    >
+                        {pageNum}
+                    </button>
+                );
+            })}
+            
+            <button
+                disabled={page === totalPages}
+                onClick={() => onPageChange(page + 1)}
+                className="cursor-pointer w-8 h-8 flex items-center justify-center text-xl font-bold rounded-full border border-gray-300 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 ease-in-out"
+            >
+                <MdOutlineKeyboardArrowRight />
+            </button>
+        </div>
+    );
+};
+
 const BukuFavorit = ({ favoriteBooks, kategori, filters = {} }) => {
     const initialCategory = filters.category || "Semua Buku";
 
@@ -124,6 +213,18 @@ const BukuFavorit = ({ favoriteBooks, kategori, filters = {} }) => {
         });
     };
 
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+        // Scroll to top of books section when page changes
+        const booksSection = document.querySelector('.books-grid-section');
+        if (booksSection) {
+            booksSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+            // Fallback: scroll to top of page
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    };
+
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth < 1024);
         window.addEventListener("resize", handleResize);
@@ -178,7 +279,7 @@ const BukuFavorit = ({ favoriteBooks, kategori, filters = {} }) => {
                         />
                         <input
                             type="text"
-                            className="w-full rounded-lg focus:outline-none focus:ring-0"
+                            className="w-full rounded-lg focus:outline-none focus:ring-0 bg-transparent"
                             placeholder="Cari berdasarkan judul atau penulis..."
                             value={searchQuery}
                             onChange={handleSearchChange}
@@ -236,118 +337,121 @@ const BukuFavorit = ({ favoriteBooks, kategori, filters = {} }) => {
                     )}
                 </div>
 
-                {filteredBooks.length === 0 ? (
-                    <div className="flex justify-center items-center w-full py-10">
-                        <p className="flex flex-col text-center text-xl text-gray-500">
-                            Tidak ada buku yang ditemukan.
-                            <span className="text-base">
-                                Minta staf perpustakaan atau gurumu untuk
-                                menambahkan buku dengan kategori{" "}
-                                <span className="font-bold">
-                                    {activeCategory}
-                                </span>
-                                !
-                            </span>
-                        </p>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-7 w-full ">
-                        {currentBooks.map((book) => {
-                            const isCloudinaryUrl = (url) => {
-                                const pattern =
-                                    /^https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/v\d+\/[^/]+\/[^/]+\.(jpg|jpeg|png|gif)$/i;
-                                return pattern.test(url);
-                            };
-                            const isValidImage =
-                                book.cover_path &&
-                                isCloudinaryUrl(book.cover_path);
-
-                            return (
-                                <div
-                                    key={book.id}
-                                    onClick={() =>
-                                        router.visit(
-                                            route("books.show", book.id)
-                                        )
-                                    }
-                                    className="flex cursor-pointer flex-col justify-between px-5 py-4 min-h-[350px] rounded-xl drop-shadow-xl hover:drop-shadow-2xl transition-[filter] gap-1 bg-white group"
-                                >
-                                    <div className="flex flex-col gap-1">
-                                        {isValidImage ? (
-                                            <img
-                                                className="w-full h-52 object-contain"
-                                                src={book.cover_path}
-                                                alt={book.judul}
-                                            />
-                                        ) : (
-                                            <div className="flex justify-center items-center text-center w-full h-52 object-contain mb-2 bg-gray-300 text-gray-500">
-                                                No Cover
-                                            </div>
-                                        )}
-                                        <div className="text-xs text-cust-gray line-clamp-1 group-hover:line-clamp-none">
-                                            {book.penulis}
-                                        </div>
-                                        <div className="text-xs text-black font-semibold line-clamp-2 group-hover:line-clamp-none">
-                                            {book.judul}
-                                        </div>
-                                    </div>
-                                    <button
-                                        className="self-end md:self-start cursor-pointer"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleBookmarkToggle(book.id);
-                                        }}
-                                    >
-                                        {bookmarks[book.id] ? (
-                                            <FaBookmark
-                                                size={24}
-                                                className="text-cust-blue"
-                                            />
-                                        ) : (
-                                            <FaRegBookmark
-                                                size={24}
-                                                className="text-cust-blue"
-                                            />
-                                        )}
-                                    </button>
-                                </div>
-                            );
-                        })}
-                    </div>
-                )}
-
-                {/* Pagination Controls */}
+                {/* Results info */}
                 {filteredBooks.length > 0 && (
-                    <div className="flex justify-center gap-2">
-                        <button
-                            disabled={currentPage === 1}
-                            onClick={() => setCurrentPage((prev) => prev - 1)}
-                            className="cursor-pointer w-8 h-8 flex items-center justify-center text-xl font-bold rounded-full border border-gray-300 hover:bg-gray-200 disabled:opacity-50 transition-all duration-300 ease-in-out"
-                        >
-                            <MdOutlineKeyboardArrowLeft />
-                        </button>
-                        {Array.from({ length: totalPages }, (_, i) => (
-                            <button
-                                key={i}
-                                onClick={() => setCurrentPage(i + 1)}
-                                className={`cursor-pointer w-8 h-8 flex items-center justify-center text-base rounded-full ${
-                                    currentPage === i + 1
-                                        ? "bg-cust-blue text-white font-bold"
-                                        : "bg-cust-light-gray"
-                                } hover:bg-cust-gray hover:text-white transition-all duration-300 ease-in-out`}
-                            >
-                                {i + 1}
-                            </button>
-                        ))}
-                        <button
-                            disabled={currentPage === totalPages}
-                            onClick={() => setCurrentPage((prev) => prev + 1)}
-                            className="cursor-pointer w-8 h-8 flex items-center justify-center text-xl font-bold rounded-full border border-gray-300 hover:bg-gray-200 disabled:opacity-50 transition-all duration-300 ease-in-out"
-                        >
-                            <MdOutlineKeyboardArrowRight />
-                        </button>
+                    <div className="flex justify-between items-center w-full text-sm text-gray-600">
+                        <span>
+                            {searchQuery ? (
+                                <>Menampilkan {filteredBooks.length} hasil untuk "{searchQuery}"</>
+                            ) : (
+                                <>Total {filteredBooks.length} buku favorit</>
+                            )}
+                        </span>
+                        <span>
+                            Halaman {currentPage} dari {totalPages} | Menampilkan {((currentPage - 1) * booksPerPage) + 1} - {Math.min(currentPage * booksPerPage, filteredBooks.length)} dari {filteredBooks.length}
+                        </span>
                     </div>
                 )}
+
+                <div className="books-grid-section w-full">
+                    {filteredBooks.length === 0 ? (
+                        <div className="flex justify-center items-center w-full py-10">
+                            <p className="flex flex-col text-center text-xl text-gray-500">
+                                {searchQuery ? (
+                                    <>
+                                        Tidak ada buku favorit yang cocok dengan pencarian "{searchQuery}".
+                                        <span className="text-base">
+                                            Coba kata kunci yang berbeda atau ubah kategori filter.
+                                        </span>
+                                    </>
+                                ) : (
+                                    <>
+                                        Tidak ada buku favorit yang ditemukan.
+                                        <span className="text-base">
+                                            Minta staf perpustakaan atau gurumu untuk
+                                            menambahkan buku dengan kategori{" "}
+                                            <span className="font-bold">
+                                                {activeCategory}
+                                            </span>
+                                            !
+                                        </span>
+                                    </>
+                                )}
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-7 w-full">
+                            {currentBooks.map((book) => {
+                                const isCloudinaryUrl = (url) => {
+                                    const pattern =
+                                        /^https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/v\d+\/[^/]+\/[^/]+\.(jpg|jpeg|png|gif)$/i;
+                                    return pattern.test(url);
+                                };
+                                const isValidImage =
+                                    book.cover_path &&
+                                    isCloudinaryUrl(book.cover_path);
+
+                                return (
+                                    <div
+                                        key={book.id}
+                                        onClick={() =>
+                                            router.visit(
+                                                route("books.show", book.id)
+                                            )
+                                        }
+                                        className="flex cursor-pointer flex-col justify-between px-5 py-4 min-h-[350px] rounded-xl drop-shadow-xl hover:drop-shadow-2xl transition-[filter] gap-1 bg-white group"
+                                    >
+                                        <div className="flex flex-col gap-1">
+                                            {isValidImage ? (
+                                                <img
+                                                    className="w-full h-52 object-contain"
+                                                    src={book.cover_path}
+                                                    alt={book.judul}
+                                                />
+                                            ) : (
+                                                <div className="flex justify-center items-center text-center w-full h-52 object-contain mb-2 bg-gray-300 text-gray-500">
+                                                    No Cover
+                                                </div>
+                                            )}
+                                            <div className="text-xs text-cust-gray line-clamp-1 group-hover:line-clamp-none">
+                                                {book.penulis}
+                                            </div>
+                                            <div className="text-xs text-black font-semibold line-clamp-2 group-hover:line-clamp-none">
+                                                {book.judul}
+                                            </div>
+                                        </div>
+                                        <button
+                                            className="self-end md:self-start cursor-pointer"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleBookmarkToggle(book.id);
+                                            }}
+                                        >
+                                            {bookmarks[book.id] ? (
+                                                <FaBookmark
+                                                    size={24}
+                                                    className="text-cust-blue"
+                                                />
+                                            ) : (
+                                                <FaRegBookmark
+                                                    size={24}
+                                                    className="text-cust-blue"
+                                                />
+                                            )}
+                                        </button>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+
+                {/* Enhanced Pagination with Ellipsis */}
+                <Pagination 
+                    page={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                />
             </div>
         </div>
     );

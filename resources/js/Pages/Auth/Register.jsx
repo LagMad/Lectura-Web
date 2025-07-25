@@ -334,7 +334,7 @@ export default function Register() {
                                     >
                                         <Icon
                                             icon={
-                                                showPassword
+                                                !showPassword
                                                     ? "mdi:eye-off"
                                                     : "mdi:eye"
                                             }
@@ -386,7 +386,7 @@ export default function Register() {
                                     >
                                         <Icon
                                             icon={
-                                                showConfirmPassword
+                                                !showConfirmPassword
                                                     ? "mdi:eye-off"
                                                     : "mdi:eye"
                                             }

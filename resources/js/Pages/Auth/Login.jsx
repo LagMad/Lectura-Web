@@ -135,7 +135,7 @@ export default function Login({ status, canResetPassword }) {
 
                                 <p
                                     href={route("password.request")}
-                                    className="text-sm text-center md:text-right"
+                                    className="text-sm text-center md:text-right text-gray-600"
                                 >
                                     Lupa Kata Sandi? <br />
                                     Kontak staf perpustakaan!

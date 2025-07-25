@@ -94,7 +94,7 @@ export default function Statistik({
                 <div className="w-full">
                     {/* Header */}
                     <div className="mb-8">
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col md:flex-row items-center justify-between gap-5">
                             <div>
                                 <h1 className="text-3xl font-bold text-gray-900">
                                     Statistik Pengunjung Website
@@ -106,7 +106,7 @@ export default function Statistik({
                             <button
                                 onClick={refreshStats}
                                 disabled={loading}
-                                className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+                                className="w-full md:w-fit bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-4 py-2 rounded-lg flex justify-center items-center gap-2 transition-colors"
                             >
                                 <TrendingUp size={16} />
                                 {loading ? "Memuat..." : "Refresh"}

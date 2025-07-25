@@ -15,7 +15,6 @@ const SloganSection = ({
     const [currentPoster, setCurrentPoster] = useState(null);
 
     useEffect(() => {
-        console.log("posters", posters);
         if (posters.length > 0) {
             setCurrentPoster(posters[0]);
         }

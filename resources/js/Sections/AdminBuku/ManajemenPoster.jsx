@@ -33,7 +33,49 @@ const Modal = ({ show, onClose, children }) => {
 
 /* ------------ Pagination helper ------------- */
 const ITEMS_PER_PAGE = 10;
-function Pagination({ page, totalPages, onChange }) {
+const Pagination = ({ page, totalPages, onChange }) => {
+    const generatePageNumbers = () => {
+        const delta = 2; // Number of pages to show around current page
+        const range = [];
+        const rangeWithDots = [];
+
+        // Always show first page
+        range.push(1);
+
+        // Calculate range around current page
+        for (
+            let i = Math.max(2, page - delta);
+            i <= Math.min(totalPages - 1, page + delta);
+            i++
+        ) {
+            range.push(i);
+        }
+
+        // Always show last page (if totalPages > 1)
+        if (totalPages > 1) {
+            range.push(totalPages);
+        }
+
+        // Remove duplicates and sort
+        const uniqueRange = [...new Set(range)].sort((a, b) => a - b);
+
+        // Add ellipsis where there are gaps
+        let prev = 0;
+        for (const current of uniqueRange) {
+            if (current - prev === 2) {
+                rangeWithDots.push(prev + 1);
+            } else if (current - prev !== 1) {
+                rangeWithDots.push("...");
+            }
+            rangeWithDots.push(current);
+            prev = current;
+        }
+
+        return rangeWithDots;
+    };
+
+    const pageNumbers = generatePageNumbers();
+
     return (
         <div className="flex sticky left-0 items-center justify-between px-6 py-3">
             <div className="text-sm text-gray-700">
@@ -43,34 +85,49 @@ function Pagination({ page, totalPages, onChange }) {
                 <button
                     onClick={() => onChange(page - 1)}
                     disabled={page === 1}
-                    className="px-3 py-2 text-sm text-gray-500 disabled:text-gray-300"
+                    className="px-3 py-2 text-sm text-gray-500 disabled:text-gray-300 hover:bg-gray-100 disabled:hover:bg-transparent rounded"
                 >
                     ‹
                 </button>
-                {Array.from({ length: totalPages }, (_, i) => (
-                    <button
-                        key={i + 1}
-                        onClick={() => onChange(i + 1)}
-                        className={`px-3 py-2 text-sm rounded ${
-                            page === i + 1
-                                ? "bg-blue-500 text-white"
-                                : "text-gray-500 hover:bg-gray-100"
-                        }`}
-                    >
-                        {i + 1}
-                    </button>
-                ))}
+
+                {pageNumbers.map((pageNum, index) => {
+                    if (pageNum === "...") {
+                        return (
+                            <span
+                                key={`ellipsis-${index}`}
+                                className="px-3 py-2 text-sm text-gray-500"
+                            >
+                                ...
+                            </span>
+                        );
+                    }
+
+                    return (
+                        <button
+                            key={pageNum}
+                            onClick={() => onChange(pageNum)}
+                            className={`px-3 py-2 text-sm rounded ${
+                                page === pageNum
+                                    ? "bg-blue-500 text-white"
+                                    : "text-gray-500 hover:bg-gray-100"
+                            }`}
+                        >
+                            {pageNum}
+                        </button>
+                    );
+                })}
+
                 <button
                     onClick={() => onChange(page + 1)}
                     disabled={page === totalPages}
-                    className="px-3 py-2 text-sm text-gray-500 disabled:text-gray-300"
+                    className="px-3 py-2 text-sm text-gray-500 disabled:text-gray-300 hover:bg-gray-100 disabled:hover:bg-transparent rounded"
                 >
                     ›
                 </button>
             </div>
         </div>
     );
-}
+};
 
 /* ------------------------------------------------------------------
    MAIN COMPONENT
@@ -85,9 +142,7 @@ export default function ManajemenPoster({ posters = [] }) {
         return posters.filter(
             (item) =>
                 item.judul.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                item.karya_oleh
-                    .toLowerCase()
-                    .includes(searchTerm.toLowerCase())
+                item.karya_oleh.toLowerCase().includes(searchTerm.toLowerCase())
         );
     }, [posters, searchTerm]);
 
@@ -202,7 +257,7 @@ export default function ManajemenPoster({ posters = [] }) {
         <section className="p-6">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-5">
-                <div>
+                <div className="text-center md:text-left">
                     <h2 className="text-2xl font-bold">Manajemen Poster</h2>
                     <p className="text-sm text-gray-500">
                         Kelola poster untuk ditampilkan di beranda.
@@ -212,7 +267,7 @@ export default function ManajemenPoster({ posters = [] }) {
                     onClick={() => {
                         setModal({ type: "add", item: null });
                     }}
-                    className="inline-flex items-center gap-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                    className="w-full md:w-full inline-flex justify-center items-center gap-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
                 >
                     <Plus className="w-4 h-4" /> Tambah Poster
                 </button>
@@ -234,7 +289,7 @@ export default function ManajemenPoster({ posters = [] }) {
                 <table className="min-w-full text-sm">
                     <thead className="bg-gray-50">
                         {[
-                            "#",
+                            "ID",
                             "Gambar",
                             "Judul",
                             "Karya Oleh",
@@ -269,7 +324,10 @@ export default function ManajemenPoster({ posters = [] }) {
                                     )}
                                 </td>
                                 <td className="px-6 py-4 max-w-xs">
-                                    <div className="truncate" title={item.judul}>
+                                    <div
+                                        className="truncate"
+                                        title={item.judul}
+                                    >
                                         {item.judul}
                                     </div>
                                 </td>
@@ -341,11 +399,13 @@ export default function ManajemenPoster({ posters = [] }) {
                     </tbody>
                 </table>
                 {/* Pagination */}
-                <Pagination
-                    page={page}
-                    totalPages={totalPages}
-                    onChange={setPage}
-                />
+                {posters.length > ITEMS_PER_PAGE && (
+                    <Pagination
+                        page={page}
+                        totalPages={totalPages}
+                        onChange={setPage}
+                    />
+                )}
             </div>
 
             {/* ------------------ ADD / EDIT MODAL ------------------ */}
@@ -359,9 +419,7 @@ export default function ManajemenPoster({ posters = [] }) {
                     encType="multipart/form-data"
                 >
                     <h3 className="text-lg font-semibold">
-                        {modal.type === "add"
-                            ? "Tambah Poster"
-                            : "Edit Poster"}
+                        {modal.type === "add" ? "Tambah Poster" : "Edit Poster"}
                     </h3>
 
                     <div>
@@ -409,7 +467,7 @@ export default function ManajemenPoster({ posters = [] }) {
                             Gambar Poster
                         </label>
                         <div className="space-y-2">
-                        {modal.type === "add" && (
+                            {modal.type === "add" && (
                                 <input
                                     type="file"
                                     accept="image/jpeg,image/jpg,image/png"
@@ -485,7 +543,7 @@ export default function ManajemenPoster({ posters = [] }) {
             <Modal show={modal.type === "delete"} onClose={closeModal}>
                 <div className="p-6 space-y-4">
                     <h3 className="text-lg font-semibold text-red-600">
-                        Hapus Poster 
+                        Hapus Poster
                     </h3>
                     <p className="text-gray-600">
                         Yakin ingin menghapus poster &nbsp;

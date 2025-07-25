@@ -28,10 +28,6 @@ const Faq = ({ searchQuery = "", selectedCategory = "", faqList = [] }) => {
         });
     };
 
-    useEffect(() => {
-        console.log("faqList", faqList);
-    }, [faqList]);
-
     const visibleFaqs = showAll ? faqList : faqList.slice(0, 5);
 
     const toggleShowAll = () => {

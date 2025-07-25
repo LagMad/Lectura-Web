@@ -157,7 +157,7 @@ export default function ManajemenPengguna({ users }) {
     };
 
     return (
-        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 ">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
             <Head title="Manajemen Admin/Guru" />
 
             {flashMessage && (
@@ -166,21 +166,23 @@ export default function ManajemenPengguna({ users }) {
                 </div>
             )}
 
-            <div className="lg:flex justify-between items-center mb-2">
-                <h2 className="text-2xl lg:mb-0 mb-2 font-bold">
-                    Manajemen Admin/Guru
-                </h2>
+            <div className="flex flex-col md:flex-row justify-between items-center gap-3">
+                <div>
+                    <h2 className="text-2xl lg:mb-0 mb-2 font-bold text-center md:text-left">
+                        Manajemen Admin/Guru
+                        <p className="md:text-sm text-xs text-gray-500 font-normal">
+                            Kelola anggota perpustakaan dan hak peminjaman
+                            mereka
+                        </p>
+                    </h2>
+                </div>
                 <button
                     onClick={() => router.visit(route("admin.users.create"))}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center text-sm"
+                    className="w-full md:w-fit bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex justify-center items-center text-sm"
                 >
                     <Plus size={16} className="mr-1" /> Tambah Pengguna
                 </button>
             </div>
-
-            <p className="md:text-sm text-xs text-gray-500 mb-6">
-                Kelola anggota perpustakaan dan hak peminjaman mereka
-            </p>
 
             <div className="flex flex-col sm:flex-row gap-3 mb-6">
                 <div className="relative flex-grow">

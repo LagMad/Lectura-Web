@@ -109,26 +109,30 @@ export default function ManajemenKategori({
 
     const getBookCountForCategory = (categoryName) => {
         if (!initialBooks || !initialBooks.data) return 0;
-        
-        return initialBooks.data.filter(book => book.kategori === categoryName).length;
+
+        return initialBooks.data.filter(
+            (book) => book.kategori === categoryName
+        ).length;
     };
 
     return (
-        <div className="w-full mx-auto pt-8 px-4 sm:px-6 lg:px-8 font-sans">
-            <div className="lg:flex justify-between items-center mb-2">
-                <h2 className="text-2xl lg:mb-0 mb-2 font-bold">
-                    Manajemen Kategori
-                </h2>
+        <div className="w-full mx-auto pt-8 px-4 sm:px-6 lg:px-8 font-sans space-y-5">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-3">
+                <div className="text-center md:text-left">
+                    <h2 className="text-2xl lg:mb-0 font-bold">
+                        Manajemen Kategori
+                    </h2>
+                    <p className="md:text-sm text-xs text-gray-500">
+                        Kelola kategori buku perpustakaan Anda
+                    </p>
+                </div>
                 <button
                     onClick={openAddModal}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center text-sm"
+                    className="w-full md:w-fit bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex justify-center items-center text-sm"
                 >
                     <span className="mr-1">+</span> Tambah Kategori
                 </button>
             </div>
-            <p className="md:text-sm text-xs text-gray-500 mb-6">
-                Kelola kategori buku perpustakaan Anda
-            </p>
 
             <div className="flex flex-col sm:flex-row gap-3 mb-6">
                 <div className="relative flex-grow">

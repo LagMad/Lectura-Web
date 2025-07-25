@@ -18,10 +18,6 @@ export default function Pengguna({ users, faqList = [], nipdList = [] }) {
         }
     };
 
-    useEffect(() => {
-        console.log("nipd", nipdList)
-    }, [nipdList])
-
     return (
         <AdminLayout
             isSidebarOpen={isSidebarOpen}

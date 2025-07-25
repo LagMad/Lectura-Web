@@ -112,9 +112,7 @@ const Navbar = () => {
                     {/* <h1 className={`font-bold text-2xl xl:text-3xl ${isScrolled ? "text-cust-primary-color" : "text-white"}`}>
                         E-Library
                     </h1> */}
-                    <a
-                        href="/"
-                    >
+                    <a href="/">
                         <img
                             src={
                                 isScrolled
@@ -129,15 +127,15 @@ const Navbar = () => {
                             <li key={idx}>
                                 <a
                                     href={link.href}
-                                    className={`transition-colors duration-200 hover:text-cust-primary-color ${
+                                    className={`transition-colors duration-200 ${
                                         url === link.href
                                             ? isScrolled
-                                                ? "text-cust-blue font-bold underline underline-offset-8"
+                                                ? "text-cust-blue font-bold underline underline-offset-8 hover:text-cust-primary-color"
                                                 : "text-white font-bold underline underline-offset-8"
                                             : isScrolled
-                                            ? "text-gray-700"
+                                            ? "text-gray-700 hover:text-cust-primary-color"
                                             : "text-white"
-                                    }`}
+                                    } hover:underline underline-offset-8`}
                                 >
                                     {link.name}
                                 </a>
@@ -269,7 +267,13 @@ const Navbar = () => {
                                                 </div>
                                             </a>
                                         )}
-                                        <hr className="w-full "/>
+                                        <hr
+                                            className={`w-full ${
+                                                isScrolled
+                                                    ? "text-gray-700 hover:text-cust-primary-color"
+                                                    : "text-white"
+                                            } transition-all duration-300 ease-in-out`}
+                                        />
                                         <button
                                             onClick={handleLogout}
                                             className="flex items-center px-4 py-2 w-full font-medium text-red-500 hover:text-red-700 hover:bg-gray-100 cursor-pointer"
@@ -293,7 +297,11 @@ const Navbar = () => {
                     </div>
                     <button
                         onClick={() => setIsOpen(!isOpen)}
-                        className="lg:hidden text-2xl text-gray-700"
+                        className={`lg:hidden text-2xl ${
+                            isScrolled
+                                ? "text-gray-700 hover:text-cust-primary-color"
+                                : "text-white"
+                        }`}
                     >
                         <Icon icon={isOpen ? "mdi:close" : "mdi:menu"} />
                     </button>
@@ -307,20 +315,64 @@ const Navbar = () => {
             >
                 {auth?.user && (
                     <>
-                        <div className="text-center text-gray-700 font-medium mb-2">
+                        <div
+                            className={`text-center ${
+                                isScrolled
+                                    ? "text-gray-700 hover:text-cust-primary-color"
+                                    : "text-white"
+                            } font-medium mb-2`}
+                        >
                             Halo, {auth.user.name.split(" ")[0]}!
                         </div>
+                        {auth?.user.role != "siswa" && (
+                            <Button
+                                href="/admin-dashboard"
+                                variant="outlined"
+                                className="mb-2"
+                            >
+                                <div
+                                    className={`flex items-center justify-center gap-2 transition-colors duration-200 ${
+                                        url === "/admin-dashboard"
+                                            ? isScrolled
+                                                ? "text-cust-blue font-bold underline underline-offset-8 hover:text-cust-primary-color"
+                                                : "text-white font-bold underline underline-offset-8"
+                                            : isScrolled
+                                            ? "text-gray-700 hover:text-cust-primary-color"
+                                            : "text-white"
+                                    } hover:underline underline-offset-8`}
+                                >
+                                    <Icon icon="mdi:view-dashboard" />
+                                    <span>Admin</span>
+                                </div>
+                            </Button>
+                        )}
                         <Button
                             href="/dashboard"
                             variant="outlined"
                             className="mb-2"
                         >
-                            <div className="flex items-center justify-center gap-2">
+                            <div
+                                className={`flex items-center justify-center gap-2 transition-colors duration-200 ${
+                                    url === "/dashboard"
+                                        ? isScrolled
+                                            ? "text-cust-blue font-bold underline underline-offset-8 hover:text-cust-primary-color"
+                                            : "text-white font-bold underline underline-offset-8"
+                                        : isScrolled
+                                        ? "text-gray-700 hover:text-cust-primary-color"
+                                        : "text-white"
+                                } hover:underline underline-offset-8`}
+                            >
                                 <Icon icon="mdi:view-dashboard" />
                                 <span>Dashboard</span>
                             </div>
                         </Button>
-                        <hr className="w-2/3 h-1 rounded-full self-center" />
+                        <hr
+                            className={`w-2/3 h-1 rounded-full self-center ${
+                                isScrolled
+                                    ? "text-gray-700 hover:text-cust-primary-color"
+                                    : "text-white"
+                            } transition-all duration-300 ease-in-out`}
+                        />
                     </>
                 )}
 
@@ -331,9 +383,13 @@ const Navbar = () => {
                                 href={link.href}
                                 className={`block text-center font-medium rounded transition-colors duration-200 ${
                                     url === link.href
-                                        ? "text-cust-blue font-bold"
-                                        : "text-gray-700"
-                                }`}
+                                        ? isScrolled
+                                            ? "text-cust-blue font-bold underline underline-offset-8 hover:text-cust-primary-color"
+                                            : "text-white font-bold underline underline-offset-8"
+                                        : isScrolled
+                                        ? "text-gray-700 hover:text-cust-primary-color"
+                                        : "text-white"
+                                } hover:underline underline-offset-8`}
                             >
                                 {link.name}
                             </a>
@@ -341,7 +397,13 @@ const Navbar = () => {
                     ))}
                 </ul>
 
-                <hr className="w-2/3 h-1 rounded-full self-center" />
+                <hr
+                    className={`w-2/3 h-1 rounded-full self-center ${
+                        isScrolled
+                            ? "text-gray-700 hover:text-cust-primary-color"
+                            : "text-white"
+                    } transition-all duration-300 ease-in-out`}
+                />
 
                 <div className="">
                     {auth?.user ? (

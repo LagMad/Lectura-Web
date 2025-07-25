@@ -225,10 +225,6 @@ const Buku = ({ books, kategori, filters = {}, topRatedBooks }) => {
                url.startsWith('data:image/'); // Base64 images
     };
 
-    useEffect(() => {
-        console.log("books", books);
-    }, [books]);
-
     // Generate pagination buttons
     const renderPaginationButtons = () => {
         const currentPage = books.current_page;

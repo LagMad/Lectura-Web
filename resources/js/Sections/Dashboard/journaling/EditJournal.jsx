@@ -13,7 +13,7 @@ const EditJournal = ({ onClose, journal }) => {
 
     // Initialize form data with journal data when component mounts
     useEffect(() => {
-        console.log(journal);
+        // console.log(journal);
         if (journal) {
             setFormData({
                 halaman_awal: journal.halaman_awal || "",

@@ -20,42 +20,100 @@ const getId = (url) => {
 };
 
 /* --- Pagination UI sama seperti sebelumnya --- */
-const Pagination = ({ page, totalPages, onPageChange }) => (
-    <div className="flex items-center justify-between">
-        <div className="text-sm text-gray-700">
-            Halaman {page} dari {totalPages}
-        </div>
-        <div className="flex space-x-1">
-            <button
-                onClick={() => onPageChange(page - 1)}
-                disabled={page === 1}
-                className="px-3 py-2 text-sm text-gray-500 disabled:text-gray-300"
-            >
-                ‹
-            </button>
-            {Array.from({ length: totalPages }, (_, i) => (
+const Pagination = ({ page, totalPages, onPageChange }) => {
+    const generatePageNumbers = () => {
+        const delta = 2; // Number of pages to show around current page
+        const range = [];
+        const rangeWithDots = [];
+
+        // Always show first page
+        range.push(1);
+
+        // Calculate range around current page
+        for (let i = Math.max(2, page - delta); i <= Math.min(totalPages - 1, page + delta); i++) {
+            range.push(i);
+        }
+
+        // Always show last page (if totalPages > 1)
+        if (totalPages > 1) {
+            range.push(totalPages);
+        }
+
+        // Remove duplicates and sort
+        const uniqueRange = [...new Set(range)].sort((a, b) => a - b);
+
+        // Add ellipsis where there are gaps
+        let prev = 0;
+        for (const current of uniqueRange) {
+            if (current - prev === 2) {
+                rangeWithDots.push(prev + 1);
+            } else if (current - prev !== 1) {
+                rangeWithDots.push('...');
+            }
+            rangeWithDots.push(current);
+            prev = current;
+        }
+
+        return rangeWithDots;
+    };
+
+    const pageNumbers = generatePageNumbers();
+
+    return (
+        <div className="flex items-center justify-between">
+            <div className="text-sm text-gray-700">
+                Halaman {page} dari {totalPages}
+            </div>
+            <div className="flex space-x-1">
+                {/* Previous button */}
                 <button
-                    key={i + 1}
-                    onClick={() => onPageChange(i + 1)}
-                    className={`px-3 py-2 text-sm rounded ${
-                        page === i + 1
-                            ? "bg-blue-500 text-white"
-                            : "text-gray-500 hover:bg-gray-100"
-                    }`}
+                    onClick={() => onPageChange(page - 1)}
+                    disabled={page === 1}
+                    className="px-3 py-2 text-sm text-gray-500 disabled:text-gray-300 hover:bg-gray-100 disabled:hover:bg-transparent rounded"
                 >
-                    {i + 1}
+                    ‹
                 </button>
-            ))}
-            <button
-                onClick={() => onPageChange(page + 1)}
-                disabled={page === totalPages}
-                className="px-3 py-2 text-sm text-gray-500 disabled:text-gray-300"
-            >
-                ›
-            </button>
+
+                {/* Page numbers with ellipsis */}
+                {pageNumbers.map((pageNum, index) => {
+                    if (pageNum === '...') {
+                        return (
+                            <span
+                                key={`ellipsis-${index}`}
+                                className="px-3 py-2 text-sm text-gray-500"
+                            >
+                                ...
+                            </span>
+                        );
+                    }
+
+                    return (
+                        <button
+                            key={pageNum}
+                            onClick={() => onPageChange(pageNum)}
+                            className={`px-3 py-2 text-sm rounded ${
+                                page === pageNum
+                                    ? "bg-blue-500 text-white"
+                                    : "text-gray-500 hover:bg-gray-100"
+                            }`}
+                        >
+                            {pageNum}
+                        </button>
+                    );
+                })}
+
+                {/* Next button */}
+                <button
+                    onClick={() => onPageChange(page + 1)}
+                    disabled={page === totalPages}
+                    className="px-3 py-2 text-sm text-gray-500 disabled:text-gray-300 hover:bg-gray-100 disabled:hover:bg-transparent rounded"
+                >
+                    ›
+                </button>
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 /* --------------- MAIN --------------- */
 const MediaLibrary = ({ videos }) => {

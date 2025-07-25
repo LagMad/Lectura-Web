@@ -6,9 +6,7 @@ const Footer = () => {
         <footer className="bg-cust-secondary-color text-white pt-10 pb-20">
             <div className="container mx-auto">
                 <div className="flex flex-col xl:flex-row justify-between items-center gap-8">
-                    <a
-                        href="/"
-                    >
+                    <a href="/">
                         <img
                             src={"/Logo-lectura-full-transparent-white.svg"}
                             className="w-auto h-40"
@@ -16,28 +14,23 @@ const Footer = () => {
                     </a>
                     <div className="flex flex-col md:flex-row justify-center items-center gap-20">
                         <div className="gap-8">
-                            <ul className="space-y-3 text-sm text-gray-300">
-                                <li>
-                                    <a className="hover:underline underline-offset-4 text-white hover:text-cust-primary-color transition-all duration-300 ease-in-out cursor-pointer">
-                                        Beranda
-                                    </a>
-                                </li>
-                                <li>
-                                    <a className="hover:underline underline-offset-4 text-white hover:text-cust-primary-color transition-all duration-300 ease-in-out cursor-pointer">
-                                        Buku
-                                    </a>
-                                </li>
-                                <li>
-                                    <a className="hover:underline underline-offset-4 text-white hover:text-cust-primary-color transition-all duration-300 ease-in-out cursor-pointer">
-                                        Bantuan
-                                    </a>
-                                </li>
-                                <li>
-                                    <a className="hover:underline underline-offset-4 text-white hover:text-cust-primary-color transition-all duration-300 ease-in-out cursor-pointer">
-                                        Tentang
-                                    </a>
-                                </li>
-                            </ul>
+                            <div className="grid grid-cols-2 md:grid-cols-1 text-sm text-gray-300 gap-5">
+                                <a className="text-center md:text-left hover:underline underline-offset-4 text-white hover:text-cust-primary-color transition-all duration-300 ease-in-out cursor-pointer">
+                                    Beranda
+                                </a>
+
+                                <a className="text-center md:text-left hover:underline underline-offset-4 text-white hover:text-cust-primary-color transition-all duration-300 ease-in-out cursor-pointer">
+                                    Buku
+                                </a>
+
+                                <a className="text-center md:text-left hover:underline underline-offset-4 text-white hover:text-cust-primary-color transition-all duration-300 ease-in-out cursor-pointer">
+                                    Bantuan
+                                </a>
+
+                                <a className="text-center md:text-left hover:underline underline-offset-4 text-white hover:text-cust-primary-color transition-all duration-300 ease-in-out cursor-pointer">
+                                    Tentang
+                                </a>
+                            </div>
                         </div>
                         <div className="flex flex-col italic text-sm text-gray-300 relative max-w-md">
                             <Icon
