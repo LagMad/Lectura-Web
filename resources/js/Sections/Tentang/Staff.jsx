@@ -28,46 +28,54 @@ const Staff = ({ staff }) => {
                     </p>
                 </div>
 
-                {kepala && (
-                    <div className="flex flex-col items-center hover:scale-105 transition-all ease-in-out">
-                        <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden mb-4">
-                            <img
-                                src={kepala.photo_path || "/anonym.png"}
-                                alt={`Kepala Perpustakaan - ${kepala.nama}`}
-                                className="w-full h-full object-cover object-top"
-                            />
+                {staff.length > 1 ? (
+                    <>
+                        {kepala && (
+                            <div className="flex flex-col items-center hover:scale-105 transition-all ease-in-out">
+                                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden mb-4">
+                                    <img
+                                        src={kepala.photo_path || "/anonym.png"}
+                                        alt={`Kepala Perpustakaan - ${kepala.nama}`}
+                                        className="w-full h-full object-cover object-top"
+                                    />
+                                </div>
+                                <h3 className="font-semibold text-base sm:text-lg">
+                                    {kepala.nama}
+                                </h3>
+                                <h5 className="font-normal text-xs sm:text-sm text-gray-500">
+                                    {kepala.jabatan}
+                                </h5>
+                            </div>
+                        )}
+
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-10 justify-items-center">
+                            {lain.map((s) => (
+                                <div
+                                    key={s.id}
+                                    className="flex flex-col items-center hover:scale-105 transition-all ease-in-out"
+                                >
+                                    <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden mb-4">
+                                        <img
+                                            src={s.photo_path || "/anonym.png"}
+                                            alt={`Foto ${s.nama}`}
+                                            className="w-full h-full object-cover object-top"
+                                        />
+                                    </div>
+                                    <h3 className="font-semibold text-base sm:text-lg text-center">
+                                        {s.nama}
+                                    </h3>
+                                    <h5 className="font-normal text-xs sm:text-sm text-center text-gray-500">
+                                        {s.jabatan}
+                                    </h5>
+                                </div>
+                            ))}
                         </div>
-                        <h3 className="font-semibold text-base sm:text-lg">
-                            {kepala.nama}
-                        </h3>
-                        <h5 className="font-normal text-xs sm:text-sm text-gray-500">
-                            {kepala.jabatan}
-                        </h5>
+                    </>
+                ) : (
+                    <div className="text-center py-8 text-gray-500 col-span-5">
+                        Belum ada staff.
                     </div>
                 )}
-
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-10 justify-items-center">
-                    {lain.map((s) => (
-                        <div
-                            key={s.id}
-                            className="flex flex-col items-center hover:scale-105 transition-all ease-in-out"
-                        >
-                            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden mb-4">
-                                <img
-                                    src={s.photo_path || "/anonym.png"}
-                                    alt={`Foto ${s.nama}`}
-                                    className="w-full h-full object-cover object-top"
-                                />
-                            </div>
-                            <h3 className="font-semibold text-base sm:text-lg text-center">
-                                {s.nama}
-                            </h3>
-                            <h5 className="font-normal text-xs sm:text-sm text-center text-gray-500">
-                                {s.jabatan}
-                            </h5>
-                        </div>
-                    ))}
-                </div>
             </div>
         </section>
     );

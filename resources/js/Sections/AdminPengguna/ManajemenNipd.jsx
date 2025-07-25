@@ -493,6 +493,10 @@ export default function ManajemenNipd({ nipdList = [] }) {
         setDeleteModal({ isOpen: false, nipd: null });
     };
 
+    useEffect(() => {
+        console.log("nipdList", nipdList);
+    }, [nipdList]);
+
     return (
         <section className="flex flex-col w-full mx-auto pt-8 px-4 sm:px-6 lg:px-8 gap-5 font-[poppins]">
             <Head title="Manajemen NIPD" />
