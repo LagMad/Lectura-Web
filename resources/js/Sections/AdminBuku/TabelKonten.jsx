@@ -160,7 +160,7 @@ const TabelKonten = ({ books }) => {
         <div className="p-6">
             {/* Header */}
             <div className="flex flex-col lg:flex-row items-center justify-between mb-6 gap-2">
-                <h2 className="text-2xl font-semibold text-gray-900">
+                <h2 className="text-2xl font-semibold text-gray-900 text-center md:text-left">
                     Konten menurut Tahun Akademik
                 </h2>
                 <div className="relative flex w-full md:w-auto">

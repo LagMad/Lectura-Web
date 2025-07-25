@@ -65,7 +65,7 @@ const Dropdown = ({ value, onChange, options }) => (
     <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
+        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white w-full md:w-fit"
     >
         {options.map((option) => (
             <option key={option} value={option}>
@@ -694,8 +694,8 @@ export default function ManajemenFaq({ faqList = [] }) {
         <section className="flex flex-col w-full mx-auto pt-8 px-4 sm:px-6 lg:px-8 gap-5 font-[poppins]">
             <Head title="Manajemen FAQ" />
 
-            <div className="flex flex-row justify-between items-center">
-                <div className="">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-3">
+                <div className="text-center md:text-left">
                     <h2 className="text-2xl font-bold">Managemen FAQ</h2>
                     <p className="text-sm text-gray-500">
                         Kelola pertanyaan yang sering diajukan oleh pengguna
@@ -703,7 +703,7 @@ export default function ManajemenFaq({ faqList = [] }) {
                 </div>{" "}
                 <button
                     onClick={() => setAddModal(true)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center text-sm"
+                    className="w-full md:w-fit bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex justify-center items-center text-sm"
                 >
                     <Plus size={16} className="mr-1" /> Tambah FAQ
                 </button>
@@ -726,7 +726,7 @@ export default function ManajemenFaq({ faqList = [] }) {
                     />
                 </div>
 
-                <div className="flex gap-3">
+                <div className="flex justify-between gap-3">
                     <Dropdown
                         value={state.date}
                         onChange={(v) =>

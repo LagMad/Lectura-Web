@@ -257,7 +257,7 @@ export default function ManajemenPoster({ posters = [] }) {
         <section className="p-6">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-5">
-                <div>
+                <div className="text-center md:text-left">
                     <h2 className="text-2xl font-bold">Manajemen Poster</h2>
                     <p className="text-sm text-gray-500">
                         Kelola poster untuk ditampilkan di beranda.
@@ -267,7 +267,7 @@ export default function ManajemenPoster({ posters = [] }) {
                     onClick={() => {
                         setModal({ type: "add", item: null });
                     }}
-                    className="inline-flex items-center gap-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                    className="w-full md:w-full inline-flex justify-center items-center gap-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
                 >
                     <Plus className="w-4 h-4" /> Tambah Poster
                 </button>

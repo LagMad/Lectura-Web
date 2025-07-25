@@ -497,7 +497,7 @@ export default function ManajemenNipd({ nipdList = [] }) {
         <section className="flex flex-col w-full mx-auto pt-8 px-4 sm:px-6 lg:px-8 gap-5 font-[poppins]">
             <Head title="Manajemen NIPD" />
 
-            <div className="flex flex-row justify-between items-center">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-3 text-center md:text-left">
                 <div className="">
                     <h2 className="text-2xl font-bold">Manajemen NIPD</h2>
                     <p className="text-sm text-gray-500">
@@ -506,7 +506,7 @@ export default function ManajemenNipd({ nipdList = [] }) {
                 </div>
                 <button
                     onClick={() => setAddModal(true)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center text-sm"
+                    className="w-full md:w-fit bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex justify-center items-center text-sm"
                 >
                     <Plus size={16} className="mr-1" /> Tambah NIPD
                 </button>
