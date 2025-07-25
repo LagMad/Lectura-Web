@@ -73,8 +73,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         return Inertia::render('Admin/Pengaturan');
     });
 
-    Route::post('/admin-pengguna', [PenggunaController::class, 'store'])->name('users.store');
-    Route::get('/tambah-pengguna', [PenggunaController::class, 'create'])->name('admin.users.create');
+    // Route::post('/admin-pengguna', [PenggunaController::class, 'store'])->name('users.store');
+    // Route::get('/tambah-pengguna', [PenggunaController::class, 'create'])->name('admin.users.create');
     Route::resource('nipd', NIPDController::class);
 
     Route::post('/kategori', [KategoriController::class, 'store'])->name('kategori.store');
