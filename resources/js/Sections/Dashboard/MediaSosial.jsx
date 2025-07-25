@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Input from "../../Components/ui/Input";
-import Button from "../../Components/ui/Button";
+import Button from "../../Components/Button";
 import {
     AiFillTwitterCircle,
     AiFillInstagram,
@@ -41,11 +41,11 @@ const MediaSosial = ({ auth }) => {
     return (
         <form
             onSubmit={submit}
-            className="flex flex-col gap-16 w-full bg-white p-10 rounded-2xl"
+            className="flex flex-col gap-10 w-full bg-white p-10 rounded-2xl"
         >
             <div className="flex flex-col gap-5 w-full">
                 <div className="text-3xl font-bold">Media Sosial</div>
-                <div className="flex flex-col lg:w-1/2 gap-5">
+                <div className="flex flex-col lg:w-full gap-5">
                     <Input
                         name={"Instagram"}
                         isSocialMedia={true}
@@ -84,7 +84,7 @@ const MediaSosial = ({ auth }) => {
                 </div>
             </div>
             <div className="relative">
-                <div className="w-1/2">
+                <div className="w-full">
                     <TextInput
                         id="password"
                         type="password"
@@ -98,8 +98,9 @@ const MediaSosial = ({ auth }) => {
                 </div>
                 <InputError message={errors.password} className="mt-2" />
             </div>
-            <div className="w-full md:w-auto">
+            <div className="w-full md:w-auto ml-auto">
                 <Button
+                    variant="filled"
                     className={"w-full md:w-auto text-center justify-center"}
                 >
                     Simpan

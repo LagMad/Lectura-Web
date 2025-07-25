@@ -85,7 +85,7 @@ export default function AdminLayout({
                 </div>
             </nav>
 
-            <div className="flex flex-1 z-0">
+            <div className="flex z-0">
                 {/* Overlay for mobile - only visible when sidebar is open */}
                 {isSidebarOpen && (
                     <div

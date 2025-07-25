@@ -33,7 +33,7 @@ export default function KataSandi({ auth }) {
 
             <h2 className="text-3xl font-bold mb-6">Ubah Kata Sandi</h2>
 
-            <form onSubmit={submit} className="space-y-6">
+            <form onSubmit={submit} className="space-y-6 w-full">
                 <div>
                     <TextInput
                         id="current_password"
@@ -92,7 +92,14 @@ export default function KataSandi({ auth }) {
                     </div>
                 )}
 
-                <Button variant="filled" disabled={processing}>Simpan</Button>
+                <div className="w-full md:w-fit self-end ml-auto">
+                    <Button
+                        variant="filled"
+                        className="w-full text-center justify-center"
+                    >
+                        Simpan
+                    </Button>
+                </div>
             </form>
         </div>
     );

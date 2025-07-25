@@ -57,7 +57,7 @@ const Dashboard = ({
 
     return (
         <Layout>
-            <div className="relative flex flex-col lg:flex-row justify-center items-start gap-10 min-h-screen px-5 md:px-20 py-40 bg-[#F5F5F5]">
+            <div className="relative flex flex-col lg:flex-row justify-center items-start gap-10 min-h-screen px-5 md:px-20 pt-28 pb-10 bg-[#F5F5F5]">
                 <div className="flex md:sticky top-24 flex-col justify-start items-start gap-8 bg-white p-10 rounded-2xl w-full lg:w-1/5">
                     <div className="flex flex-col justify-center items-center gap-3 w-full">
                         <img

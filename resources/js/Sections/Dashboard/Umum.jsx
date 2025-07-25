@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Input from "../../Components/ui/Input";
-import Button from "../../Components/ui/Button";
+import Button from "@/Components/Button";
 import { useForm } from "@inertiajs/inertia-react";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
@@ -59,7 +59,7 @@ const Umum = ({ auth }) => {
                 </div>
             </div>
             <div className="relative">
-                <div className="w-1/2">
+                <div className="w-full">
                     <TextInput
                         id="password"
                         type="password"
@@ -73,8 +73,9 @@ const Umum = ({ auth }) => {
                 </div>
                 <InputError message={errors.password} className="mt-2" />
             </div>
-            <div className="w-full md:w-auto">
+            <div className="w-full md:w-auto ml-auto">
                 <Button
+                variant="filled"
                     className={"w-full md:w-auto text-center justify-center"}
                 >
                     Simpan

@@ -87,34 +87,38 @@ const TabelKonten = ({ books }) => {
         totalEntries === 0 ? 0 : (currentPage - 1) * entriesPerPage + 1;
     const endEntry = Math.min(currentPage * entriesPerPage, totalEntries);
 
-    // Generate pagination numbers
-    const getPaginationNumbers = () => {
-        if (totalPages <= 1) return [1];
-
-        const delta = 2;
+    // Improved pagination numbers with ellipsis
+    const generatePageNumbers = () => {
+        const delta = 2; // Number of pages to show around current page
         const range = [];
         const rangeWithDots = [];
 
-        for (
-            let i = Math.max(2, currentPage - delta);
-            i <= Math.min(totalPages - 1, currentPage + delta);
-            i++
-        ) {
+        // Always show first page
+        range.push(1);
+
+        // Calculate range around current page
+        for (let i = Math.max(2, currentPage - delta); i <= Math.min(totalPages - 1, currentPage + delta); i++) {
             range.push(i);
         }
 
-        if (currentPage - delta > 2) {
-            rangeWithDots.push(1, "...");
-        } else {
-            rangeWithDots.push(1);
+        // Always show last page (if totalPages > 1)
+        if (totalPages > 1) {
+            range.push(totalPages);
         }
 
-        rangeWithDots.push(...range);
+        // Remove duplicates and sort
+        const uniqueRange = [...new Set(range)].sort((a, b) => a - b);
 
-        if (currentPage + delta < totalPages - 1) {
-            rangeWithDots.push("...", totalPages);
-        } else if (totalPages > 1) {
-            rangeWithDots.push(totalPages);
+        // Add ellipsis where there are gaps
+        let prev = 0;
+        for (const current of uniqueRange) {
+            if (current - prev === 2) {
+                rangeWithDots.push(prev + 1);
+            } else if (current - prev !== 1) {
+                rangeWithDots.push('...');
+            }
+            rangeWithDots.push(current);
+            prev = current;
         }
 
         return rangeWithDots;
@@ -379,7 +383,7 @@ const TabelKonten = ({ books }) => {
                     </tbody>
                 </table>
 
-                {/* Pagination */}
+                {/* Improved Pagination with Ellipsis */}
                 <div className="flex sticky left-0 items-center justify-between mt-6 px-6 py-3">
                     <p className="text-sm text-gray-700">
                         Data {startEntry} - {endEntry} dari {totalEntries}{" "}
@@ -414,28 +418,32 @@ const TabelKonten = ({ books }) => {
                                 <ChevronLeft className="w-4 h-4" />
                             </button>
 
-                            {getPaginationNumbers().map((page, index) => (
-                                <React.Fragment key={index}>
-                                    {page === "..." ? (
-                                        <span className="px-3 py-2 text-sm text-gray-400">
+                            {generatePageNumbers().map((pageNum, index) => {
+                                if (pageNum === '...') {
+                                    return (
+                                        <span
+                                            key={`ellipsis-${index}`}
+                                            className="px-3 py-2 text-sm text-gray-400"
+                                        >
                                             ...
                                         </span>
-                                    ) : (
-                                        <button
-                                            onClick={() =>
-                                                setCurrentPage(page)
-                                            }
-                                            className={`px-3 py-2 text-sm rounded-md ${
-                                                currentPage === page
-                                                    ? "bg-blue-600 text-white"
-                                                    : "text-gray-700 hover:bg-gray-100"
-                                            }`}
-                                        >
-                                            {page}
-                                        </button>
-                                    )}
-                                </React.Fragment>
-                            ))}
+                                    );
+                                }
+
+                                return (
+                                    <button
+                                        key={pageNum}
+                                        onClick={() => setCurrentPage(pageNum)}
+                                        className={`px-3 py-2 text-sm rounded-md ${
+                                            currentPage === pageNum
+                                                ? "bg-blue-600 text-white"
+                                                : "text-gray-700 hover:bg-gray-100"
+                                        }`}
+                                    >
+                                        {pageNum}
+                                    </button>
+                                );
+                            })}
 
                             <button
                                 onClick={() =>

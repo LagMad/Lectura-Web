@@ -36,7 +36,49 @@ const Modal = ({ show, onClose, children }) => {
 
 /* ------------ Pagination helper ------------- */
 const ITEMS_PER_PAGE = 10;
-function Pagination({ page, totalPages, onChange }) {
+const Pagination = ({ page, totalPages, onChange }) => {
+    const generatePageNumbers = () => {
+        const delta = 2; // Number of pages to show around current page
+        const range = [];
+        const rangeWithDots = [];
+
+        // Always show first page
+        range.push(1);
+
+        // Calculate range around current page
+        for (
+            let i = Math.max(2, page - delta);
+            i <= Math.min(totalPages - 1, page + delta);
+            i++
+        ) {
+            range.push(i);
+        }
+
+        // Always show last page (if totalPages > 1)
+        if (totalPages > 1) {
+            range.push(totalPages);
+        }
+
+        // Remove duplicates and sort
+        const uniqueRange = [...new Set(range)].sort((a, b) => a - b);
+
+        // Add ellipsis where there are gaps
+        let prev = 0;
+        for (const current of uniqueRange) {
+            if (current - prev === 2) {
+                rangeWithDots.push(prev + 1);
+            } else if (current - prev !== 1) {
+                rangeWithDots.push("...");
+            }
+            rangeWithDots.push(current);
+            prev = current;
+        }
+
+        return rangeWithDots;
+    };
+
+    const pageNumbers = generatePageNumbers();
+
     return (
         <div className="flex sticky left-0 items-center justify-between px-6 py-3">
             <div className="text-sm text-gray-700">
@@ -46,34 +88,49 @@ function Pagination({ page, totalPages, onChange }) {
                 <button
                     onClick={() => onChange(page - 1)}
                     disabled={page === 1}
-                    className="px-3 py-2 text-sm text-gray-500 disabled:text-gray-300"
+                    className="px-3 py-2 text-sm text-gray-500 disabled:text-gray-300 hover:bg-gray-100 disabled:hover:bg-transparent rounded"
                 >
                     ‹
                 </button>
-                {Array.from({ length: totalPages }, (_, i) => (
-                    <button
-                        key={i + 1}
-                        onClick={() => onChange(i + 1)}
-                        className={`px-3 py-2 text-sm rounded ${
-                            page === i + 1
-                                ? "bg-blue-500 text-white"
-                                : "text-gray-500 hover:bg-gray-100"
-                        }`}
-                    >
-                        {i + 1}
-                    </button>
-                ))}
+
+                {pageNumbers.map((pageNum, index) => {
+                    if (pageNum === "...") {
+                        return (
+                            <span
+                                key={`ellipsis-${index}`}
+                                className="px-3 py-2 text-sm text-gray-500"
+                            >
+                                ...
+                            </span>
+                        );
+                    }
+
+                    return (
+                        <button
+                            key={pageNum}
+                            onClick={() => onChange(pageNum)}
+                            className={`px-3 py-2 text-sm rounded ${
+                                page === pageNum
+                                    ? "bg-blue-500 text-white"
+                                    : "text-gray-500 hover:bg-gray-100"
+                            }`}
+                        >
+                            {pageNum}
+                        </button>
+                    );
+                })}
+
                 <button
                     onClick={() => onChange(page + 1)}
                     disabled={page === totalPages}
-                    className="px-3 py-2 text-sm text-gray-500 disabled:text-gray-300"
+                    className="px-3 py-2 text-sm text-gray-500 disabled:text-gray-300 hover:bg-gray-100 disabled:hover:bg-transparent rounded"
                 >
                     ›
                 </button>
             </div>
         </div>
     );
-}
+};
 
 /* ------------------------------------------------------------------
    MAIN COMPONENT
@@ -245,7 +302,7 @@ export default function ManajemenWeb({ web = [] }) {
                 <table className="min-w-full text-sm">
                     <thead className="bg-gray-50">
                         {[
-                            "#",
+                            "ID",
                             "Gambar",
                             "Nama",
                             "Deskripsi",
@@ -365,11 +422,13 @@ export default function ManajemenWeb({ web = [] }) {
                     </tbody>
                 </table>
                 {/* Pagination */}
-                <Pagination
-                    page={page}
-                    totalPages={totalPages}
-                    onChange={setPage}
-                />
+                {web.length > ITEMS_PER_PAGE && (
+                    <Pagination
+                        page={page}
+                        totalPages={totalPages}
+                        onChange={setPage}
+                    />
+                )}
             </div>
 
             {/* ------------------ ADD / EDIT MODAL ------------------ */}
