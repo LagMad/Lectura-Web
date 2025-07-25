@@ -8,20 +8,15 @@ import WebPortal from "@/Sections/Tentang/WebPortal";
 import React, { useEffect } from "react";
 
 const Tentang = ({ staff, books, user, videos, web }) => {
-
-    useEffect(() => {
-        console.log("web", web)
-    }, [web])
-
     return (
         <Layout>
             <div className="">
-                <Hero staff={staff} books={books} user={user}/>
+                <Hero staff={staff} books={books} user={user} />
                 {/* <Pelayanan /> */}
-                <Staff staff={staff}/>
-                <MediaLibrary videos={videos}/>
+                <Staff staff={staff} />
+                <MediaLibrary videos={videos} />
                 <Mitra />
-                <WebPortal web={web}/>
+                <WebPortal web={web} />
             </div>
         </Layout>
     );

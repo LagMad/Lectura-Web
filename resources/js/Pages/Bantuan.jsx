@@ -21,10 +21,6 @@ const Bantuan = ({ faqList }) => {
         return matchQuery && matchCategory;
     });
 
-    useEffect(() => {
-        console.log("faqlist", faqList)
-    }, [faqList])
-
     return (
         <Layout title="Bantuan">
             <Hero searchQuery={searchQuery} setSearchQuery={setSearchQuery} />

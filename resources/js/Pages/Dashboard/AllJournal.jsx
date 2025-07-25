@@ -57,10 +57,6 @@ const AllJournal = ({ auth, journals, categories, stats, filters }) => {
         }
     ];
 
-    useEffect(() => {
-        console.log("journals", journals)
-    }, [journals])
-
     return (
         <div className="container py-10 bg-gray-50 min-h-screen font-[poppins] space-y-6">
             <div className="flex items-center">

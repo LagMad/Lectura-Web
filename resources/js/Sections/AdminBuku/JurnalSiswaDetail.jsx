@@ -22,14 +22,6 @@ const JurnalSiswaDetail = ({ book, siswa, totalPages = 1 }) => {
         }
     }, [siswa]);
 
-    useEffect(() => {
-        console.log("book", book);
-    }, [book]);
-
-    useEffect(() => {
-        console.log("siswa", siswa);
-    }, [siswa]);
-
     const fetchStudents = async (page = 1, query = "") => {
         setLoading(true);
         try {

@@ -158,7 +158,6 @@ const Journaling = ({ books, jurnaling }) => {
     };
 
     useEffect(() => {
-        console.log("jurnaling data:", jurnaling);
 
         // Transform jurnaling data ke format yang dibutuhkan JournalCard
         if (jurnaling) {

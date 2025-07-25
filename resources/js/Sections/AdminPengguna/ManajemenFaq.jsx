@@ -361,10 +361,6 @@ const EditModal = ({ faq, isOpen, onClose, onSave }) => {
 const AddModal = ({ isOpen, onClose }) => {
     const { auth } = usePage().props;
 
-    useEffect(() => {
-        console.log("auth", auth);
-    }, [auth]);
-
     const { data, setData, post, processing, errors, reset } = useForm({
         nama: "",
         nipd: auth?.user.nipd,
